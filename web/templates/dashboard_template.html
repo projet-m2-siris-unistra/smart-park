@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord{% endblock %}
+{% block content %}
+
+<div class="dashboard-widgets ">
+
+    <!-- Graphic -->
+    {% include "graphic_widget.html" %}
+    <!-- Summary Widgets -->
+    {% include "summary_widget.html" %}
+    <!-- Parking widgets -->
+    <br>
+    {% include "parking_widget.html" %}
+    {% include "parking_widget.html" %}
+    {% include "parking_widget.html" %}
+    {% include "parking_widget.html" %}
+    {% include "parking_widget.html" %}
+    {% include "parking_widget.html" %}
+    
+</div>
+
+{% endblock %}

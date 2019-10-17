@@ -1,0 +1,71 @@
+
+.widget-text {
+    margin-bottom: 3px;
+}
+
+h4 {
+    font-weight: bold;
+}
+
+.bx--btn {
+    margin-top: 5px;
+    margin-right: 10px;
+}
+
+.dashboard-widgets {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+.graphic-widget {
+    min-height: 233px;
+    display: inline-block;
+    margin-right: 20px;
+    min-width: 285px;
+    width: 65%;
+}
+
+.summary-widget {
+    min-width: 285px;
+    width: 30%;
+    min-height: 94px;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.parking-widget {
+    width: 285px;
+    overflow: auto;
+    display: inline-block;
+    margin-right: 20px;
+    margin-left: auto;
+    margin-top: 20px;
+}
+
+.parking-widget-status-btn {
+    margin: 0;
+}
+
+/* DASHBOARD MEDIA QUERY */
+@media screen and (max-width: 1210px){
+    .dashboard-widgets {
+        margin: 0;
+    }
+    .graphic-widget {
+        width: 100%;
+    }
+    .summary-widget {
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+}
+
+
+.login-formular {
+    text-align: center;
+    padding: 15px;
+    max-width: 450px;
+    display: block;
+    margin: auto;
+}

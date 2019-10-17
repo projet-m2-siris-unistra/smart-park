@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+
+<form class="login-formular" action="/login-check" method="post">
+    
+    <h3>Formulaire de connexion</h3>
+
+    <br>
+
+    <div class="bx--form-item bx--text-input-wrapper">
+            <label for="text-input-3" class="bx--label">Identifiant</label>
+            <div class="bx--text-input__field-wrapper">
+              <input name="login" id="text-input-3" type="text" class="bx--text-input" placeholder="Indentifiant">
+            </div>
+    </div>
+
+    <div class="bx--form-item bx--text-input-wrapper">
+        <label for="text-input-3" class="bx--label">Mot de passe</label>
+        <div class="bx--text-input__field-wrapper">
+            <input name="passwd" id="text-input-3" type="password" class="bx--text-input" placeholder="Password ">
+        </div>
+    </div>
+    <br>
+    <button class="bx--btn bx--btn--primary" type="submit">
+        Connexion
+    </button>
+
+</form>
+
+{% endblock %}
