@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Zones de parkings{% endblock %}
+
 {% block content %}
 
 <div class="bx--data-table-container " data-table>
@@ -93,8 +94,10 @@
     <table class="bx--data-table tr bx--data-table--sort" >
         <thead>
             <tr>
-                <th class="bx--table-column-checkbox">
-                    <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--accordion__arrow" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M11 8L6 13 5.3 12.3 9.6 8 5.3 3.7 6 3z"></path></svg>                    
+                <th  class="bx--table-expand" data-event="expandAll">
+                        <!-- checkbox th -->
+                        <!-- sortable th  -->
+                        <span class="bx--table-header-label"></span>
                 </th>
                 <th  class="bx--table-column-checkbox">
                     <!-- checkbox th -->
@@ -169,11 +172,16 @@
 
 
         <!-- HERE COMES THE INCLUSION OF THE ELEMENTS -->
+
+        
         <tbody>
 
             {% include "zone_element.html" %}
 
         </tbody>
+
+
+        <!------------------------------------------------>
 
     </table>
 

@@ -1,0 +1,15 @@
+FROM python:3.5
+LABEL maintainer="Lionel Jung <lionel.jung@etu.unistra.fr>"
+
+# à modifier
+ADD . /code
+RUN pip3 install sanic
+
+# install requirements
+
+EXPOSE 8080
+
+# à modifier
+WORKDIR /code
+
+CMD ["python", "hello.py"]

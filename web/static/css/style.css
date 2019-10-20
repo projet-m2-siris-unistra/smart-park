@@ -23,21 +23,23 @@ h4 {
     margin-right: 20px;
     min-width: 285px;
     width: 65%;
+    margin-top: 20px;
 }
 
 .summary-widget {
     min-width: 285px;
     width: 30%;
-    min-height: 94px;
+    min-height: 233px;
     margin-top: 20px;
-    display: inline-block;
+    /*display: inline-block;*/
+    float: right;
 }
 
 .parking-widget {
     width: 285px;
     overflow: auto;
     display: inline-block;
-    margin-right: 20px;
+    margin-right: 20px; /* auto not working */
     margin-left: auto;
     margin-top: 20px;
 }
@@ -58,11 +60,12 @@ h4 {
         margin-left: auto;
         margin-right: auto;
         display: block;
+        float: none;
     }
 }
 
 
-.login-formular {
+.sp-formular {
     text-align: center;
     padding: 15px;
     max-width: 450px;

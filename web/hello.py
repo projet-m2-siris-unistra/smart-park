@@ -1,6 +1,8 @@
 from sanic import Sanic
 from sanic import response
+from sanic.response import json
 from jinja2 import Environment, PackageLoader, select_autoescape
+
 
 app = Sanic(__name__)
 
@@ -16,11 +18,12 @@ base_template = template_env.get_template("base_template.html")
 dashboard_template = template_env.get_template("dashboard_template.html")
 zones_template = template_env.get_template("zones_template.html")
 login_template = template_env.get_template("login_template.html")
+signup_template = template_env.get_template("signup_template.html")
 
 app.static("/static", "./static")
 
 @app.route('/')
-@app.route('/acceuil')
+@app.route('/home')
 async def welcome(request):
     rendered_template = await base_template.render_async(
         knights='BIENVENUE SUR SMART PARK !')
@@ -41,8 +44,31 @@ async def login(request):
     rendered_template = await login_template.render_async()
     return response.html(rendered_template)
 
-@app.route('/login-check', methods=['POST'])
+@app.route('/login-check', methods=["POST"])
 async def login_check(request):
-    return response.text(request.args)
+        return json({
+        "parsed": True,
+        "url": request.url,
+        "query_string": request.query_string,
+        "args": request.args,
+        "raw_args": request.raw_args,
+        "query_args": request.query_args,
+    })
+
+@app.route('/signup-check', methods=["POST"])
+async def login_check(request):
+        return json({
+        "parsed": True,
+        "url": request.url,
+        "query_string": request.query_string,
+        "args": request.args,
+        "raw_args": request.raw_args,
+        "query_args": request.query_args,
+    })
+
+@app.route('/signup')
+async def login(request):
+    rendered_template = await signup_template.render_async()
+    return response.html(rendered_template)
 
 app.run(host="0.0.0.0", port=8080, debug=True)
