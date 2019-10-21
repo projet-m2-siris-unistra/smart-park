@@ -1,0 +1,10 @@
+<h4>Zone GARE1</h4>
+<br>
+<div class="tabs">
+    <ul>
+        <li {% if active_tab_view %}class="is-active"{% endif %}><a href="/parking/{{ zone }}/overview">Vue d'ensemble</a></li>
+        <li {% if active_tab_list %}class="is-active"{% endif %}><a href="/parking/{{ zone }}/spots">Liste des places</a></li>
+        <li {% if active_tab_stats %}class="is-active"{% endif %}><a href="/parking/{{ zone }}/statistics">Statistiques</a></li>
+        <li {% if active_tab_config %}class="is-active"{% endif %}><a href="/parking/{{ zone }}/configuration">Configuration</a></li>
+    </ul>
+</div>
