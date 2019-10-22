@@ -80,7 +80,6 @@ async def login(request):
 
 
 
-
 # Handling Parkings zones
 @app.route('/parking/<zone>')
 @app.route('/parking/<zone>/overview')
