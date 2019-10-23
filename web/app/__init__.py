@@ -18,19 +18,19 @@ app.blueprint(zones.bp)
 # Handling navigation
 @app.route('/')
 @app.route('/home')
-async def welcome(request):
-    rendered_template = await render('base_template.html',
+async def home(request):
+    rendered_template = await render('base_template.html', request,
         knights='BIENVENUE SUR SMART PARK !')
     return response.html(rendered_template)
 
 @app.route('/dashboard')
 async def dashboard(request):
-    rendered_template = await render('dashboard_template.html')
+    rendered_template = await render('dashboard_template.html', request)
     return response.html(rendered_template)
 
 @app.route('/zones')
 async def zones(request):
-    rendered_template = await render('zones_template.html')
+    rendered_template = await render('zones_template.html', request)
     return response.html(rendered_template)
 
 def run():

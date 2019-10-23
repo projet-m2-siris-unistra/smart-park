@@ -13,6 +13,11 @@ def get(name):
         cache[name] = env.get_template(name)
     return cache[name]
 
-async def render(name, *args, **kwargs):
+async def render(name, request, **context):
     tmpl = get(name)
-    return await tmpl.render_async(*args, **kwargs)
+    return await tmpl.render_async(
+        request=request,
+        url_for=request.app.url_for,
+        app=request.app,
+        **context,
+    )
