@@ -6,14 +6,13 @@
 
     {% if active_tab_view %}
         {% include "graphic_widget.html" %}
-        {% include "summary_widget.html" %}
+        {% include "zone_summary_widget.html" %}
     {% elif active_tab_list %}
-        {% include "summary_widget.html" %}
+        {% include "zone_summary_widget.html" %}
     {% elif active_tab_stats %}
-        {% include "summary_widget.html" %}
+            {% include "stats_widget.html" %}
     {% elif active_tab_config %}
-        {% include "summary_widget.html" %}
+        {% include "zone_summary_widget.html" %}
     {% endif %}
-
 
 {% endblock %}

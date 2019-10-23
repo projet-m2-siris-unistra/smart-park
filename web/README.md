@@ -1,6 +1,3 @@
-# Configuration du front-end
-Access to front-end: 0.0.0.0:8080
-
 ## Installation du framework
 pip install sanic
 pip install jinja2
@@ -17,3 +14,6 @@ pew getproject sp-web
 pew setproject sp-web "/home/path/to/project/depot/web"
 ### 4. Working on project
 pew workon sp-web
+
+# Accès au front-end
+URL: 0.0.0.0:8080

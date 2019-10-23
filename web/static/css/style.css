@@ -72,3 +72,14 @@ h4 {
     display: block;
     margin: auto;
 }
+
+
+/* ZONES */
+.stats-widget {
+    min-width: 285px;
+    min-height: 233px;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: 20px;
+    margin-top: 20px;
+}

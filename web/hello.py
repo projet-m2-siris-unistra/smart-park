@@ -2,6 +2,7 @@ from sanic import Sanic
 from sanic import response
 from sanic.response import json
 from jinja2 import Environment, PackageLoader, select_autoescape
+import parkings
 
 
 app = Sanic(__name__)
@@ -55,23 +56,11 @@ async def login(request):
 
 @app.route('/login-check', methods=["POST"])
 async def login_check(request):
-    return json({
-    "parsed": True,
-    "url": request.url,
-    "query_string": request.query_string,
-    "args": request.args,
-    "raw_args": request.raw_args,
-    "query_args": request.query_args})
+    return json({"form": request.form})
 
 @app.route('/signup-check', methods=["POST"])
 async def login_check(request):
-    return json({
-    "parsed": True,
-    "url": request.url,
-    "query_string": request.query_string,
-    "args": request.args,
-    "raw_args": request.raw_args,
-    "query_args": request.query_args})
+    return json({"form": request.form})
 
 @app.route('/signup')
 async def login(request):
@@ -95,17 +84,20 @@ async def parking_spots(request, zone):
     return response.html(rendered_template)
 
 @app.route('/parking/<zone>/statistics')
-async def parking_spots(request, zone):
+async def parking_stats(request, zone):
+    zone1 = parkings.ZoneManagement()
     rendered_template = await parking_template.render_async(
-        active_tab_stats='true', zone=zone)
+        active_tab_stats='true', 
+        zone=zone,
+        statistics=zone1.getAllStats()
+        )
     return response.html(rendered_template)
 
 @app.route('/parking/<zone>/configuration')
-async def parking_spots(request, zone):
+async def parking_config(request, zone):
     rendered_template = await parking_template.render_async(
         active_tab_config='true', zone=zone)
     return response.html(rendered_template)
-
 
 
 

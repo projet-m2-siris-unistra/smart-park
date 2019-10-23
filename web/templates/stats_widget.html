@@ -1,0 +1,12 @@
+{% for item in statistics %}
+    <div class="bx--tile stats-widget">
+        <h4 class="widget-title">{{ item.stats_type }}</h4>
+        <br>
+        <p class="widget-text">Nombre d'usagers total: {{ item.total_users }}</p>
+        <p class="widget-text">Taux d'occupation: {{ item.rate }}%</p>
+        {% if item.is_charge %}
+            <p class="widget-text">Prix moyen des places: {{ item.avg_price }} par heure</p>
+            <p class="widget-text">Total des gains: {{ item.earning }}</p>
+        {% endif %}
+    </div>
+{% endfor %}
