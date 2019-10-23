@@ -1,5 +1,5 @@
 <header class="bx--header" role="banner" data-header>
-  <a class="bx--header__name" href="/home">
+  <a class="bx--header__name" href="{{ url_for("home") }}">
     <!--<img src="/static/img/sp-logo.png" width="28" height="28"> -->
     <span class="bx--header__name--prefix">Smart</span>
     Park
@@ -8,13 +8,13 @@
   <nav class="bx--header__nav" data-header-nav>
     <ul class="bx--header__menu-bar" role="menubar">
       <li>
-        <a class="bx--header__menu-item" role="menuitem" href="/dashboard" tabindex="0">
+        <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("dashboard") }}" tabindex="0">
           Tableau de bord
         </a>
       </li>
 
       <li>
-        <a class="bx--header__menu-item" role="menuitem" href="/zones" tabindex="0">
+        <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("zones") }}" tabindex="0">
           Zones
         </a>
       </li>
@@ -72,13 +72,13 @@
   <div class="bx--header__global">
     <ul class="bx--header__menu-bar" role="menubar">
       <li>
-        <a class="bx--header__menu-item" role="menuitem" href="/signup">
+        <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("accounts.signup") }}">
           Inscription
         </a>
       </li>
 
       <li>
-        <a class="bx--header__menu-item" role="menuitem" href="/login">
+        <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("accounts.login") }}">
           Connexion
         </a>
       </li>

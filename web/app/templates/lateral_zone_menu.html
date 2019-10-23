@@ -7,16 +7,16 @@
     </div>
     <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
         <li class="bx--tabs__nav-item {% if active_tab_view %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-            <a class="bx--tabs__nav-link" href="/parking/{{ zone }}/overview">Vue d'ensemble</a>
+            <a class="bx--tabs__nav-link" href="{{ url_for("zones.view", zone=zone) }}">Vue d'ensemble</a>
         </li>
         <li class="bx--tabs__nav-item {% if active_tab_list %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-            <a class="bx--tabs__nav-link" href="/parking/{{ zone }}/spots">Liste des places</a>
+            <a class="bx--tabs__nav-link" href="{{ url_for("zones.spots", zone=zone) }}">Liste des places</a>
         </li>
         <li class="bx--tabs__nav-item {% if active_tab_stats %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-            <a class="bx--tabs__nav-link" href="/parking/{{ zone }}/statistics">Statistiques</a>
+            <a class="bx--tabs__nav-link" href="{{ url_for("zones.stats", zone=zone) }}">Statistiques</a>
         </li>
         <li class="bx--tabs__nav-item {% if active_tab_config %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-            <a class="bx--tabs__nav-link" href="/parking/{{ zone }}/configuration">Configuration</a>
+            <a class="bx--tabs__nav-link" href="{{ url_for("zones.config", zone=zone) }}">Configuration</a>
         </li>
     </ul>
 </div>
