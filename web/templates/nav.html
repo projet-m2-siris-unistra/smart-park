@@ -1,72 +1,87 @@
-<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-        <a class="navbar-item" href="/home">
-        <img src="/static/img/sp-logo.png" width="28" height="28">
+<header class="bx--header" role="banner">
+  <a class="bx--header__name" href="/home">
+    <!--<img src="/static/img/sp-logo.png" width="28" height="28"> -->
+    <span class="bx--header__name--prefix">Smart</span>
+    Park
+  </a>
+
+  <nav class="bx--header__nav">
+    <ul class="bx--header__menu-bar" role="menubar">
+      <li>
+        <a class="bx--header__menu-item" role="menuitem" href="/dashboard">
+          Tableau de bord
         </a>
-    
-        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
+      </li>
+
+      <li>
+        <a class="bx--header__menu-item" role="menuitem" href="/zones">
+          Zones
         </a>
-    </div>
-    
-    <div id="navbarBasicExample" class="navbar-menu">
-        <div class="navbar-start">
-        <a class="navbar-item" href="/dashboard">
-            Tableau de bord
+      </li>
+
+      <li>
+        <a class="bx--header__menu-item" role="menuitem">
+          Cartes
         </a>
-    
-        <a class="navbar-item" href="/zones">
-            Zones
+      </li>
+
+      <li>
+        <a class="bx--header__menu-item" role="menuitem">
+          Statistiques
+        </a>
+      </li>
+
+      <li>
+        <a class="bx--header__menu-item" role="menuitem">
+          Configuration
+        </a>
+      </li>
+
+      <li class="bx--header__submenu">
+        <a aria-expanded="false" aria-haspopup="menu" class="bx--header__menu-item bx--header__menu-title" role="menuitem">
+          Plus
+          <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true" class="bx--header__menu-arrow" style="will-change: transform;"><path d="M5 6L0 1 .7.3 5 4.6 9.3.3l.7.7z"></path></svg>
         </a>
 
-        <a class="navbar-item">
-            Cartes
-        </a>
-
-        <a class="navbar-item">
-            Statistiques
-        </a>
-
-        <a class="navbar-item">
-            Configuration
-        </a>
-    
-        <div class="navbar-item has-dropdown is-hoverable">
-            <a class="navbar-link">
-            Plus
-            </a>
-    
-            <div class="navbar-dropdown">
-            <a class="navbar-item">
+        <ul class="bx--header__menu" role="menu">
+          <li>
+            <a class="bx--header__menu-item" role="menuitem">
                 A propos
             </a>
-            <a class="navbar-item">
+          </li>
+          <li>
+            <a class="bx--header__menu-item" role="menuitem">
                 Carrières
             </a>
-            <a class="navbar-item">
+          </li>
+          <li>
+            <a class="bx--header__menu-item" role="menuitem">
                 Contact
             </a>
-            <hr class="navbar-divider">
-            <a class="navbar-item">
+          </li>
+          <li>
+            <a class="bx--header__menu-item" role="menuitem">
                 Problèmes
             </a>
-            </div>
-        </div>
-        </div>
-    
-        <div class="navbar-end">
-        <div class="navbar-item">
-            <div class="buttons">
-            <a class="button is-link" href="/signup">
-                <strong>Inscription</strong>
-            </a>
-            <a class="button is-light" href="/connexion">
-                Connexion
-            </a>
-            </div>
-        </div>
-        </div>
-    </div>
-</nav>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="bx--header__global">
+    <ul class="bx--header__menu-bar" role="menubar">
+      <li>
+        <a class="bx--header__menu-item" role="menuitem" href="/signup">
+          Inscription
+        </a>
+      </li>
+
+      <li>
+        <a class="bx--header__menu-item" role="menuitem" href="/login">
+          Connexion
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
