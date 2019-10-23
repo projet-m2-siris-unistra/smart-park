@@ -48,7 +48,7 @@ async def zones(request):
 
 
 # Handling accounts
-@app.route('/connexion')
+@app.route('/login')
 async def login(request):
     rendered_template = await login_template.render_async()
     return response.html(rendered_template)
