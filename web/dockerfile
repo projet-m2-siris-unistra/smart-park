@@ -1,15 +1,23 @@
-FROM python:3.5
+FROM python:3.8-alpine
 LABEL maintainer="Lionel Jung <lionel.jung@etu.unistra.fr>"
 
-# à modifier
-ADD . /code
-RUN pip3 install sanic
+WORKDIR /app
 
-# install requirements
+# Install dependencies
+ADD requirements.txt ./
+RUN apk add --no-cache -t .build gcc autoconf python3-dev musl-dev make openssl-dev && \
+    pip install -r requirements.txt && \
+    apk del --no-cache .build
+
+# Add the rest
+ADD . .
+
+USER nobody:nobody
 
 EXPOSE 8080
 
-# à modifier
-WORKDIR /code
+ENV HOST ::
+ENV PORT 8080
+ENV DEBUG False
 
-CMD ["python", "hello.py"]
+ENTRYPOINT ["python", "run.py"]
