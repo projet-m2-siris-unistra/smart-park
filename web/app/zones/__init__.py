@@ -8,6 +8,12 @@ from app.parkings import ZoneManagement
 bp = Blueprint("zones", url_prefix='/parking')
 
 # Handling Parkings zones
+@bp.route('/create_zone')
+async def create_zone(request):
+    rendered_template = await render("zone_creation.html", request)
+    return response.html(rendered_template)
+
+
 @bp.route('/<zone>')
 @bp.route('/<zone>/overview')
 async def view(request, zone):
