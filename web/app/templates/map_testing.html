@@ -1,0 +1,111 @@
+<script src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+
+<div id='map' class="test-map"></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [7.7475, 48.5827],
+        zoom: 14
+    });
+/*
+    // Popup CSS: .mapboxgl-popup
+    map.on('load', function () {
+        // Add a layer showing the places.
+        map.addLayer({
+            "id": "places",
+            "type": "symbol",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [{
+                        "type": "Feature",
+                        "properties": {
+                            "description": "<h3 class=\"bx--toast-notification__title\">Notification title</h3><p>test</p>",
+                            "icon": "theatre"
+                        },
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": [7.7475, 48.5827]
+                        }
+                    }]
+                }
+            },
+            "layout": {
+                "icon-image": "{icon}-15",
+                "icon-allow-overlap": true
+            }
+        });*/
+        
+    map.on('load', function() {
+        map.loadImage('/static/img/location-icon.png', function(error, image) {
+            if (error) throw error;
+            map.addImage('location', image);
+            map.addLayer({
+                "id": "points",
+                "type": "symbol",
+                "source": {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": [{
+                            "type": "Feature",
+                            "properties": {
+                                "description": "<h3 class=\"bx--toast-notification__title\">Parking</h3><p>Il est beau</p> \
+                                <a class=\"bx--btn bx--btn--primary\" href=\"#\"> \
+                                        Naviguer \
+                                </a> \
+                                ",
+                            },
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [7.7475, 48.5827]
+                            }
+                        }]
+                    }
+                },
+                "layout": {
+                    "icon-image": "location",
+                    "icon-size": 0.1
+                }
+            });
+        });
+
+        // When a click event occurs on a feature in the places layer, open a popup at the
+        // location of the feature, with description HTML from its properties.
+        map.on('click', 'points', function (e) {
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.description;
+            
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+            
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+
+        // Change the cursor to a pointer when the mouse is over the places layer.
+        map.on('mouseenter', 'points', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'points', function () {
+            map.getCanvas().style.cursor = '';
+        });
+
+        // Add zoom and rotation controls to the map.
+        map.addControl(new mapboxgl.NavigationControl());
+    });
+</script>
+
+
