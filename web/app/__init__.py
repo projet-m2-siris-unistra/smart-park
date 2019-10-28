@@ -37,6 +37,6 @@ async def zones(request):
 async def map(request):
     rendered_template = await render('map_template.html', request)
     return response.html(rendered_template)
-
+    
 def run():
     app.run(host="0.0.0.0", port=8080, debug=True)

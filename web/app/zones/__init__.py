@@ -13,6 +13,9 @@ async def create_zone(request):
     rendered_template = await render("zone_creation.html", request)
     return response.html(rendered_template)
 
+@bp.route('/zone-creation-check', methods=['POST'])
+async def zone_creation_check(request):
+    return response.json(request.form)
 
 @bp.route('/<zone>')
 @bp.route('/<zone>/overview')

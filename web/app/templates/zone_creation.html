@@ -1,8 +1,18 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block extra_inclusions %}
 
-    <h1>Ville de Schmilbligheim</h1>
-    <h3>Création de zone</h3>
-
-{% endblock %}
+    <script src='https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.css' rel='stylesheet' />
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
+    
+    {% endblock %}
+    
+    
+    {% block content %}
+    
+    {% include "zone_creation_form.html" %}
+    
+    {% endblock %}

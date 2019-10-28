@@ -66,11 +66,13 @@ h4 {
 
 
 .sp-formular {
-    text-align: center;
-    padding: 15px;
-    max-width: 450px;
+    /*padding: 15px;*/
+    max-width: 600px;
     display: block;
     margin: auto;
+}
+.bx--form-item {
+    margin-top: 15px;
 }
 
 
@@ -100,4 +102,12 @@ h4 {
     height: 600px;
     margin-left: auto;
     margin-right: auto; 
+}
+
+.zone-creation-map{
+    top:0;
+    bottom:0; 
+    width:100%;
+    max-width: 600px; 
+    height: 400px;
 }
