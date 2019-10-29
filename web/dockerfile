@@ -14,4 +14,8 @@ ADD . .
 
 EXPOSE 8080
 
+ENV PORT=8080
+ENV HOST=::
+ENV DEBUG=True
+
 CMD ["python", "run.py"]
