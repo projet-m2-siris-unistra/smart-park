@@ -1,0 +1,43 @@
+---
+- name: install ssh keys for {{ ansible_user }}
+  authorized_key:
+    user: '{{ ansible_user }}'
+    state: present
+    key: '{{ item }}'
+  with_file:
+  - keys/sandhose.pub
+  tags:
+  - bootstrap
+
+- name: setup sudo without password for {{ ansible_user }}
+  template:
+    src: 'sudoers.j2'
+    dest: '/etc/sudoers.d/sudoers'
+    mode: 0440
+    validate: 'visudo -cf %s'
+  tags:
+  - bootstrap
+
+- name: install ssh keys for {{ ansible_user }}
+  authorized_key:
+    user: '{{ ansible_user }}'
+    key: '{{ item }}'
+  with_file:
+  - keys/sandhose.pub
+
+- name: run apt update
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: create directory for persistent volumes
+  file:
+    path: /srv/data
+    state: directory
+
+- name: remove unecessary packages
+  apt:
+    pkg:
+    - snap
+    - lxcfs
+    state: absent
