@@ -1,0 +1,47 @@
+
+<div class="bx--tile zone-config-part">
+    <a name="general"></a> 
+    <h4>Général</h4>
+    <br>
+    <p class="zone-config-field">
+        <label>Nom:</label> {{ zone }}
+        <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()">
+            modifier
+        </button>
+    </p>
+    <p class="zone-config-field">
+        <label>Description:</label> une belle zone de parking.
+        <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()">
+            modifier
+        </button>
+    </p>
+    <div id="validate">
+
+    </div>
+</div>
+
+<div class="bx--tile zone-config-part">
+    <a name="spots"></a> 
+    <h4>Gérer les places</h4>
+    <br>
+    <div id='map' class="spot-config-map"></div>
+    <script src="/static/js/map_spot_list.js"></script>  
+</div>
+
+<script>
+
+    var modify = false;
+    var button = document.createElement('button');
+    button.textContent = "Enregistrer";
+    button.className = "bx--btn bx--btn--primary";
+    button.type = "submit";
+    
+    function modify_name() {
+        if (!modify) {
+            modify = true;
+            document.getElementById('validate').append(button);
+        }
+
+    }
+
+</script>

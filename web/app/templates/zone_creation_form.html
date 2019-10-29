@@ -11,7 +11,7 @@
             Ce nom unique identifiera la zone.
         </div>
         <div class="bx--text-input__field-wrapper">
-            <input id="text-input-1" type="text" class="bx--text-input" name="name" placeholder="Nom">
+            <input id="text-input-1" type="text" class="bx--text-input" name="name" placeholder="Nom" value="">
         </div>
     </div>
 
@@ -22,7 +22,7 @@
             Indiquer le type de parking que contiendra la zone.
         </div>
         <div class="bx--select-input__wrapper">
-            <select name="type" id="select-id" class="bx--select-input ">
+            <select name="type" id="select-id" class="bx--select-input " value="">
                 <option class="bx--select-option" value="" disabled selected hidden>Choisissez une option</option>  
                 <option class="bx--select-option" value="free" >Gratuit</option>           
                 <option class="bx--select-option" value="charge" >Payant</option>  
@@ -47,7 +47,7 @@
     <div class="bx--form-item">
         <div id='map' class="zone-creation-map"></div>
         <script src='/static/js/map_draw_polygon.js'></script>
-        <input id="coordinates-input" type="hidden" name="coordinates">
+        <input id="coordinates-input" type="hidden" name="coordinates" value="">
     </div>
 
     <!-- Button for validation -->

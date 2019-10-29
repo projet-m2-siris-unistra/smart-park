@@ -95,6 +95,36 @@ h4 {
     vertical-align: top;
 }
 
+.zone-config-part {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 100px;
+    padding-right: 100px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.zone-menu {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 650px;
+    text-align: center;
+}
+
+.zone-config-field {
+    vertical-align: middle;
+}
+
+.zone-modify-button {
+    display: inline;
+    margin: 0;
+}
+label {
+    font-weight: bold;
+}
 
 /* CARTES */
 .test-map {
@@ -110,4 +140,35 @@ h4 {
     width:100%;
     max-width: 600px; 
     height: 400px;
+}
+
+.black-marker {
+    background-image: url('../img/location-icon.png');
+    background-size: cover;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+.mapboxgl-popup {
+    max-width: 200px;
+}
+
+.mapboxgl-popup-content {
+    text-align: center;
+    font-family: 'IBM Plex Sans';
+}
+  
+.spot-list-map {
+    margin: auto;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 1200px;
+    height: 600px;
+}
+
+.spot-config-map {
+    max-width: 1000;
+    height: 500px;
 }

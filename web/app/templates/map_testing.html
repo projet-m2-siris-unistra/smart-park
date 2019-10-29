@@ -1,8 +1,8 @@
-<!--
+
 <script src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
 
-<\!-- for polygon drawings --\>
+<!-- for polygon drawings -->
 <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
 <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.js'></script>
 <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.9/mapbox-gl-draw.css' type='text/css'/>
@@ -20,40 +20,83 @@
         zoom: 14
     });
 
+    /* The parking spot markers list */
+    var markerList = {
+        type: 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [7.7475, 48.5827]
+          },
+          properties: {
+            title: 'Parking#001',
+            description: 'État du parking: OK'
+          }
+        },
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [7.7490, 48.5827]
+          },
+          properties: {
+            title: 'Parking#002',
+            description: 'État du parking: OK'
+          }
+        }]
+    };
 
-    /* Add marker */
+    /* Add markers to map */
+    markerList.features.forEach(function(marker) {
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'black-marker';
+        // make a marker for each feature and add to the map
+        new mapboxgl.Marker(el)
+        .setLngLat(marker.geometry.coordinates)
+        .setPopup(new mapboxgl.Popup({ offset: 25 })
+            .setHTML(
+                '<h3>' + marker.properties.title 
+                + '</h3><p>' + marker.properties.description + '</p>'
+                + "<a class=\"bx--btn bx--btn--primary\" href=\"#\">Éditer</a>"
+                + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
+            )
+        )
+        .addTo(map);
+    });
+
+    /* Loading elements on map */
     map.on('load', function() {
-        map.loadImage('/static/img/location-icon.png', function(error, image) {
-            if (error) throw error;
-            map.addImage('location', image);
-            map.addLayer({
-                "id": "points",
-                "type": "symbol",
-                "source": {
-                    "type": "geojson",
-                    "data": {
-                        "type": "FeatureCollection",
-                        "features": [{
-                            "type": "Feature",
-                            "properties": {
-                                "description": "<h3 class=\"bx--toast-notification__title\">Parking</h3><p>Il est beau</p> \
-                                <a class=\"bx--btn bx--btn--primary\" href=\"#\"> \
-                                        Naviguer \
-                                </a> \
-                                ",
-                            },
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [7.7475, 48.5827]
-                            }
-                        }]
+
+        /* Add zone on map */
+        map.addLayer({
+            'id': 'maine',
+            'type': 'fill',
+            'source': {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Polygon',
+                        'coordinates': [[[7.739396,48.579816],[7.742014,48.579957],
+                        [7.744117,48.579134],[7.747464,48.578623],
+                        [7.74888,48.57885],[7.751756,48.579929],
+                        [7.755189,48.581831],[7.756906,48.583251],
+                        [7.754288,48.58555],[7.753558,48.586061],
+                        [7.751455,48.586743],[7.748537,48.58714],
+                        [7.746906,48.586828],[7.744503,48.585834],
+                        [7.740769,48.584244],[7.73901,48.582967],
+                        [7.738409,48.581973],[7.738495,48.580781],
+                        [7.739396,48.579816]]]
                     }
-                },
-                "layout": {
-                    "icon-image": "location",
-                    "icon-size": 0.1
                 }
-            });
+            },
+            'layout': {},
+            'paint': {
+                'fill-color': '#f4e628',
+                'fill-opacity': 0.2
+            }
         });
 
         // When a click event occurs on a feature in the places layer, open a popup at the
@@ -120,70 +163,4 @@
 
 </script>
 
--->
-
-<!-- map 2 -->
-
-<script src='https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.css' rel='stylesheet' />
-<style>
-  #map { position:absolute; top:0; bottom:0; width:100%; height: 600px; }
-</style>
-<body>
-
-<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.css' rel='stylesheet' />
-<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.4.10/leaflet.draw.js'></script>
-<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js'></script>
-
-<div id='map'></div>
-
-<script>
-L.mapbox.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
-var map = L.mapbox.map('map')
-    .setView([38.89399, -77.03659], 17)
-    .addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'));
-
-var featureGroup = L.featureGroup().addTo(map);
-
-var drawControl = new L.Control.Draw({
-    edit: {
-        featureGroup: featureGroup
-    },
-    draw: {
-        polygon: true,
-        polyline: false,
-        rectangle: false,
-        circle: false,
-        marker: false
-    }
-}).addTo(map);
-
-map.on('draw:created', showPolygonArea);
-map.on('draw:edited', showPolygonAreaEdited);
-
-function showPolygonAreaEdited(e) {
-    e.layers.eachLayer(function(layer) {
-        showPolygonArea({ layer: layer });
-    });
-}
-
-function showPolygonArea(e) {
-    featureGroup.clearLayers();
-    featureGroup.addLayer(e.layer);
-    area = (LGeo.area(e.layer) / 1000000).toFixed(2);
-    
-    if (area < 0.03)
-    {
-        e.layer.bindPopup("La zone est trop petite. Taille minimale requise: 0.03km<sup>2</sup>");
-    } else {
-        e.layer.bindPopup(area + ' km<sup>2</sup>');
-    }
-    e.layer.openPopup();
-
-    // Get the GeoJson of the drawn polygon
-    var shape_string = JSON.stringify(e.layer.toGeoJSON());
-    console.debug(shape_string);
-    console.debug(e.layer.toGeoJSON().geometry.coordinates[0]);
-}
-</script>
 

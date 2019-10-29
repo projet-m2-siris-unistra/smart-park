@@ -15,6 +15,10 @@ async def create_zone(request):
 
 @bp.route('/zone-creation-check', methods=['POST'])
 async def zone_creation_check(request):
+    # Checking args
+    # Adding args to database
+    # Linking to zone management
+
     return response.json(request.form)
 
 @bp.route('/<zone>')
@@ -22,12 +26,6 @@ async def zone_creation_check(request):
 async def view(request, zone):
     rendered_template = await render('parking_template.html', request,
         active_tab_view='true', zone=zone)
-    return response.html(rendered_template)
-
-@bp.route('/<zone>/spots')
-async def spots(request, zone):
-    rendered_template = await render('parking_template.html', request,
-        active_tab_list='true', zone=zone)
     return response.html(rendered_template)
 
 @bp.route('/<zone>/statistics')
@@ -45,3 +43,14 @@ async def config(request, zone):
     rendered_template = await render('parking_template.html', request,
         active_tab_config='true', zone=zone)
     return response.html(rendered_template)
+
+# Handling Parking Spots
+@bp.route('/<zone>/spots')
+async def spots(request, zone):
+    rendered_template = await render('parking_template.html', request,
+        active_tab_list='true', zone=zone)
+    return response.html(rendered_template)
+
+@bp.route('/<zone>/spots/<spot>')
+async def spot_edit(request, zone, spot):
+    return response.text("edition de la place")
