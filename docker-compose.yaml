@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  web:
+    build: web
+    ports:
+    - "8080:8080"
+
+  nats:
+    image: nats-streaming
+    ports:
+    - "4222:4222"
+    - "8222:8222"
+
+  database:
+    image: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+    - "5432:5432"
+
+  backend:
+    build: backend
+    depends_on:
+    - database
+    - nats
+    environment:
+      NATS_URL: nats://nats:4222
+      DATABASE: postgres://postgres:postgres@database/postgres?sslmode=disable
