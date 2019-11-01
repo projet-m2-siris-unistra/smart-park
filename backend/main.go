@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" //we will be utilizing to interact with our database
 	"github.com/nats-io/nats.go"
 
 	"github.com/projet-m2-siris-unistra/smart-park/backend/bus"
@@ -16,7 +16,7 @@ import (
 func main() {
 	var err error
 
-	// Connect to the DB
+	// Connect to the DB - defini dans docker-compose
 	databaseURL, ok := os.LookupEnv("DATABASE")
 	if !ok {
 		databaseURL = "postgres:///postgres?sslmode=disable"
@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("unable to connect to database: %v", err)
 	}
 
-	// Connect to NATS
+	// Connect to NATS - defini dans docker-compose
 	natsURL, ok := os.LookupEnv("NATS_URL")
 	if !ok {
 		natsURL = nats.DefaultURL
@@ -45,8 +45,9 @@ func main() {
 	// Register the handlers
 	handlers.Register(bus.Conn())
 
+	// wait signal
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-	<-c
+	<-c // Receive from c
 	log.Println("main: exiting")
 }
