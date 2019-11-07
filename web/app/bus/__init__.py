@@ -1,10 +1,17 @@
+import logging
+
 from nats.aio.client import Client as NATS
 
+logger = logging.getLogger(__name__)
 nc = NATS()
 
 
+async def error_cb(err):
+    logger.error("error while connecting to NATS: " + str(err))
+
+
 async def init(app, loop):
-    await nc.connect(app.config.NATS_URL, loop=loop)
+    await nc.connect(app.config.NATS_URL, loop=loop, error_cb=error_cb)
     app.nc = nc
 
 
