@@ -1,9 +1,5 @@
-## Installation du framework
-pip install sanic
-pip install jinja2
-
 ## Installation des dépendances
-requirements.txt
+pip install -r requirements.txt
 
 ## Environnement python
 ### 1. Installing "pew"

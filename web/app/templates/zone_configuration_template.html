@@ -1,5 +1,5 @@
 
-<div class="bx--tile zone-config-part">
+<div class="zone-config-part">
     <a name="general"></a> 
     <h4>Général</h4>
     <br>
@@ -15,17 +15,23 @@
             modifier
         </button>
     </p>
-    <div id="validate">
+    <div id="validate-general">
 
     </div>
 </div>
 
-<div class="bx--tile zone-config-part">
+<div class="zone-config-part">
     <a name="spots"></a> 
     <h4>Gérer les places</h4>
     <br>
     <div id='map' class="spot-config-map"></div>
-    <script src="/static/js/map_spot_list.js"></script>  
+    <script src="/static/js/map_spot_list.js"></script> 
+    <script src="/static/js/map_spot_adding.js"></script> 
+    <div id="validate-spots">
+        <a class="bx--btn bx--btn--primary" type="button" href="submit-spots">
+            Enregistrer
+        </a>
+    </div>
 </div>
 
 <script>
@@ -39,7 +45,7 @@
     function modify_name() {
         if (!modify) {
             modify = true;
-            document.getElementById('validate').append(button);
+            document.getElementById('validate-general').append(button);
         }
 
     }
