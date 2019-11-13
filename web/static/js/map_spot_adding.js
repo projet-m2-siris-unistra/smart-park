@@ -4,7 +4,7 @@ var polygonClickEnabled = true;
 var count = 0;
 var spotsLimit = 20;
 var currentMarker;
-var markerList;
+var addedMarkerList = [];
 
 // When clicking on the zone: adds a marker
 map.on('click', 'zone-polygon', function(e) {
@@ -35,7 +35,7 @@ function validate_marker() {
     // adding this spot coordinates to the list
     var coordinates = currentMarker.getLngLat().wrap();
     console.debug(coordinates);
-    markerList.push(coordinates);
+    addedMarkerList.push(coordinates);
 
     // if not set, enable validating button
 

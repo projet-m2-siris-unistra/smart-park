@@ -4,7 +4,7 @@
     <h4>Général</h4>
     <br>
     <p class="zone-config-field">
-        <label>Nom:</label> {{ zone }}
+        <label>Nom:</label> {{ zoneName }}
         <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()">
             modifier
         </button>
@@ -25,7 +25,71 @@
     <h4>Gérer les places</h4>
     <br>
     <div id='map' class="spot-config-map"></div>
-    <script src="/static/js/map_spot_list.js"></script> 
+    <script>
+
+    // Create map
+    mapboxgl.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [7.7475, 48.5827],
+        zoom: 14
+    });
+
+    // The parking spot markers list
+    var markerList = {
+        'type': 'FeatureCollection',
+        'features': [
+            {% for spot in spotList %}
+                console.debug(spot);
+                spot
+            {% endfor %}
+        ]
+    };
+
+    // Add markers to map
+    markerList.features.forEach(function(marker) {
+    
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'black-marker';
+    
+        // make a marker for each feature and add to the map
+        new mapboxgl.Marker(el)
+            .setLngLat(marker.geometry.coordinates)
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+                .setHTML(
+                    '<h3>' + marker.properties.title 
+                    + '</h3><p>' + marker.properties.description + '</p>'
+                    + "<a class=\"bx--btn bx--btn--primary\" href=\"#\">Éditer</a>"
+                    + "<a class=\"bx--btn bx--btn--tertiary\" href=\"#\">Statistiques</a>"
+                    + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
+                )
+            )
+            .addTo(map);
+    });
+
+    /* Loading elements on map */
+    map.on('load', function() {
+
+        /* Add zone on map */
+        map.addLayer({{ zonePolygon|safe }});
+        
+        // Change the cursor to a pointer when the mouse is over the places layer.
+        map.on('mouseenter', 'points', function () {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'points', function () {
+            map.getCanvas().style.cursor = '';
+        });
+
+        // Add zoom and rotation controls to the map.
+        map.addControl(new mapboxgl.NavigationControl());
+    });
+    </script>
+
     <script src="/static/js/map_spot_adding.js"></script> 
     <div id="validate-spots">
         <a class="bx--btn bx--btn--primary" type="button" href="submit-spots">
@@ -47,7 +111,6 @@
             modify = true;
             document.getElementById('validate-general').append(button);
         }
-
     }
 
 </script>

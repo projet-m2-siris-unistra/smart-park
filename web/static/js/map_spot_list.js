@@ -9,32 +9,32 @@ var map = new mapboxgl.Map({
 
 /* The parking spot markers list */
 var markerList = {
-    type: 'FeatureCollection',
-    features: [{
-        type: 'Feature',
-        geometry: {
-            type: 'Point',
-            coordinates: [7.7475, 48.5827]
+    'type': 'FeatureCollection',
+    'features': [{
+        'type': 'Feature',
+        'geometry': {
+            'type': 'Point',
+            'coordinates': [7.7475, 48.5827]
         },
-        properties: {
-            title: 'Parking#001',
-            description: 'État du parking: OK'
+        'properties': {
+            'title': 'Parking#001',
+            'description': 'État du parking: OK'
         }
     },
     {
-        type: 'Feature',
-        geometry: {
-            type: 'Point',
-            coordinates: [7.7490, 48.5827]
+        'type': 'Feature',
+        'geometry': {
+            'type': 'Point',
+            'coordinates': [7.7490, 48.5827]
         },
-        properties: {
-            title: 'Parking#002',
-            description: 'État du parking: OK'
+        'properties': {
+            'title': 'Parking#002',
+            'description': 'État du parking: OK'
         }
     }]
 };
 
-/* Add markers to map */
+// Add markers to map
 markerList.features.forEach(function(marker) {
  
     // create a HTML element for each feature
@@ -54,53 +54,4 @@ markerList.features.forEach(function(marker) {
             )
         )
         .addTo(map);
-});
-
-/* Loading elements on map */
-map.on('load', function() {
-
-    /* Add zone on map */
-    map.addLayer({
-        'id': 'zone-polygon',
-        'type': 'fill',
-        'source': {
-            'type': 'geojson',
-            'data': {
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Polygon',
-                    'coordinates': [[
-                    [7.739396,48.579816],[7.742014,48.579957],
-                    [7.744117,48.579134],[7.747464,48.578623],
-                    [7.74888,48.57885],[7.751756,48.579929],
-                    [7.755189,48.581831],[7.756906,48.583251],
-                    [7.754288,48.58555],[7.753558,48.586061],
-                    [7.751455,48.586743],[7.748537,48.58714],
-                    [7.746906,48.586828],[7.744503,48.585834],
-                    [7.740769,48.584244],[7.73901,48.582967],
-                    [7.738409,48.581973],[7.738495,48.580781],
-                    [7.739396,48.579816]
-                    ]]
-                }
-            }
-        },
-        'layout': {},
-        'paint': {
-            'fill-color': '#f4e628',
-            'fill-opacity': 0.2
-        }
-    });
-
-    // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'points', function () {
-        map.getCanvas().style.cursor = 'pointer';
-    });
-    
-    // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'points', function () {
-        map.getCanvas().style.cursor = '';
-    });
-
-    // Add zoom and rotation controls to the map.
-    map.addControl(new mapboxgl.NavigationControl());
 });
