@@ -8,15 +8,13 @@
     <!-- Graphic -->
     {% include "graphic_widget.html" %}
     <!-- Summary Widgets -->
-    {% include "city_summary_widget.html" %}
+    {% include "tenant_summary_widget.html" %}
     <!-- Parking widgets -->
     <br>
-    {% include "parking_widget.html" %}
-    {% include "parking_widget.html" %}
-    {% include "parking_widget.html" %}
-    {% include "parking_widget.html" %}
-    {% include "parking_widget.html" %}
-    {% include "parking_widget.html" %}
+
+    {% for zoneItem in zoneList %}
+        {% include "parking_widget.html" %}
+    {% endfor %}
     
 </div>
 

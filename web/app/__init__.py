@@ -7,7 +7,9 @@ import app.accounts
 import app.bus
 import app.config
 import app.zones
+
 from app.templating import render
+from app.parkings import TenantManagement
 
 app = Sanic(__name__)
 app.register_listener(config.load, "before_server_start")
@@ -18,19 +20,30 @@ app.static("/static", "./static")
 app.blueprint(accounts.bp)
 app.blueprint(zones.bp)
 
+
 # Handling navigation
 @app.route("/")
 @app.route("/home")
 async def home(request):
     rendered_template = await render(
-        "base_template.html", request, knights="BIENVENUE SUR SMART PARK !"
+        "base_template.html", 
+        request, 
+        knights="BIENVENUE SUR SMART PARK !"
     )
     return response.html(rendered_template)
 
 
 @app.route("/dashboard")
 async def dashboard(request):
-    rendered_template = await render("dashboard_template.html", request)
+    # request from ID
+    tenantInstance = TenantManagement(123)
+    rendered_template = await render(
+        "dashboard_template.html",
+        request, 
+        zoneList = tenantInstance.getZones(),
+        totalSpots = tenantInstance.getTotalSpots(),
+        takenSpots = tenantInstance.getTakenSpots()
+    )
     return response.html(rendered_template)
 
 

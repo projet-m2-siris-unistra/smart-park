@@ -39,7 +39,7 @@ async def stats(request, zone):
         request,
         active_tab_stats='true', 
         zoneName=zone,
-        statistics=zone1.getAllStats()
+        statistics=zoneInstance.getAllStats()
     )
     return response.html(rendered_template)
 
@@ -71,12 +71,13 @@ async def submit_spots(request, zone):
 # Handling Parking Spots
 @bp.route('/<zone>/spots')
 async def spots(request, zone):
+    zoneInstance = ZoneManagement(zone)
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_list='true', 
         zonePolygon=zoneInstance.getPolygon(),
-        zone=zone
+        zoneName=zone
     )
     return response.html(rendered_template)
 

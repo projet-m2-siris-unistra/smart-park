@@ -1,23 +1,51 @@
-import json
+# Instance of a tenant
+class TenantManagement:
 
-# Instance of a city
-class CityManagement:
+    def __init__(self, tenant_id):
+        self.id = 1
+        self.name = "Schmilbligheim"
+        self.coordinates = {'coordinates': [7.7475, 48.5827]}
 
-    def __init__(self):
-        id = 1
-        name = "Schmilbligheim"
-        coordinates = {'coordinates': [7.7475, 48.5827]}
+    def getZones(self):
+        zone_list = []
+        # request the zones linked to this town
+        zone1 = ZoneManagement("CENTRE")
+        zone_list.append(zone1)
+        return zone_list
+
+    def getTotalSpots(self):
+        count = 0
+        zoneList = self.getZones()
+        for zone in zoneList:
+            count += zone.getNbTotalSpots()
+        return count
+    
+    def getTakenSpots(self):
+        count = 0
+        zoneList = self.getZones()
+        for zone in zoneList:
+            count += zone.getNbTakenSpots()
+        return count
 
 
 # Instance of a zone
 class ZoneManagement:
 
     def __init__(self, nameArg):
-        id = 1
-        name = nameArg
-        nb_total_spots = 456
-        nb_taken_spots = 123
+        self.id = 1
+        self.name = nameArg
+        self.nb_total_spots = 456
+        self.nb_taken_spots = 123
+
+    # Getter / Setter #
+
+    def getNbTotalSpots(self):
+        return self.nb_total_spots
+
+    def getNbTakenSpots(self):
+        return self.nb_taken_spots
     
+
     # Data requests #
 
     def getPolygon(self):
@@ -106,12 +134,11 @@ class ZoneManagement:
 class SpotManagement:
 
     def __init__(self):
-        
-        id = 112535
-        name = "GARE1#124"
-        available = True
-        inService = True
-        pointJson = self.getPoint()
+        self.id = 112535
+        self.name = "GARE1#124"
+        self.available = True
+        self.inService = True
+        self.pointJson = self.getPoint()
 
 
     # Data requests # 
