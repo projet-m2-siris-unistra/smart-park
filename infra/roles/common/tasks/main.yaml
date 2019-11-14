@@ -5,6 +5,8 @@
     state: present
     key: '{{ item }}'
   with_file:
+  - keys/constan.pub
+  - keys/cyrille.pub
   - keys/sandhose.pub
   tags:
   - bootstrap
@@ -18,12 +20,19 @@
   tags:
   - bootstrap
 
-- name: install ssh keys for {{ ansible_user }}
-  authorized_key:
-    user: '{{ ansible_user }}'
-    key: '{{ item }}'
-  with_file:
-  - keys/sandhose.pub
+- name: disable ssh password auth
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "PasswordAuthentication no"
+    regexp: "^PasswordAuthentication"
+  notify: reload sshd
+
+- name: only allow {{ ansible_user }} to login via ssh
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "AllowUsers {{ ansible_user }}"
+    regexp: "^AllowUsers"
+  notify: reload sshd
 
 - name: run apt update
   apt:
