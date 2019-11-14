@@ -8,11 +8,15 @@
         {% include "graphic_widget.html" %}
         {% include "zone_summary_widget.html" %}
     {% elif active_tab_list %}
-        {% include "zone_summary_widget.html" %}
+        {% include "spot_list_template.html" %}
+        {% block extra_inclusions %}
+        <script src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
+        <link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+        {% endblock %}
     {% elif active_tab_stats %}
-            {% include "stats_widget.html" %}
+        {% include "stats_widget.html" %}
     {% elif active_tab_config %}
-        {% include "zone_summary_widget.html" %}
+        {% include "zone_configuration_template.html" %}
     {% endif %}
 
 {% endblock %}
