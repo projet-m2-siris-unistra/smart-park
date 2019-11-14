@@ -23,6 +23,14 @@ services:
     ports:
     - "5432:5432"
 
+  migrations:
+    image: migrate/migrate:v4.7.0
+    command: -database=postgres://postgres:postgres@database/postgres?sslmode=disable -path=/migrations up
+    depends_on:
+    - database
+    volumes:
+    - "./backend/database/migrations:/migrations"
+
   backend:
     build: backend
     depends_on:
