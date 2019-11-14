@@ -1,4 +1,7 @@
-/* Create map */
+var polygon = window.polygon;
+var spots = window.spots;
+
+// Create map
 mapboxgl.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
 var map = new mapboxgl.Map({
     container: 'map',
@@ -7,40 +10,14 @@ var map = new mapboxgl.Map({
     zoom: 14
 });
 
-/* The parking spot markers list */
-var markerList = {
-    'type': 'FeatureCollection',
-    'features': [{
-        'type': 'Feature',
-        'geometry': {
-            'type': 'Point',
-            'coordinates': [7.7475, 48.5827]
-        },
-        'properties': {
-            'title': 'Parking#001',
-            'description': 'État du parking: OK'
-        }
-    },
-    {
-        'type': 'Feature',
-        'geometry': {
-            'type': 'Point',
-            'coordinates': [7.7490, 48.5827]
-        },
-        'properties': {
-            'title': 'Parking#002',
-            'description': 'État du parking: OK'
-        }
-    }]
-};
 
 // Add markers to map
-markerList.features.forEach(function(marker) {
- 
+spots.forEach(function(marker) {
+
     // create a HTML element for each feature
     var el = document.createElement('div');
     el.className = 'black-marker';
- 
+
     // make a marker for each feature and add to the map
     new mapboxgl.Marker(el)
         .setLngLat(marker.geometry.coordinates)
@@ -54,4 +31,42 @@ markerList.features.forEach(function(marker) {
             )
         )
         .addTo(map);
+});
+
+// Loading elements on map 
+map.on('load', function() {
+
+    // Add zone on map
+    polygonGeoJson = {
+        'id': 'zone-polygon',
+        'type': 'fill',
+        'source': {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [polygon.coordinates]
+                }
+            }
+        },
+        'paint': {
+            'fill-color': polygon.color,
+            'fill-opacity': 0.2
+        }
+    }
+    map.addLayer(polygonGeoJson);
+    
+    // Change the cursor to a pointer when the mouse is over the places layer.
+    map.on('mouseenter', 'points', function () {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    
+    // Change it back to a pointer when it leaves.
+    map.on('mouseleave', 'points', function () {
+        map.getCanvas().style.cursor = '';
+    });
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
 });

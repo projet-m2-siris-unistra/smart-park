@@ -18,7 +18,6 @@ async def zone_creation_check(request):
     # Checking args
     # Adding args to database
     # Linking to zone management
-
     return response.json(request.form)
 
 @bp.route('/<zone>')
@@ -59,11 +58,11 @@ async def config(request, zone):
 
 @bp.route('/<zone>/submit-spots')
 async def submit_spots(request, zone):
-        rendered_template = await render(
+    rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_list='true', 
-        zone=zone
+        zoneName=zone
     )
     # checking spot list and adding to DB
     return response.html(rendered_template)
