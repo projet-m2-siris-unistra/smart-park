@@ -58,6 +58,24 @@ async def map(request):
     rendered_template = await render("map_template.html", request)
     return response.html(rendered_template)
 
+@app.route("/configuration")
+async def configuration(request):
+    rendered_template = await render(
+        "base_template.html", 
+        request, 
+        knights="En cours de construction..."
+    )
+    return response.html(rendered_template)
+
+@app.route("/statistics")
+async def statistics(request):
+    rendered_template = await render(
+        "base_template.html", 
+        request, 
+        knights="En cours de construction..."
+    )
+    return response.html(rendered_template)
+
 
 @app.route("/ping")
 async def ping(request):

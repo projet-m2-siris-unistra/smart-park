@@ -13,7 +13,7 @@
 
     <p class="widget-text">??? usagers aujourd'hui</p>
 
-    <div class="parking-widget-status-btn bx--btn bx--btn--danger bx--btn--sm">
+    <a class="parking-widget-status-btn bx--btn bx--btn--danger bx--btn--sm" href="{{ url_for("zones.config", zone=zoneItem.name) }}">
         <p>? capteurs déconnectés</p>
-    </div>
+    </a>
 </div>

@@ -23,11 +23,14 @@ async def zone_creation_check(request):
 @bp.route('/<zone>')
 @bp.route('/<zone>/overview')
 async def view(request, zone):
+    zoneInstance = ZoneManagement(zone)
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_view='true', 
-        zoneName=zone
+        zoneName=zone,
+        zoneTaken=zoneInstance.getNbTakenSpots(),
+        zoneTotal=zoneInstance.getNbTotalSpots()
     )
     return response.html(rendered_template)
 
@@ -58,11 +61,14 @@ async def config(request, zone):
 
 @bp.route('/<zone>/submit-spots')
 async def submit_spots(request, zone):
+    zoneInstance = ZoneManagement(zone)
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_list='true', 
-        zoneName=zone
+        zoneName=zone,
+        zonePolygon=zoneInstance.getPolygon(),
+        spotList=zoneInstance.getSpotList()
     )
     # checking spot list and adding to DB
     return response.html(rendered_template)
@@ -76,8 +82,9 @@ async def spots(request, zone):
         'parking_template.html', 
         request,
         active_tab_list='true', 
+        zoneName=zone,
         zonePolygon=zoneInstance.getPolygon(),
-        zoneName=zone
+        spotList=zoneInstance.getSpotList()
     )
     return response.html(rendered_template)
 

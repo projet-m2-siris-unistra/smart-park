@@ -128,7 +128,7 @@ label {
 
 /* CARTES */
 .test-map {
-    width: 100%;
+    width: 800px;
     height: 600px;
     margin-left: auto;
     margin-right: auto; 
@@ -164,11 +164,11 @@ label {
     margin: auto;
     margin-top: 20px;
     width: 100%;
-    max-width: 1200px;
-    height: 600px;
+    max-width: 1000px;
+    height: 500px;
 }
 
 .spot-config-map {
-    max-width: 1000;
+    max-width: 1000px;
     height: 500px;
 }

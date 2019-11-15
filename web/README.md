@@ -11,5 +11,5 @@ pew setproject sp-web "/home/path/to/project/depot/web"
 ### 4. Working on project
 pew workon sp-web
 
-# Accès au front-end
+## Accès au front-end
 URL: 0.0.0.0:8080
