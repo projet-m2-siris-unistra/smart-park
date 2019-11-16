@@ -1,4 +1,33 @@
 
+.home-photo {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.over-photo-text {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #f4f4f4;
+    font-size: 3.5em;
+    font-family: inherit;
+    background-color: #161616;
+    padding: 10px;
+}
+
+.home-div {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    z-index:0;
+    left:0;
+    top:0;
+}
+
 .widget-text {
     margin-bottom: 3px;
 }
