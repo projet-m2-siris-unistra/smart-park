@@ -1,4 +1,3 @@
-var polygon = window.polygon;
 var spots = window.spots;
 
 // Create map
@@ -10,63 +9,34 @@ var map = new mapboxgl.Map({
     zoom: 14
 });
 
+// Add zoom and rotation controls to the map.
+map.addControl(new mapboxgl.NavigationControl());
 
-// Add markers to map
-spots.forEach(function(marker) {
+if (spots != null) {
 
-    // create a HTML element for each feature
-    var el = document.createElement('div');
-    el.className = 'black-marker';
+    // Add markers to map
+    spots.forEach(function(marker) {
+        marker = JSON.parse(marker);
 
-    // make a marker for each feature and add to the map
-    new mapboxgl.Marker(el)
-        .setLngLat(marker.geometry.coordinates)
-        .setPopup(new mapboxgl.Popup({ offset: 25 })
-            .setHTML(
-                '<h3>' + marker.properties.title 
-                + '</h3><p>' + marker.properties.description + '</p>'
-                + "<a class=\"bx--btn bx--btn--primary\" href=\"#\">Éditer</a>"
-                + "<a class=\"bx--btn bx--btn--tertiary\" href=\"#\">Statistiques</a>"
-                + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
+        // create a HTML element for each feature
+        var el = document.createElement('div');
+        el.className = 'black-marker';
+
+        // make a marker for each feature and add to the map
+        new mapboxgl.Marker(el)
+            .setLngLat(marker.point.geometry.coordinates)
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+                .setHTML(
+                    '<h3>' + marker.name 
+                    + '</h3><p>' + 'Etat du parking: ' + marker.state + '</p>'
+                    + "<a class=\"bx--btn bx--btn--primary\" href=\"#\">Éditer</a>"
+                    + "<a class=\"bx--btn bx--btn--tertiary\" href=\"#\">Statistiques</a>"
+                    + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
+                )
             )
-        )
-        .addTo(map);
-});
-
-// Loading elements on map 
-map.on('load', function() {
-
-    // Add zone on map
-    polygonGeoJson = {
-        'id': 'zone-polygon',
-        'type': 'fill',
-        'source': {
-            'type': 'geojson',
-            'data': {
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Polygon',
-                    'coordinates': [polygon.coordinates]
-                }
-            }
-        },
-        'paint': {
-            'fill-color': polygon.color,
-            'fill-opacity': 0.2
-        }
-    }
-    map.addLayer(polygonGeoJson);
-    
-    // Change the cursor to a pointer when the mouse is over the places layer.
-    map.on('mouseenter', 'points', function () {
-        map.getCanvas().style.cursor = 'pointer';
+            .addTo(map);
     });
-    
-    // Change it back to a pointer when it leaves.
-    map.on('mouseleave', 'points', function () {
-        map.getCanvas().style.cursor = '';
-    });
-
-    // Add zoom and rotation controls to the map.
-    map.addControl(new mapboxgl.NavigationControl());
-});
+}
+else {
+    console.debug("Warning: " + "spots = " + spots);
+}

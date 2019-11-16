@@ -85,7 +85,7 @@ class ZoneManagement:
         # requesting all spots belonging to this zone
         # loop for parsing all spots
         spot = SpotManagement()
-        spotList = [spot.getPoint()]
+        spotList = [spot]
         return spotList 
 
 
@@ -154,7 +154,15 @@ class SpotManagement:
         self.name = "CENTRE#124"
         self.state = "free"
         self.pointJson = self.getPoint()
+        self.coordinates = {7.7475, 48.5827}
 
+    def toJson(self):
+        return {
+            "id" : self.id,
+            "name" : self.name,
+            "state" : self.state,
+            "point" : self.pointJson
+        }
 
     # Data requests # 
 
@@ -164,10 +172,6 @@ class SpotManagement:
             'geometry': {
                 'type': 'Point',
                 'coordinates': [7.7475, 48.5827]
-            },
-            'properties': {
-                'title': 'Parking#001',
-                'description': 'État du parking: OK'
             }
         }
 

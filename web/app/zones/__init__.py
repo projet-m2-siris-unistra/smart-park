@@ -1,3 +1,5 @@
+import json as js
+
 from sanic import Blueprint, response
 from sanic.response import json
 
@@ -61,13 +63,14 @@ async def maintenance(request, zone):
 @bp.route('/<zone>/configuration')
 async def config(request, zone):
     zoneInstance = ZoneManagement(zone)
+    spotsJson = jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_config='true',
         zoneName=zone,
         zonePolygon=zoneInstance.getPolygon(),
-        spotList=zoneInstance.getSpotList()
+        spotList=spotsJson
     )
     return response.html(rendered_template)
 
@@ -85,21 +88,28 @@ async def submit_spots(request, zone):
     # checking spot list and adding to DB
     return response.html(rendered_template)
 
-
 # Handling Parking Spots
 @bp.route('/<zone>/spots')
 async def spots(request, zone):
     zoneInstance = ZoneManagement(zone)
+    spotsJson = jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_list='true', 
         zoneName=zone,
         zonePolygon=zoneInstance.getPolygon(),
-        spotList=zoneInstance.getSpotList()
+        spotList = spotsJson
     )
     return response.html(rendered_template)
 
 @bp.route('/<zone>/spots/<spot>')
 async def spot_edit(request, zone, spot):
     return response.text("edition de la place")
+
+# convert elements of list into Json
+def jsonList(arg):
+    liste = []
+    for item in arg:
+        liste.append(js.dumps(item.toJson()))
+    return liste

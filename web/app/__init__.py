@@ -7,6 +7,7 @@ import app.accounts
 import app.bus
 import app.config
 import app.zones
+import app.spots
 
 from app.templating import render
 from app.parkings import TenantManagement
@@ -19,6 +20,7 @@ app.static("/static", "./static")
 
 app.blueprint(accounts.bp)
 app.blueprint(zones.bp)
+app.blueprint(spots.bp)
 
 
 # Handling navigation
