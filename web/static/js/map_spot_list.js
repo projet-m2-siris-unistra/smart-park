@@ -29,8 +29,7 @@ if (spots != null) {
                 .setHTML(
                     '<h3>' + marker.name 
                     + '</h3><p>' + 'Etat du parking: ' + marker.state + '</p>'
-                    + "<a class=\"bx--btn bx--btn--primary\" href=\"#\">Éditer</a>"
-                    + "<a class=\"bx--btn bx--btn--tertiary\" href=\"#\">Statistiques</a>"
+                    + "<a class=\"bx--btn bx--btn--primary\" href=\"/spot/"+ marker.name +"\">Voir</a>"
                     + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
                 )
             )

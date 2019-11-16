@@ -49,6 +49,11 @@ h4, h3 {
     margin: 0;
 }
 
+.bread-link:visited  {
+    color: rgb(72, 127, 228);
+}
+
+
 /* DASHBOARD MEDIA QUERY */
 @media screen and (max-width: 1210px){
     .dashboard-widgets {
@@ -199,4 +204,24 @@ label {
 .spot-config-map {
     max-width: 1200px;
     height: 500px;
+}
+
+
+
+/* SPOTS */
+.spot-menu {
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.spot-div {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }

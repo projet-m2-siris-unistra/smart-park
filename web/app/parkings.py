@@ -7,7 +7,7 @@ class TenantManagement:
     def __init__(self, tenant_id):
         self.id = tenant_id
         #infos = self.getTenantFromDB()
-        self.name = "CENTRE"
+        self.name = "Schmilbligheim"
         self.coordinates = {'coordinates': [7.7475, 48.5827]}
 
     async def msg_handler(msg):
@@ -151,7 +151,7 @@ class SpotManagement:
 
     def __init__(self):
         self.id = 124
-        self.name = "CENTRE#124"
+        self.name = "CENTRE-124"
         self.state = "free"
         self.pointJson = self.getPoint()
         self.coordinates = {7.7475, 48.5827}

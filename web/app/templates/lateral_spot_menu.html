@@ -7,8 +7,17 @@
             <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path></svg>
         </div>
         <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
-            <li class="bx--tabs__nav-item {% if active_tab_view %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
+            <li class="bx--tabs__nav-item {% if active_tab_overview %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
                 <a class="bx--tabs__nav-link" href="{{ url_for("spots.overview", spot=spotName) }}">Vue d'ensemble</a>
+            </li>
+            <li class="bx--tabs__nav-item {% if active_tab_stats %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
+                <a class="bx--tabs__nav-link" href="{{ url_for("spots.stats", spot=spotName) }}">Statistiques</a>
+            </li>
+            <li class="bx--tabs__nav-item {% if active_tab_maintenance %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
+                <a class="bx--tabs__nav-link" href="{{ url_for("spots.maintenance", spot=spotName) }}">Maintenance</a>
+            </li>
+            <li class="bx--tabs__nav-item {% if active_tab_config %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
+                <a class="bx--tabs__nav-link" href="{{ url_for("spots.config", spot=spotName) }}">Configuration</a>
             </li>
         </ul>
     </div>
