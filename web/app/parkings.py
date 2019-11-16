@@ -52,6 +52,8 @@ class ZoneManagement:
         self.name = nameArg
         self.nb_total_spots = 456
         self.nb_taken_spots = 123
+        self.desc = "Parking description"
+        self.type = "Payant"
 
     # Getter / Setter #
 
@@ -141,7 +143,6 @@ class ZoneManagement:
         stats.append(self.getWeeklyStats())
         stats.append(self.getMonthlyStats())
         stats.append(self.getAnnualStats())
-
         return stats
 
 
@@ -180,25 +181,52 @@ class SpotManagement:
 
     def getDailyStats(self):
         stats = {
-            'nbUsers':12
+            'stats_type':'Daily',
+            'total_users':123,
+            'rate':18,
+            'is_charge':True,
+            'avg_price':0.34,
+            'earning':12
             }
         return stats
     
     def getWeeklyStats(self):
         stats = {
-            'nbUsers':54
+            'stats_type':'Weekly',
+            'total_users':123,
+            'rate':18,
+            'is_charge':True,
+            'avg_price':0.34,
+            'earning':12
             }
         return stats
 
     def getMonthlyStats(self):
         stats = {
-            'nbUsers':144
+            'stats_type':'Monthly',
+            'total_users':123,
+            'rate':18,
+            'is_charge':True,
+            'avg_price':0.34,
+            'earning':12
             }
         return stats
 
     def getAnnualStats(self):
         stats = {
-            'nbUsers':1029
+            'stats_type':'Annual',
+            'total_users':123,
+            'rate':18,
+            'is_charge':True,
+            'avg_price':0.34,
+            'earning':12
             }
         return stats
 
+    def getAllStats(self):
+        stats = []
+        stats.append(self.getDailyStats())
+        stats.append(self.getWeeklyStats())
+        stats.append(self.getMonthlyStats())
+        stats.append(self.getAnnualStats())
+        return stats

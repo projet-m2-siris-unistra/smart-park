@@ -8,6 +8,8 @@
 
     {% if active_tab_overview %}
         {% include "spot_overview.html" %}
+    {% elif active_tab_stats %}
+        {% include "stats_widget.html" %}
     {% endif %}
 
 {% endblock %}

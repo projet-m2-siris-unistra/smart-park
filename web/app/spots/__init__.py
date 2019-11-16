@@ -2,10 +2,11 @@ from sanic import Blueprint, response
 from sanic.response import json
 
 from app.parkings import TenantManagement
+from app.parkings import ZoneManagement
+from app.parkings import SpotManagement
 
 from app.templating import render
 
-from app.parkings import ZoneManagement
 
 bp = Blueprint("spots", url_prefix='/spot')
 
@@ -26,15 +27,17 @@ async def overview(request, spot):
 
 @bp.route('/<spot>/statistics')
 async def stats(request, spot):
-    tenant = TenantManagement(123)
-    zone = ZoneManagement("CENTRE")
+    tenantInstance = TenantManagement(123)
+    zoneInstance = ZoneManagement("CENTRE")
+    spotInstance = SpotManagement()
     rendered_template = await render(
         'spot_template.html', 
         request,
         active_tab_stats='true', 
         spotName=spot,
-        zoneName=zone.name,
-        tenantName=tenant.name
+        zoneName=zoneInstance.name,
+        statistics=spotInstance.getAllStats(),
+        tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
 

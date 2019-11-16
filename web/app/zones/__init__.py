@@ -69,7 +69,7 @@ async def maintenance(request, zone):
 
 @bp.route('/<zone>/configuration')
 async def config(request, zone):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(123)
     zoneInstance = ZoneManagement(zone)
     spotsJson = jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
@@ -77,8 +77,9 @@ async def config(request, zone):
         request,
         active_tab_config='true',
         zoneName=zone,
-        tenantName=tenant.name,    
+        tenantName=tenantInstance.name,    
         zonePolygon=zoneInstance.getPolygon(),
+        zoneInstance=zoneInstance,
         spotList=spotsJson
     )
     return response.html(rendered_template)
@@ -115,6 +116,36 @@ async def spots(request, zone):
         spotList = spotsJson
     )
     return response.html(rendered_template)
+
+# Interface for deleting a zone
+@bp.route('/<zone>/remove')
+async def remove(request, zone):
+    tenant = TenantManagement(123)
+    zoneInstance = ZoneManagement(zone)
+    spotsJson = jsonList(zoneInstance.getSpotList())
+    rendered_template = await render(
+        'zone_removing.html', 
+        request,
+        zoneName=zone,
+        tenantName=tenant.name
+    )
+    return response.html(rendered_template)
+
+@bp.route('/<zone>/remove-check')
+async def remove_check(request, zone):
+    # removing the zone
+    # removing the spots if needed
+    tenantInstance = TenantManagement(123)
+    rendered_template = await render(
+        "dashboard_template.html",
+        request, 
+        zoneList=tenantInstance.getZones(),
+        totalSpots=tenantInstance.getTotalSpots(),
+        takenSpots=tenantInstance.getTakenSpots(),
+        removed_zone=True
+    )
+    return response.html(rendered_template)
+
 
 # convert elements of list into Json
 def jsonList(arg):

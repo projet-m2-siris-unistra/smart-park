@@ -17,27 +17,27 @@
             <!-- expand icon td -->
             <td >
                 <!-- truncated new markup -->
-                GARE1
+                {{ item.name }}
             </td>
                     <!-- expand icon td -->
             <td >
                 <!-- truncated new markup -->
-                Parking de la gare
+                {{ item.desc }}
             </td>
                     <!-- expand icon td -->
             <td >
                 <!-- truncated new markup -->
-                Payant
+                {{ item.type }}
             </td>
                     <!-- expand icon td -->
             <td >
                 <!-- truncated new markup -->
-                350
+                {{ item.nb_total_spots }}
             </td>
                     <!-- expand icon td -->
             <td >
                 <!-- truncated new markup -->
-                312
+                {{ item.nb_total_spots - item.nb_taken_spots }}
             </td>
                     <!-- expand icon td -->
             <td >
@@ -52,15 +52,17 @@
                     <ul class="bx--overflow-menu-options bx--overflow-menu--flip">
 
                         <li class="bx--overflow-menu-options__option bx--table-row--menu-option">
-                        <a hhref="#" class="bx--overflow-menu-options__btn" onclick="console.log('keyboard action')">
+                        <a href="{{ url_for("zones.config", zone=item.name) }}" class="bx--overflow-menu-options__btn" onclick="console.log('keyboard action')">
                             <div class="bx--overflow-menu-options__option-content">
-                            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 13H15V14H1zM12.7 4.5c.4-.4.4-1 0-1.4 0 0 0 0 0 0l-1.8-1.8c-.4-.4-1-.4-1.4 0 0 0 0 0 0 0L2 8.8V12h3.2L12.7 4.5zM10.2 2L12 3.8l-1.5 1.5L8.7 3.5 10.2 2zM3 11V9.2l5-5L9.8 6l-5 5H3z"></path></svg> Editer
+                            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 13H15V14H1zM12.7 4.5c.4-.4.4-1 0-1.4 0 0 0 0 0 0l-1.8-1.8c-.4-.4-1-.4-1.4 0 0 0 0 0 0 0L2 8.8V12h3.2L12.7 4.5zM10.2 2L12 3.8l-1.5 1.5L8.7 3.5 10.2 2zM3 11V9.2l5-5L9.8 6l-5 5H3z"></path></svg> 
+                            Editer
                             </div>
                         </a>
                         <li class="bx--overflow-menu-options__option bx--table-row--menu-option">
-                        <a href="#" class="bx--overflow-menu-options__btn">
+                        <a href="{{ url_for("zones.remove", zone=item.name) }}" class="bx--overflow-menu-options__btn">
                             <div class="bx--overflow-menu-options__option-content">
-                            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 6H7V12H6zM9 6H10V12H9z"></path><path d="M2 3v1h1v10c0 .6.4 1 1 1h8c.6 0 1-.4 1-1V4h1V3H2zM4 14V4h8v10H4zM6 1H10V2H6z"></path></svg> Supprimer
+                            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 6H7V12H6zM9 6H10V12H9z"></path><path d="M2 3v1h1v10c0 .6.4 1 1 1h8c.6 0 1-.4 1-1V4h1V3H2zM4 14V4h8v10H4zM6 1H10V2H6z"></path></svg> 
+                            Supprimer
                             </div>
                         </a>
                         </li>

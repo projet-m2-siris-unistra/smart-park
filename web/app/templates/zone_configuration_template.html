@@ -10,10 +10,17 @@
         </button>
     </p>
     <p class="zone-config-field">
-        <label>Description:</label> une belle zone de parking.
+        <label>Description:</label> {{ zoneInstance.desc }}
         <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()">
             modifier
         </button>
+    </p>
+    <br>
+    <p class="zone-config-field">
+        <label>Supprimer la zone:</label>
+        <a class="bx--btn bx--btn--danger bx--btn--sm zone-modify-button" type="button" href="{{ url_for("zones.remove", zone=zoneName) }}">
+            supprimer
+        </a>
     </p>
     <div id="validate-general">
 

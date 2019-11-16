@@ -51,7 +51,13 @@ async def dashboard(request):
 
 @app.route("/zones")
 async def zones(request):
-    rendered_template = await render("zones_template.html", request)
+    tenantInstance = TenantManagement(123)
+    rendered_template = await render(
+        "tenant_zone_data_table.html", 
+        request,
+        zoneList=tenantInstance.getZones(),
+        tenantName=tenantInstance.name
+    )
     return response.html(rendered_template)
 
 
