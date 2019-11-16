@@ -13,7 +13,7 @@ from app.parkings import TenantManagement
 
 app = Sanic(__name__)
 app.register_listener(config.load, "before_server_start")
-bus.setup(app)
+bus.setup(app) # app.nc ==> connected object
 
 app.static("/static", "./static")
 

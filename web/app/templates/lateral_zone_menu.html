@@ -1,5 +1,5 @@
 <div class="zone-menu">
-    <h4>Zone {{ zoneName }}</h4>
+    <h3>Zone: {{ zoneName }}</h3 >
     <br>
     <div class="bx--tabs">
         <div class="bx--tabs-trigger" tabindex="0">
@@ -15,6 +15,9 @@
             </li>
             <li class="bx--tabs__nav-item {% if active_tab_stats %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
                 <a class="bx--tabs__nav-link" href="{{ url_for("zones.stats", zone=zoneName) }}">Statistiques</a>
+            </li>
+            <li class="bx--tabs__nav-item {% if active_tab_maintenance %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
+                    <a class="bx--tabs__nav-link" href="{{ url_for("zones.maintenance", zone=zoneName) }}">Maintenance</a>
             </li>
             <li class="bx--tabs__nav-item {% if active_tab_config %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
                 <a class="bx--tabs__nav-link" href="{{ url_for("zones.config", zone=zoneName) }}">Configuration</a>

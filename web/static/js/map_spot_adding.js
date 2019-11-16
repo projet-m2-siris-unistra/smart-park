@@ -37,8 +37,19 @@ function validate_marker() {
     console.debug(coordinates);
     addedMarkerList.push(coordinates);
 
-    // if not set, enable validating button
+    // display added marker
+    var placedSpotsDiv = document.getElementById('placed-spots');
+    if (count == 0) {
+        var title = document.createElement("h5");
+        title.innerHTML = "Places créées:";
+        placedSpotsDiv.appendChild(title);
+    }
+    var spotLine = document.createElement("p");
+    spotLine.className = "placed-spot-element";
+    spotLine.innerHTML = "Coordonnées: " + coordinates;
+    placedSpotsDiv.appendChild(spotLine);
 
+    // if not set, enable validating button
     count++;
     if (count < spotsLimit) {
         polygonClickEnabled = true;

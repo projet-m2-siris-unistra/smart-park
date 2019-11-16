@@ -1,8 +1,16 @@
-       
-<div id='map' class="spot-list-map"></div>
+<div id='map' class="spot-list-map">
+    <h4>Carte des places</h4>
+    <br>
+</div>
 <script type="text/javascript">
     window.spots = {{ spotList | tojson }};
     window.polygon = {{ zonePolygon | tojson }};
 </script>         
 
 <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
+
+<div class="zone-div">
+    <h4>Table des places</h4>
+    <br>
+    Bientôt...
+</div>

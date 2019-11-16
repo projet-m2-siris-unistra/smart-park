@@ -46,6 +46,18 @@ async def stats(request, zone):
     )
     return response.html(rendered_template)
 
+@bp.route('/<zone>/maintenance')
+async def maintenance(request, zone):
+    zoneInstance = ZoneManagement(zone)
+    rendered_template = await render(
+        'parking_template.html', 
+        request,
+        active_tab_maintenance='true',
+        zoneName=zone,
+        spotList=zoneInstance.getSpotList()
+    )
+    return response.html(rendered_template)
+
 @bp.route('/<zone>/configuration')
 async def config(request, zone):
     zoneInstance = ZoneManagement(zone)

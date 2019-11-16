@@ -5,8 +5,11 @@
     {% include "lateral_zone_menu.html" %}
 
     {% if active_tab_view %}
-        {% include "graphic_widget.html" %}
-        {% include "zone_summary_widget.html" %}
+        <div class="dashboard-widgets">
+            {% include "graphic_widget.html" %}
+            {% include "zone_summary_widget.html" %}
+            {% include "spots-status-widget.html" %}
+        </div>
     {% elif active_tab_list %}
         {% include "spot_list_template.html" %}
         {% block extra_inclusions %}
@@ -15,6 +18,8 @@
         {% endblock %}
     {% elif active_tab_stats %}
         {% include "stats_widget.html" %}
+    {% elif active_tab_maintenance %}
+        {% include "zone-maintenance.html" %}
     {% elif active_tab_config %}
         {% include "zone_configuration_template.html" %}
     {% endif %}

@@ -1,10 +1,26 @@
+from nats.aio.client import Client as NATS
+#from app import app.nc as nc
+
 # Instance of a tenant
 class TenantManagement:
 
     def __init__(self, tenant_id):
-        self.id = 1
-        self.name = "Schmilbligheim"
+        self.id = tenant_id
+        #infos = self.getTenantFromDB()
+        self.name = "CENTRE"
         self.coordinates = {'coordinates': [7.7475, 48.5827]}
+
+    async def msg_handler(msg):
+        subject = msg.subject
+        reply = msg.reply
+        data = msg.data.decode()
+        print("Received a message on '{subject} {reply}': {data}".format(
+            subject=subject, reply=reply, data=data))
+
+    #def getTenantFromDB():
+    #    sid = await nc.suscribe("postgre", cb=msg_handler)
+    #    await nc.publish("postgre", b'tenant')
+
 
     def getZones(self):
         zone_list = []
@@ -134,10 +150,9 @@ class ZoneManagement:
 class SpotManagement:
 
     def __init__(self):
-        self.id = 112535
-        self.name = "GARE1#124"
-        self.available = True
-        self.inService = True
+        self.id = 124
+        self.name = "CENTRE#124"
+        self.state = "free"
         self.pointJson = self.getPoint()
 
 
