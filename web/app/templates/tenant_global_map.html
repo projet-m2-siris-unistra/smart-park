@@ -1,0 +1,19 @@
+<div id='map' class="tenant-global-map"></div>
+         
+<script>
+
+    tenantCoor = {{ tenantCoor | tojson }};
+    window.zones = {{ zoneJsonList | tojson }};
+
+    /* Create map */
+    mapboxgl.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: tenantCoor.coordinates,
+        zoom: 14
+    });
+
+</script>
+
+<script type="text/javascript" src="/static/js/map_zones_list.js"></script>

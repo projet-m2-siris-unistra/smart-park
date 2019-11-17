@@ -1,11 +1,14 @@
 var spots = window.spots;
+var tenantCoor = window.tenantCoor;
+
+console.debug("tenantCoor: " + tenantCoor);
 
 // Create map
 mapboxgl.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
-    center: [7.7475, 48.5827],
+    center: tenantCoor.coordinates,
     zoom: 14
 });
 

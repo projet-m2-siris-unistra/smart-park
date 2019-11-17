@@ -5,6 +5,7 @@ from sanic.response import json
 
 from app.templating import render
 
+from app.parkings import Tooling
 from app.parkings import ZoneManagement
 from app.parkings import TenantManagement
 
@@ -71,7 +72,7 @@ async def maintenance(request, zone):
 async def config(request, zone):
     tenantInstance = TenantManagement(123)
     zoneInstance = ZoneManagement(zone)
-    spotsJson = jsonList(zoneInstance.getSpotList())
+    spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
         'parking_template.html', 
         request,
@@ -80,6 +81,8 @@ async def config(request, zone):
         tenantName=tenantInstance.name,    
         zonePolygon=zoneInstance.getPolygon(),
         zoneInstance=zoneInstance,
+        zoneColor=zoneInstance.color,
+        tenantCoor=tenantInstance.coordinates,
         spotList=spotsJson
     )
     return response.html(rendered_template)
@@ -103,17 +106,19 @@ async def submit_spots(request, zone):
 # Handling Parking Spots
 @bp.route('/<zone>/spots')
 async def spots(request, zone):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(123)
     zoneInstance = ZoneManagement(zone)
-    spotsJson = jsonList(zoneInstance.getSpotList())
+    spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_list='true', 
         zoneName=zone,
-        tenantName=tenant.name,
+        tenantName=tenantInstance.name,
+        tenantCoor=tenantInstance.coordinates,
         zonePolygon=zoneInstance.getPolygon(),
-        spotList = spotsJson
+        zoneColor=zoneInstance.color,
+        spotList=spotsJson
     )
     return response.html(rendered_template)
 
@@ -122,7 +127,7 @@ async def spots(request, zone):
 async def remove(request, zone):
     tenant = TenantManagement(123)
     zoneInstance = ZoneManagement(zone)
-    spotsJson = jsonList(zoneInstance.getSpotList())
+    spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
         'zone_removing.html', 
         request,
@@ -145,11 +150,3 @@ async def remove_check(request, zone):
         removed_zone=True
     )
     return response.html(rendered_template)
-
-
-# convert elements of list into Json
-def jsonList(arg):
-    liste = []
-    for item in arg:
-        liste.append(js.dumps(item.toJson()))
-    return liste

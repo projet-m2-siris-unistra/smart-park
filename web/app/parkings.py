@@ -1,5 +1,14 @@
 from nats.aio.client import Client as NATS
+import json as js
 #from app import app.nc as nc
+
+class Tooling:
+    # convert elements of list into Json
+    def jsonList(arg):
+        liste = []
+        for item in arg:
+            liste.append(js.dumps(item.toJson()))
+        return liste
 
 # Instance of a tenant
 class TenantManagement:
@@ -23,11 +32,10 @@ class TenantManagement:
 
 
     def getZones(self):
-        zone_list = []
         # request the zones linked to this town
-        zone1 = ZoneManagement("CENTRE")
-        zone_list.append(zone1)
-        return zone_list
+        zone = ZoneManagement("CENTRE")
+        zoneList = [zone]
+        return zoneList 
 
     def getTotalSpots(self):
         count = 0
@@ -54,6 +62,20 @@ class ZoneManagement:
         self.nb_taken_spots = 123
         self.desc = "Parking description"
         self.type = "Payant"
+        self.color = "#f4e628"
+
+    def toJson(self):
+        return {
+            "id" : self.id,
+            "name" : self.name,
+            "nb_total_spots" : self.nb_total_spots,
+            "nb_taken_spots" : self.nb_taken_spots,
+            "desc" : self.desc,
+            "type" : self.type,
+            "color" : self.color,
+            "coordinates" : self.getPolygon(),
+            "spots" : Tooling.jsonList(self.getSpotList())
+        }
 
     # Getter / Setter #
 
@@ -67,21 +89,18 @@ class ZoneManagement:
     # Data requests #
 
     def getPolygon(self):
-        return {
-            'coordinates': [
-                [7.739396,48.579816],[7.742014,48.579957],
-                [7.744117,48.579134],[7.747464,48.578623],
-                [7.74888,48.57885],[7.751756,48.579929],
-                [7.755189,48.581831],[7.756906,48.583251],
-                [7.754288,48.58555],[7.753558,48.586061],
-                [7.751455,48.586743],[7.748537,48.58714],
-                [7.746906,48.586828],[7.744503,48.585834],
-                [7.740769,48.584244],[7.73901,48.582967],
-                [7.738409,48.581973],[7.738495,48.580781],
-                [7.739396,48.579816]
-            ],
-            'color': '#f4e628',
-        }
+        return [
+            [7.739396,48.579816],[7.742014,48.579957],
+            [7.744117,48.579134],[7.747464,48.578623],
+            [7.74888,48.57885],[7.751756,48.579929],
+            [7.755189,48.581831],[7.756906,48.583251],
+            [7.754288,48.58555],[7.753558,48.586061],
+            [7.751455,48.586743],[7.748537,48.58714],
+            [7.746906,48.586828],[7.744503,48.585834],
+            [7.740769,48.584244],[7.73901,48.582967],
+            [7.738409,48.581973],[7.738495,48.580781],
+            [7.739396,48.579816]
+        ]
     
     def getSpotList(self):
         # requesting all spots belonging to this zone

@@ -1,4 +1,5 @@
 var polygon = window.polygon;
+var color = window.color;
 
 if (polygon != null) {
     // Loading elements on map 
@@ -14,17 +15,16 @@ if (polygon != null) {
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Polygon',
-                        'coordinates': [polygon.coordinates]
+                        'coordinates': [polygon]
                     }
                 }
             },
             'paint': {
-                'fill-color': polygon.color,
+                'fill-color': color,
                 'fill-opacity': 0.2
             }
         }
         map.addLayer(polygonGeoJson);
-
     });
 }
 else {

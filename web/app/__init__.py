@@ -11,6 +11,8 @@ import app.spots
 
 from app.templating import render
 from app.parkings import TenantManagement
+from app.parkings import ZoneManagement
+from app.parkings import Tooling
 
 app = Sanic(__name__)
 app.register_listener(config.load, "before_server_start")
@@ -63,7 +65,15 @@ async def zones(request):
 
 @app.route("/map")
 async def map(request):
-    rendered_template = await render("map_template.html", request)
+    tenantInstance = TenantManagement(123)
+    zonesJson = Tooling.jsonList(tenantInstance.getZones())
+    rendered_template = await render(
+        "map_template.html",
+        request,
+        tenantName=tenantInstance.name,
+        tenantCoor=tenantInstance.coordinates,
+        zoneJsonList=zonesJson
+    )
     return response.html(rendered_template)
 
 @app.route("/configuration")

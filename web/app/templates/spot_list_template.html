@@ -2,9 +2,12 @@
     <h4>Carte des places</h4>
     <br>
 </div>
+
 <script type="text/javascript">
     window.spots = {{ spotList | tojson }};
     window.polygon = {{ zonePolygon | tojson }};
+    window.color = "{{ zoneColor }}";
+    window.tenantCoor = {{ tenantCoor | tojson }};
 </script>         
 
 <script type="text/javascript" src="/static/js/map_spot_list.js"></script>

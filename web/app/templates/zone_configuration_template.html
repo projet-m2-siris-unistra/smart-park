@@ -38,6 +38,9 @@
     <script type="text/javascript">
         window.spots = {{ spotList | tojson }};
         window.polygon = {{ zonePolygon | tojson }};
+        window.tenantCoor = {{ tenantCoor | tojson }};
+        console.debug("zone-config:tenantCoor:"+window.tenantCoor);
+        window.color = "{{ zoneColor }}";
     </script>
 
     <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
