@@ -10,6 +10,7 @@ import (
 func Register(conn *nats.Conn) {
 	log.Println("handlers: register")
 	conn.Subscribe("ping", ping)
+	conn.Subscribe("devices.get", getDevice)
 }
 
 func Publisher(conn *nats.Conn, subj string, data []byte) {

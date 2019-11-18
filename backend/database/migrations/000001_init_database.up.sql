@@ -6,6 +6,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- owner of the park (example  : Schmilbligheim)
 CREATE TABLE tenants
 (
 	tenant_id  serial      PRIMARY KEY,
@@ -29,7 +30,7 @@ CREATE TABLE zones
 	tenant_id  integer     NOT NULL REFERENCES tenants(tenant_id),
 	name       text        NOT NULL,
 	type       zonetype    NOT NULL,
-	color      char(6)     CHECK (color ~ '^[0-9A-F]{6}$'),    --to convert to hex
+	color      char(6)     CHECK (color ~ '^[0-9A-F]{6}$'),    --to convert to hex / color picker
 	geo        text,       --GEOGRAPHY(linestring),
 	created_at timestamptz NOT NULL DEFAULT NOW(),
 	updated_at timestamptz NOT NULL DEFAULT NOW()
@@ -58,7 +59,7 @@ CREATE TABLE places
 (
 	place_id   serial      PRIMARY KEY,
 	zone_id    integer     REFERENCES zones(zone_id),
-	type       varchar(50) UNIQUE NOT NULL,
+	type       varchar(50) UNIQUE NOT NULL, -- type (moto, car)
 	geo        text,       --GEOGRAPHY(point)
 	device_id  integer     REFERENCES devices(device_id),
 	created_at timestamptz NOT NULL DEFAULT NOW(),
