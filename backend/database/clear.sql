@@ -1,0 +1,5 @@
+DELETE FROM users;
+DELETE FROM places;
+DELETE FROM devices;
+DELETE FROM zones;
+DELETE FROM tenants;
