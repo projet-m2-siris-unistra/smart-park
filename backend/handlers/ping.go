@@ -10,8 +10,10 @@ import (
 )
 
 func ping(m *nats.Msg) {
+	ctx := context.TODO()
 	log.Println("handlers: handling ping")
-	ret, err := database.Ping(context.TODO())
+
+	ret, err := database.Ping(ctx)
 	if err != nil {
 		return
 	}
