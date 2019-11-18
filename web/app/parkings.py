@@ -1,35 +1,61 @@
-from nats.aio.client import Client as NATS
 import json as js
-#from app import app.nc as nc
+import datetime
+
+from app.bus import Request
+
 
 class Tooling:
+
     # convert elements of list into Json
+    @staticmethod
     def jsonList(arg):
         liste = []
         for item in arg:
             liste.append(js.dumps(item.toJson()))
         return liste
 
+
 # Instance of a tenant
 class TenantManagement:
 
     def __init__(self, tenant_id):
+        #res = Request.getTenant(12)
         self.id = tenant_id
-        #infos = self.getTenantFromDB()
         self.name = "Schmilbligheim"
         self.coordinates = {'coordinates': [7.7475, 48.5827]}
+        self.zones = []
 
-    async def msg_handler(msg):
-        subject = msg.subject
-        reply = msg.reply
-        data = msg.data.decode()
-        print("Received a message on '{subject} {reply}': {data}".format(
-            subject=subject, reply=reply, data=data))
+    '''
+        NATS: topic = nom de la fonction
+              payload = parametres en JSON
+              communication en JSON 
 
-    #def getTenantFromDB():
-    #    sid = await nc.suscribe("postgre", cb=msg_handler)
-    #    await nc.publish("postgre", b'tenant')
+        exemple réponse sur une place (inclu objet device et zone)
+        {"place_id": 12}
+        {
+            "place_id": 12,
+            "zone": {
+                "zone_id": 4,
+                ...
+            },
+            "device": {
+                "device_id": 42,
+                "status": "occupied",
+                
+            }
+        } 
+            ==> extension sur une couche (remonte pas jusqu'au tenant)
 
+        # Send a request and expect a single response
+        # and trigger timeout if not faster than 1 second.
+        try:
+            response = await nc.request("help", b'help me', timeout=1)
+            print("Received response: {message}".format(
+                message=response.data.decode()))
+        except ErrTimeout:
+            print("Request timed out")
+
+    '''
 
     def getZones(self):
         # request the zones linked to this town
@@ -63,6 +89,7 @@ class ZoneManagement:
         self.desc = "Parking description"
         self.type = "Payant"
         self.color = "#f4e628"
+        self.spots = []
 
     def toJson(self):
         return {
@@ -175,6 +202,7 @@ class SpotManagement:
         self.state = "free"
         self.pointJson = self.getPoint()
         self.coordinates = {7.7475, 48.5827}
+        self.device = "lul"
 
     def toJson(self):
         return {
@@ -249,3 +277,15 @@ class SpotManagement:
         stats.append(self.getMonthlyStats())
         stats.append(self.getAnnualStats())
         return stats
+
+
+
+# instance of a device
+class DeviceManagement:
+
+    def __init__(self):
+        self.id = 12
+        self.battery = 100 # between 0 and 100
+        self.state = "free"
+        # creation date
+        # updated date
