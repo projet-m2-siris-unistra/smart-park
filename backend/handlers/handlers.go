@@ -13,6 +13,7 @@ import (
 var handlers = map[string]interface{}{
 	"ping":        ping,
 	"devices.get": getDevice,
+	"tenants.get": getTenant,
 }
 
 // wrapHandler wraps a handler to do error handling and request/reply marshaling/unmarshaling
