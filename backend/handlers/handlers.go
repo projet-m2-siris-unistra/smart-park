@@ -11,13 +11,13 @@ import (
 )
 
 var handlers = map[string]interface{}{
-	"ping":        ping,
-	"devices.get": getDevice,
-	"tenants.get": getTenant,
-	"zones.get":   getZone,
-	"places.get":  getPlace,
-	"users.get":   getUser,
-	//"devices.list": getDevices,
+	"ping":         ping,
+	"devices.get":  getDevice,
+	"tenants.get":  getTenant,
+	"zones.get":    getZone,
+	"places.get":   getPlace,
+	"users.get":    getUser,
+	"devices.list": getDevices,
 	//"tenants.get": getTenants,
 	//"zones.get": getZones,
 	//"places.get": getPlaces,
