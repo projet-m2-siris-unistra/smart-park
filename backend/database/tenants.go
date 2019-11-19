@@ -3,15 +3,16 @@ package database
 import (
 	"context"
 	"time"
+
+	"gopkg.in/guregu/null.v3"
 )
 
 // Tenant : owner of one park
 type Tenant struct {
-	TenantID  int       `json:"id"`
-	Name      string    `json:"name"`
-	Geography string    `json:"geo"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	TenantID  int         `json:"id"`
+	Name      string      `json:"name"`
+	Geography null.String `json:"geo"`
+	Timestamps
 }
 
 // GetTenant fetches the tenant by its ID

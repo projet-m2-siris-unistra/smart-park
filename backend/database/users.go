@@ -3,18 +3,19 @@ package database
 import (
 	"context"
 	"time"
+
+	"gopkg.in/guregu/null.v3"
 )
 
-// User:
+// User describes a user in the database
 type User struct {
 	UserID    int       `json:"user_id"`
-	TenantID  int       `json:"tenant_id`
-	Username  string    `json:"username`
-	Password  string    `json:"password`
-	Email     string    `json:"email`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	LastLogin time.Time `json:"last_login`
+	TenantID  int       `json:"tenant_id"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+	Email     string    `json:"email"`
+	LastLogin null.Time `json:"last_login"`
+	Timestamps
 }
 
 // GetUser fetches the user by its ID

@@ -3,18 +3,19 @@ package database
 import (
 	"context"
 	"time"
+
+	"gopkg.in/guregu/null.v3"
 )
 
 // Zone :
 type Zone struct {
-	ZoneID    int       `json:"zone_id"`
-	TenantID  int       `json:"tenant_id"`
-	Name      string    `json:"name"`
-	Type      string    `json:"type"`
-	Color     string    `json:"color"`
-	Geography string    `json:"geo"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ZoneID    int         `json:"zone_id"`
+	TenantID  int         `json:"tenant_id"`
+	Name      string      `json:"name"`
+	Type      string      `json:"type"`
+	Color     null.String `json:"color"`
+	Geography null.String `json:"geo"`
+	Timestamps
 }
 
 // GetZone fetches the zone by its ID

@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"time"
 )
 
@@ -16,13 +18,42 @@ const (
 	//nil
 )
 
+func (s DeviceState) MarshalJSON() ([]byte, error) {
+	switch s {
+	case Free:
+		return json.Marshal("free")
+	case Occupied:
+		return json.Marshal("occupied")
+	}
+
+	return nil, errors.New("invalid device state")
+}
+
+func (s *DeviceState) UnmarshalJSON(b []byte) error {
+	var j string
+	err := json.Unmarshal(b, &j)
+	if err != nil {
+		return err
+	}
+
+	switch j {
+	case "free":
+		*s = Free
+	case "occupied":
+		*s = Occupied
+	default:
+		return errors.New("invalid DeviceState")
+	}
+
+	return nil
+}
+
 // Device represents an IoT device
 type Device struct {
-	DeviceID  int       `json:"device_id"`
-	Battery   int       `json:"battery"`
-	State     string    `json:"state"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	DeviceID int    `json:"device_id"`
+	Battery  int    `json:"battery"`
+	State    string `json:"state"`
+	Timestamps
 }
 
 // GetDevice fetches the device by its ID

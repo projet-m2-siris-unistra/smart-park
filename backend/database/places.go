@@ -3,17 +3,18 @@ package database
 import (
 	"context"
 	"time"
+
+	"gopkg.in/guregu/null.v3"
 )
 
 // Place : owner of one park
 type Place struct {
-	PlaceID   int       `json:"place_id"`
-	ZoneID    int       `json:"zone_id"`
-	Type      string    `json:"type"`
-	Geography string    `json:"geo"`
-	DeviceID  int       `json:"device_id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	PlaceID   int         `json:"place_id"`
+	ZoneID    int         `json:"zone_id"`
+	Type      string      `json:"type"`
+	Geography null.String `json:"geo"`
+	DeviceID  int         `json:"device_id"`
+	Timestamps
 }
 
 // GetPlace fetches the place by its ID
