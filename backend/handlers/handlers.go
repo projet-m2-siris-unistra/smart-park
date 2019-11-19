@@ -39,8 +39,18 @@ func wrapHandler(fn interface{}) func(*nats.Msg) {
 	handler := reflect.ValueOf(fn)
 	fnType := reflect.TypeOf(fn)
 
-	// Check that the handler takes two parameters
-	if fnType.NumIn() != 2 {
+	// Check the number of inputs variables
+	// If there is only one, this topic does not have any argyments
+	// If there are two, the message will be parsed with the type of the first output
+	var hasRequest bool
+	var requestType reflect.Type
+	switch fnType.NumIn() {
+	case 1:
+		hasRequest = false
+	case 2:
+		hasRequest = true
+		requestType = fnType.In(1)
+	default:
 		log.Fatal(errors.New("invalid number of inputs in handler"))
 	}
 
@@ -59,32 +69,39 @@ func wrapHandler(fn interface{}) func(*nats.Msg) {
 		log.Fatal(errors.New("invalid number of outputs in handler"))
 	}
 
-	// Get the request type from the handler signature
-	requestType := fnType.In(1)
-
 	// Here's the "real" handler
 	return func(m *nats.Msg) {
+		var err error
+
 		// Create the context for this handler
 		// We might want to inherit it from somewhere later
 		ctx, cancel := context.WithCancel(context.TODO())
 		defer cancel()
 
-		// Create an empty request type from the handler signature
-		request := reflect.New(requestType).Interface()
+		ctxValue := reflect.ValueOf(ctx)
 
-		// Unmarshal the JSON message
-		err := json.Unmarshal(m.Data, request)
-		if err != nil {
-			log.Println(err)
-			return
+		// Prepare the arguments for the call to the handler
+		callArgs := []reflect.Value{ctxValue}
+
+		if hasRequest {
+			// Create an empty request type from the handler signature
+			request := reflect.New(requestType).Interface()
+
+			// Unmarshal the JSON message
+			err = json.Unmarshal(m.Data, request)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			requestValue := reflect.ValueOf(request)
+
+			callArgs = append(callArgs, reflect.Indirect(requestValue))
 		}
 
 		// Call the handler.
 		// Calling a reflected function is a bit tricky and involves using
 		// reflect.Value objects.
-		ctxValue := reflect.ValueOf(ctx)
-		requestValue := reflect.ValueOf(request)
-		out := handler.Call([]reflect.Value{ctxValue, reflect.Indirect(requestValue)})
+		out := handler.Call(callArgs)
 
 		// Extract the error and check it.
 		// It is the last thing returned by the handler.
