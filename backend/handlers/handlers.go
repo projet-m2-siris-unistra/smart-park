@@ -18,10 +18,10 @@ var handlers = map[string]interface{}{
 	"places.get":   getPlace,
 	"users.get":    getUser,
 	"devices.list": getDevices,
-	//"tenants.get": getTenants,
-	//"zones.get": getZones,
-	//"places.get": getPlaces,
-	//"users.get": getUsers,
+	"tenants.list": getTenants,
+	"zones.list":   getZones,
+	"places.list":  getPlaces,
+	"users.list":   getUsers,
 }
 
 // wrapHandler wraps a handler to do error handling and request/reply marshaling/unmarshaling

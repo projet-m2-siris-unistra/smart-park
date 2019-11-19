@@ -16,3 +16,9 @@ func getTenant(ctx context.Context, request getTenantRequest) (database.Tenant, 
 
 	return database.GetTenant(ctx, request.TenantID)
 }
+
+func getTenants(ctx context.Context, request getTenantRequest) ([]database.Tenant, error) {
+	log.Println("handlers: handling getTenants")
+
+	return database.GetTenants(ctx)
+}

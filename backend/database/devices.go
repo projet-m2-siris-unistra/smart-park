@@ -15,9 +15,9 @@ const (
 	Free DeviceState = iota + 1
 	// Occupied devices have a vehicle on it
 	Occupied
-	//nil
 )
 
+// MarshalJSON : encode to JSON
 func (s DeviceState) MarshalJSON() ([]byte, error) {
 	switch s {
 	case Free:
@@ -29,6 +29,7 @@ func (s DeviceState) MarshalJSON() ([]byte, error) {
 	return nil, errors.New("invalid device state")
 }
 
+// UnmarshalJSON : decode JSON
 func (s *DeviceState) UnmarshalJSON(b []byte) error {
 	var j string
 	err := json.Unmarshal(b, &j)
@@ -50,9 +51,9 @@ func (s *DeviceState) UnmarshalJSON(b []byte) error {
 
 // Device represents an IoT device
 type Device struct {
-	DeviceID int    `json:"device_id"`
-	Battery  int    `json:"battery"`
-	State    string `json:"state"`
+	DeviceID int         `json:"device_id"`
+	Battery  int         `json:"battery"`
+	State    DeviceState `json:"state"`
 	Timestamps
 }
 
@@ -79,7 +80,7 @@ func GetDevice(ctx context.Context, deviceID int) (Device, error) {
 }
 
 // GetDevices : get all the device
-func GetDevices(ctx context.Context, deviceID int) ([]Device, error) {
+func GetDevices(ctx context.Context) ([]Device, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 

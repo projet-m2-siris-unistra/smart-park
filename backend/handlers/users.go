@@ -16,3 +16,9 @@ func getUser(ctx context.Context, request getUserRequest) (database.User, error)
 
 	return database.GetUser(ctx, request.UserID)
 }
+
+func getUsers(ctx context.Context, request getUserRequest) ([]database.User, error) {
+	log.Println("handlers: handling getUsers")
+
+	return database.GetUsers(ctx)
+}

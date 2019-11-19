@@ -25,7 +25,7 @@ func GetPlace(ctx context.Context, placeID int) (Place, error) {
 	var place Place
 
 	err := pool.QueryRowContext(ctx, `
-		SELECT place_id, zone_id, type, geo, device_id, created_at, updated_at
+		SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
 		FROM places 
 		WHERE place_id = $1
 	`, placeID).
@@ -37,4 +37,42 @@ func GetPlace(ctx context.Context, placeID int) (Place, error) {
 	}
 
 	return place, nil
+}
+
+// GetPlaces : get all the place
+func GetPlaces(ctx context.Context) ([]Place, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var places []Place
+	var place Place
+	var i int
+
+	i = 0
+	rows, err := pool.QueryContext(ctx,
+		`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
+		FROM places`)
+
+	if err != nil {
+		return places, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&place.PlaceID, &place.ZoneID, &place.Type, &place.Geography, &place.DeviceID,
+			&place.CreatedAt, &place.UpdatedAt)
+		if err != nil {
+			return places, err
+		}
+		places = append(places, place)
+		i = i + 1
+	}
+
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return places, err
+	}
+
+	return places, nil
 }

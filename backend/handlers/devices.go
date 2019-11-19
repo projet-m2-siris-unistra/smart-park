@@ -20,5 +20,5 @@ func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, 
 func getDevices(ctx context.Context, request getDeviceRequest) ([]database.Device, error) {
 	log.Println("handlers: handling getDevices")
 
-	return database.GetDevices(ctx, request.DeviceID)
+	return database.GetDevices(ctx)
 }

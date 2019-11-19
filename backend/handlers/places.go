@@ -16,3 +16,9 @@ func getPlace(ctx context.Context, request getPlaceRequest) (database.Place, err
 
 	return database.GetPlace(ctx, request.PlaceID)
 }
+
+func getPlaces(ctx context.Context, request getPlaceRequest) ([]database.Place, error) {
+	log.Println("handlers: handling getPlaces")
+
+	return database.GetPlaces(ctx)
+}

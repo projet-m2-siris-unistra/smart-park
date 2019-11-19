@@ -16,3 +16,9 @@ func getZone(ctx context.Context, request getZoneRequest) (database.Zone, error)
 
 	return database.GetZone(ctx, request.ZoneID)
 }
+
+func getZones(ctx context.Context, request getZoneRequest) ([]database.Zone, error) {
+	log.Println("handlers: handling getZones")
+
+	return database.GetZones(ctx)
+}
