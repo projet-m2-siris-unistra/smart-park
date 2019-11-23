@@ -74,17 +74,33 @@ func GetZone(ctx context.Context, zoneID int) (Zone, error) {
 	defer cancel()
 
 	var zone Zone
+	var tmp null.String
+	var d *string
 
 	err := pool.QueryRowContext(ctx, `
 		SELECT zone_id, tenant_id, name, type, color, geo, created_at, updated_at
 		FROM zones 
 		WHERE zone_id = $1
 	`, zoneID).
-		Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
+		Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
 			&zone.CreatedAt, &zone.UpdatedAt)
 
 	if err != nil {
 		return zone, err
+	}
+
+	if tmp.IsZero() == true {
+		zone.Type = FreeZone
+	} else {
+		d = tmp.Ptr()
+		switch *d {
+		case "paid":
+			zone.Type = Paid
+		case "blue":
+			zone.Type = Blue
+		default:
+			zone.Type = FreeZone
+		}
 	}
 
 	return zone, nil
@@ -98,6 +114,8 @@ func GetZones(ctx context.Context) ([]Zone, error) {
 	var zones []Zone
 	var zone Zone
 	var i int
+	var tmp null.String
+	var d *string
 
 	i = 0
 	rows, err := pool.QueryContext(ctx,
@@ -110,10 +128,23 @@ func GetZones(ctx context.Context) ([]Zone, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
+		err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
 			&zone.CreatedAt, &zone.UpdatedAt)
 		if err != nil {
 			return zones, err
+		}
+		if tmp.IsZero() == true {
+			zone.Type = FreeZone
+		} else {
+			d = tmp.Ptr()
+			switch *d {
+			case "paid":
+				zone.Type = Paid
+			case "blue":
+				zone.Type = Blue
+			default:
+				zone.Type = FreeZone
+			}
 		}
 		zones = append(zones, zone)
 		i = i + 1
