@@ -2,7 +2,11 @@ package database
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"time"
+
+	"gopkg.in/guregu/null.v3"
 )
 
 // DeviceState represents the state of the device
@@ -13,15 +17,52 @@ const (
 	Free DeviceState = iota + 1
 	// Occupied devices have a vehicle on it
 	Occupied
+	// NotAssigned devices
+	NotAssigned
 )
+
+// MarshalJSON : encode to JSON
+func (s DeviceState) MarshalJSON() ([]byte, error) {
+	switch s {
+	case Free:
+		return json.Marshal("free")
+	case Occupied:
+		return json.Marshal("occupied")
+	case NotAssigned:
+		return json.Marshal("notassigned")
+	}
+
+	return nil, errors.New("invalid device state")
+}
+
+// UnmarshalJSON : decode JSON
+func (s *DeviceState) UnmarshalJSON(b []byte) error {
+	var j string
+	err := json.Unmarshal(b, &j)
+	if err != nil {
+		return err
+	}
+
+	switch j {
+	case "free":
+		*s = Free
+	case "occupied":
+		*s = Occupied
+	case "notassigned":
+		*s = NotAssigned
+	default:
+		return errors.New("invalid DeviceState")
+	}
+
+	return nil
+}
 
 // Device represents an IoT device
 type Device struct {
-	DeviceID  int       `json:"device_id"`
-	Battery   int       `json:"battery"`
-	State     string    `json:"state"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	DeviceID int         `json:"device_id"`
+	Battery  int         `json:"battery"`
+	State    DeviceState `json:"state"`
+	Timestamps
 }
 
 // GetDevice fetches the device by its ID
@@ -30,18 +71,85 @@ func GetDevice(ctx context.Context, deviceID int) (Device, error) {
 	defer cancel()
 
 	var device Device
+	var tmp null.String
+	var d *string
 
 	err := pool.QueryRowContext(ctx, `
 		SELECT device_id, battery, state, created_at, updated_at
 		FROM devices 
 		WHERE device_id = $1
 	`, deviceID).
-		Scan(&device.DeviceID, &device.Battery, &device.State,
+		Scan(&device.DeviceID, &device.Battery, &tmp,
 			&device.CreatedAt, &device.UpdatedAt)
 
 	if err != nil {
 		return device, err
 	}
 
+	if tmp.IsZero() == true {
+		device.State = NotAssigned
+	} else {
+		d = tmp.Ptr()
+		switch *d {
+		case "free":
+			device.State = Free
+		case "occupied":
+			device.State = Occupied
+		default:
+			device.State = NotAssigned
+		}
+	}
 	return device, nil
+}
+
+// GetDevices : get all the device
+func GetDevices(ctx context.Context) ([]Device, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var devices []Device
+	var device Device
+	var i int
+	var d *string
+	var tmp null.String
+
+	i = 0
+	rows, err := pool.QueryContext(ctx,
+		`SELECT device_id, battery, state, created_at, updated_at FROM devices`)
+
+	if err != nil {
+		return devices, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
+			&device.CreatedAt, &device.UpdatedAt)
+		if err != nil {
+			return devices, err
+		}
+		if tmp.IsZero() == true {
+			device.State = NotAssigned
+		} else {
+			d = tmp.Ptr()
+			switch *d {
+			case "free":
+				device.State = Free
+			case "occupied":
+				device.State = Occupied
+			default:
+				device.State = NotAssigned
+			}
+		}
+		devices = append(devices, device)
+		i = i + 1
+	}
+
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return devices, err
+	}
+
+	return devices, nil
 }

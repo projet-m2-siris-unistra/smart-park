@@ -1,12 +1,18 @@
 import asyncio
-from nats.aio.client import Client as NATS
 import sys
+
+from nats.aio.client import Client as NATS
+
 
 async def run():
     nc = NATS()
     await nc.connect()
 
-    response = await nc.request(sys.argv[1], bytes(sys.argv[2], 'utf-8'), timeout=1)
+    payload = b""
+    if len(sys.argv) == 3:
+        payload = bytes(sys.argv[2], "utf-8")
+
+    response = await nc.request(sys.argv[1], payload, timeout=1)
     print(response.data)
 
     await nc.close()
