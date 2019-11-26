@@ -15,15 +15,17 @@ class Tooling:
 
     """
     converting a string of format
-        "x1,y1 ; x2,y2 ; x3,y3"
+            "x1,y1 ; x2,y2 ; x3,y3"
     into a list of coordinates of format
         [[x1,y1], [x2,y2], [x3, y3]]
     """
     @staticmethod
     def stringToCoordinates(arg):
         liste = []
-        coorList = arg.split(";") # THIS WILL BE A ';' SOON...
-        liste.append(coorList)
+        #coorList = arg.split("],[") # THIS WILL BE A ';' SOON...
+        coorList = arg[1:]
+        #liste.append(coorList)
+        print(coorList)
         return coorList
         #for item in coorList:
         #    coors = item.split(",")
@@ -44,7 +46,8 @@ class TenantManagement:
         response = await Request.getTenant(tenant_id)
         data = js.loads(response)
         self.name = data['name']
-        self.coordinates = Tooling.stringToCoordinates(data['geo'])
+        print(data['geo'])
+        self.coordinates = data['geo']
 
     def getZones(self):
         # request the zones linked to this town
@@ -190,7 +193,7 @@ class SpotManagement:
         self.name = "CENTRE-124"
         self.state = "free"
         self.pointJson = self.getPoint()
-        self.coordinates = {7.7475, 48.5827}
+        self.coordinates = [7.7475, 48.5827]
         self.device = "lul"
 
     def toJson(self):

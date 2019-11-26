@@ -38,7 +38,7 @@
     <script type="text/javascript">
         window.spots = {{ spotList | tojson }};
         window.polygon = {{ zonePolygon | tojson }};
-        window.tenantCoor = {{ tenantCoor | tojson }};
+        window.tenantCoor = {{ tenantCoor }};
         console.debug("zone-config:tenantCoor:"+window.tenantCoor);
         window.color = "{{ zoneColor }}";
     </script>

@@ -41,8 +41,8 @@ async def home(request):
 
 @app.route("/dashboard")
 async def dashboard(request):
-    # request from ID
     tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     rendered_template = await render(
         "dashboard_template.html",
         request, 
@@ -55,7 +55,8 @@ async def dashboard(request):
 
 @app.route("/zones")
 async def zones(request):
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     rendered_template = await render(
         "tenant_zone_data_table.html", 
         request,
@@ -68,6 +69,7 @@ async def zones(request):
 @app.route("/map")
 async def map(request):
     tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zonesJson = Tooling.jsonList(tenantInstance.getZones())
     rendered_template = await render(
         "map_template.html",
@@ -118,7 +120,8 @@ async def ping(request):
 @app.route("/getTenant")
 async def getTenant(request):
     ret = await bus.getTenant(1)
-    return response.json(ret)
+    data = js.loads(ret)
+    return response.json(data["geo"])
 
 
 @click.command()
