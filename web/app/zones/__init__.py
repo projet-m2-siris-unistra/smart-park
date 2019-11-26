@@ -26,76 +26,82 @@ async def zone_creation_check(request):
     # Linking to zone management
     return response.json(request.form)
 
-@bp.route('/<zone>')
-@bp.route('/<zone>/overview')
-#@bp.route('/zone/<zone_id>')
-async def view(request, zone):
+@bp.route('/zone/<zone_id>')
+@bp.route('/zone/<zone_id>/overview')
+async def view(request, zone_id):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
 
-    zone_id = int(request.raw_args['id'])
-    zoneInstance = ZoneManagement(zone_id, zone)
+    zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
 
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_view='true', 
-        zoneName=zone,
+        zoneName=zoneInstance.name,
+        zone_id=zone_id,
         tenantName=tenantInstance.name,
         zoneTaken=zoneInstance.getNbTakenSpots(),
         zoneTotal=zoneInstance.getNbTotalSpots()
     )
     return response.html(rendered_template)
 
-@bp.route('/<zone>/statistics')
-async def stats(request, zone):
+@bp.route('/zone/<zone_id>/statistics')
+async def stats(request, zone_id):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
    
-    zoneInstance = ZoneManagement(zone)
-    zone_id = int(request.raw_args['id'])
-    zoneInstance = ZoneManagement(zone_id, zone)
+    zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
 
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_stats='true', 
-        zoneName=zone,
+        zoneName=zoneInstance.name,
+        zone_id=zone_id,
         tenantName=tenantInstance.name,
         statistics=zoneInstance.getAllStats()
     )
     return response.html(rendered_template)
 
-@bp.route('/<zone>/maintenance')
-async def maintenance(request, zone):
+@bp.route('/zone/<zone_id>/maintenance')
+async def maintenance(request, zone_id):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
-    zoneInstance = ZoneManagement(zone)
+
+    zoneInstance = ZoneManagement(zone_id)
+    await zoneInstance.init(zone_id)
+
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_maintenance='true',
-        zoneName=zone,
+        zoneName=zoneInstance.name,
+        zone_id=zone_id,
         tenantName=tenantInstance.name,    
         spotList=zoneInstance.getSpotList()
     )
     return response.html(rendered_template)
 
-@bp.route('/<zone>/configuration')
-async def config(request, zone):
+@bp.route('/zone/<zone_id>/configuration')
+async def config(request, zone_id):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
-    zoneInstance = ZoneManagement(zone)
+
+    zoneInstance = ZoneManagement(zone_id)
+    await zoneInstance.init(zone_id)
+
     spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_config='true',
-        zoneName=zone,
-        tenantName=tenantInstance.name,    
-        zonePolygon=zoneInstance.getPolygon(),
+        zoneName=zoneInstance.name,
+        zone_id=zone_id,
+        tenantName=tenantInstance.name,
+        zonePolygon=zoneInstance.polygon,
         zoneInstance=zoneInstance,
         zoneColor=zoneInstance.color,
         tenantCoor=tenantInstance.coordinates,
@@ -103,62 +109,77 @@ async def config(request, zone):
     )
     return response.html(rendered_template)
 
-@bp.route('/<zone>/submit-spots')
-async def submit_spots(request, zone):
+@bp.route('/zone/<zone_id>/submit-spots')
+async def submit_spots(request, zone_id):
     tenant = TenantManagement(1)
     await tenant.init(1)
-    zoneInstance = ZoneManagement(zone)
+    
+    zoneInstance = ZoneManagement(zone_id)
+    await zoneInstance.init(zone_id)
+
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_list='true', 
-        zoneName=zone,
+        zoneName=zoneInstance.name,
+        zone_id=zone_id,
         tenantName=tenant.name,
-        zonePolygon=zoneInstance.getPolygon(),
+        zonePolygon=zoneInstance.polygon,
         spotList=zoneInstance.getSpotList()
     )
     # checking spot list and adding to DB
     return response.html(rendered_template)
 
 # Handling Parking Spots
-@bp.route('/<zone>/spots')
-async def spots(request, zone):
+@bp.route('/zone/<zone_id>/spots')
+async def spots(request, zone_id):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
-    zoneInstance = ZoneManagement(zone)
+
+    zoneInstance = ZoneManagement(zone_id)
+    await zoneInstance.init(zone_id)
+
     spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
+
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_list='true', 
-        zoneName=zone,
+        zoneName=zoneInstance.name,
         tenantName=tenantInstance.name,
+        zone_id=zone_id,
         tenantCoor=tenantInstance.coordinates,
-        zonePolygon=zoneInstance.getPolygon(),
+        zonePolygon=zoneInstance.polygon,
         zoneColor=zoneInstance.color,
         spotList=spotsJson
     )
     return response.html(rendered_template)
 
 # Interface for deleting a zone
-@bp.route('/<zone>/remove')
-async def remove(request, zone):
+@bp.route('/zone/<zone_id>/remove')
+async def remove(request, zone_id):
     tenant = TenantManagement(1)
     await tenant.init(1)
-    zoneInstance = ZoneManagement(zone)
+
+    zoneInstance = ZoneManagement(zone_id)
+    await zoneInstance.init(zone_id)
+
     spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
+    
     rendered_template = await render(
         'zone_removing.html', 
         request,
-        zoneName=zone,
+        zoneName=zoneInstance.name,
         tenantName=tenant.name
     )
     return response.html(rendered_template)
 
-@bp.route('/<zone>/remove-check')
-async def remove_check(request, zone):
+@bp.route('/zone/<zone_id>/remove-check')
+async def remove_check(request, zone_id):
     # removing the zone
     # removing the spots if needed
+
+    # temporary redirection to dashboard of tenant
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
     rendered_template = await render(

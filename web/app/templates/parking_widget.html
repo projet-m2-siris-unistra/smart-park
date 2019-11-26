@@ -1,5 +1,5 @@
 <div class="bx--tile parking-widget">
-    <a href="{{ url_for("zones.view", zone=zoneItem.name) }}/?id={{ zoneItem.id }}">
+    <a href="{{ url_for("zones.view", zone_id=zoneItem.id) }}">
         <h4 id="widget-title">Parking {{ zoneItem.name }} <b>></b></h4>
     </a>
 
@@ -9,11 +9,11 @@
             <circle class="bx--loading__stroke" cx="0" cy="0" r="37.5" />
         </svg>
     </div>
-    <p class="widget-text">{{ zoneItem.nb_taken_spots }}/{{ zoneItem.nb_total_spots }} places occupées</p>
+    <p class="widget-text">{{ zoneItem.getNbTakenSpots() }}/{{ zoneItem.getNbTakenSpots() }} places occupées</p>
 
     <p class="widget-text">??? usagers aujourd'hui</p>
 
-    <a class="parking-widget-status-btn bx--btn bx--btn--danger bx--btn--sm" href="{{ url_for("zones.config", zone=zoneItem.name) }}">
+    <a class="parking-widget-status-btn bx--btn bx--btn--danger bx--btn--sm" href="{{ url_for("zones.config", zone_id=zoneItem.id) }}">
         <p>? capteurs déconnectés</p>
     </a>
 </div>

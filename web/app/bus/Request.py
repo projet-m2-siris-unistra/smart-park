@@ -14,7 +14,7 @@ async def getTenant(tenant_id):
 
 # Request zone infos
 async def getZone(zone_id):
-    request = json.dumps({'zone_id' : zone_id})
+    request = json.dumps({'zone_id' : int(zone_id)})
     response = await nc.request("zones.get", bytes(request, "utf-8"), timeout=1)
     return response.data.decode("utf-8")
 

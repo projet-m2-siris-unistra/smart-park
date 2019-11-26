@@ -25,11 +25,13 @@ class TenantManagement:
         self.name = "NOT UPDATED"
         self.coordinates = [7.9726, 49.0310] # Altenstadt (FR,67)
 
+
     async def init(self, tenant_id):
         response = await Request.getTenant(tenant_id)
         data = js.loads(response)
         self.name = data['name']
         self.coordinates = data['geo']
+
 
     # Get the list of all the zones from this tenant
     async def getZones(self):
@@ -37,16 +39,17 @@ class TenantManagement:
         zoneList = []
         reponse = await Request.getZones(self.id)
         data = js.loads(reponse)
+
         for item in data:
-            obj = ZoneManagement(
-                item['zone_id'], 
-                item['name']
-            )
+            obj = ZoneManagement(item['zone_id'])
             obj.staticInit(
+                item['name'],
                 item['type'],
-                '#' + item['color']
+                '#' + item['color'],
+                item['geo']
             )
             self.zones.append(obj)
+
 
     def getTotalSpots(self):
         count = 0
@@ -56,7 +59,8 @@ class TenantManagement:
         for zone in self.zones:
             count += zone.getNbTotalSpots()
         return count
-    
+
+
     def getTakenSpots(self):
         count = 0
         if self.zones == []:
@@ -70,22 +74,26 @@ class TenantManagement:
 # Instance of a zone
 class ZoneManagement:
 
-    def __init__(self, zone_id, name):
+    def __init__(self, zone_id):
         self.id = zone_id
-        self.name = name
         # some default data to reveal further failed init
         self.desc = "Parking description"
         self.spots = []
 
-    def staticInit(self, type, color):
+    def staticInit(self, name, type, color, polygon):
+        self.name = name
         self.type = type
         self.color = color
+        self.polygon = polygon
 
     async def init(self, zone_id):
         response = await Request.getZone(zone_id)
         data = js.loads(response)
+        self.name = data['name']
         self.type = data['type']
         self.color = '#' + data['color']
+        print("polygon from data: ", data['geo'])
+        self.polygon = data['geo']
 
     def toJson(self):
         return {
@@ -111,8 +119,7 @@ class ZoneManagement:
         return 123
     
 
-    # Data requests #
-
+    """
     def getPolygon(self):
         return [
             [7.739396,48.579816],[7.742014,48.579957],
@@ -126,6 +133,7 @@ class ZoneManagement:
             [7.738409,48.581973],[7.738495,48.580781],
             [7.739396,48.579816]
         ]
+    """
     
     def getSpotList(self):
         # requesting all spots belonging to this zone
