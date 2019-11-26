@@ -28,10 +28,15 @@ async def zone_creation_check(request):
 
 @bp.route('/<zone>')
 @bp.route('/<zone>/overview')
+#@bp.route('/zone/<zone_id>')
 async def view(request, zone):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
-    zoneInstance = ZoneManagement(zone)
+
+    zone_id = int(request.raw_args['id'])
+    zoneInstance = ZoneManagement(zone_id, zone)
+    await zoneInstance.init(zone_id)
+
     rendered_template = await render(
         'parking_template.html', 
         request,
@@ -47,7 +52,12 @@ async def view(request, zone):
 async def stats(request, zone):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
+   
     zoneInstance = ZoneManagement(zone)
+    zone_id = int(request.raw_args['id'])
+    zoneInstance = ZoneManagement(zone_id, zone)
+    await zoneInstance.init(zone_id)
+
     rendered_template = await render(
         'parking_template.html', 
         request,

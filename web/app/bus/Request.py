@@ -15,16 +15,17 @@ async def getTenant(tenant_id):
 # Request zone infos
 async def getZone(zone_id):
     request = json.dumps({'zone_id' : zone_id})
-    print("Request to DB:" + request)
-    try: 
-        response = await nc.request("zone", bytes(request, "utf-8"), timeout=1)
-    except ErrTimeout:
-        print("Request timed out")
-    return format(response.data.decode())
+    response = await nc.request("zones.get", bytes(request, "utf-8"), timeout=1)
+    return response.data.decode("utf-8")
+
+# This will return a list of zones from a tenant
+async def getZones(tenant_id):
+    response = await nc.request("zones.list", b"{}", timeout=1)
+    return response.data.decode("utf-8")
 
 
 # Request spot infos
-async def getZone(spot_id):
+async def getSpot(spot_id):
     request = json.dumps({'zone_id' : spot_id})
     print("Request to DB:" + request)
     try: 

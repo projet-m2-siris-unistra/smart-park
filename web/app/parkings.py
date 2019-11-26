@@ -13,24 +13,7 @@ class Tooling:
             liste.append(js.dumps(item.toJson()))
         return liste
 
-    """
-    converting a string of format
-            "x1,y1 ; x2,y2 ; x3,y3"
-    into a list of coordinates of format
-        [[x1,y1], [x2,y2], [x3, y3]]
-    """
-    @staticmethod
-    def stringToCoordinates(arg):
-        liste = []
-        #coorList = arg.split("],[") # THIS WILL BE A ';' SOON...
-        coorList = arg[1:]
-        #liste.append(coorList)
-        print(coorList)
-        return coorList
-        #for item in coorList:
-        #    coors = item.split(",")
-        #    liste.append(coors)
-        #    print("coors = ", coors)
+
 
 # Instance of a tenant
 class TenantManagement:
@@ -46,26 +29,40 @@ class TenantManagement:
         response = await Request.getTenant(tenant_id)
         data = js.loads(response)
         self.name = data['name']
-        print(data['geo'])
         self.coordinates = data['geo']
 
-    def getZones(self):
+    # Get the list of all the zones from this tenant
+    async def getZones(self):
         # request the zones linked to this town
-        zone = ZoneManagement("CENTRE")
-        zoneList = [zone]
-        return zoneList 
+        zoneList = []
+        reponse = await Request.getZones(self.id)
+        data = js.loads(reponse)
+        for item in data:
+            obj = ZoneManagement(
+                item['zone_id'], 
+                item['name']
+            )
+            obj.staticInit(
+                item['type'],
+                '#' + item['color']
+            )
+            self.zones.append(obj)
 
     def getTotalSpots(self):
         count = 0
-        zoneList = self.getZones()
-        for zone in zoneList:
+        if self.zones == []:
+            print("WARNING: tenant.zones empty")
+            return -1
+        for zone in self.zones:
             count += zone.getNbTotalSpots()
         return count
     
     def getTakenSpots(self):
         count = 0
-        zoneList = self.getZones()
-        for zone in zoneList:
+        if self.zones == []:
+            print("WARNING: tenant.zones empty")
+            return -1
+        for zone in self.zones:
             count += zone.getNbTakenSpots()
         return count
 
@@ -73,22 +70,29 @@ class TenantManagement:
 # Instance of a zone
 class ZoneManagement:
 
-    def __init__(self, nameArg):
-        self.id = 1
-        self.name = nameArg
-        self.nb_total_spots = 456
-        self.nb_taken_spots = 123
+    def __init__(self, zone_id, name):
+        self.id = zone_id
+        self.name = name
+        # some default data to reveal further failed init
         self.desc = "Parking description"
-        self.type = "Payant"
-        self.color = "#f4e628"
         self.spots = []
+
+    def staticInit(self, type, color):
+        self.type = type
+        self.color = color
+
+    async def init(self, zone_id):
+        response = await Request.getZone(zone_id)
+        data = js.loads(response)
+        self.type = data['type']
+        self.color = '#' + data['color']
 
     def toJson(self):
         return {
             "id" : self.id,
             "name" : self.name,
-            "nb_total_spots" : self.nb_total_spots,
-            "nb_taken_spots" : self.nb_taken_spots,
+            "nb_total_spots" : self.getNbTotalSpots(),
+            "nb_taken_spots" : self.getNbTakenSpots(),
             "desc" : self.desc,
             "type" : self.type,
             "color" : self.color,
@@ -99,10 +103,12 @@ class ZoneManagement:
     # Getter / Setter #
 
     def getNbTotalSpots(self):
-        return self.nb_total_spots
+        # calculation from DB
+        return 321
 
     def getNbTakenSpots(self):
-        return self.nb_taken_spots
+        # calculation from DB
+        return 123
     
 
     # Data requests #

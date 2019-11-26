@@ -5,8 +5,6 @@
     tenantCoor = {{ tenantCoor }};
     window.zones = {{ zoneJsonList | tojson }};
 
-    console.debug("tenantCoor: " + tenantCoor);
-
     /* Create map */
     mapboxgl.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
     var map = new mapboxgl.Map({

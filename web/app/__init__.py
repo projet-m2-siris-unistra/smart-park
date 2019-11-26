@@ -43,10 +43,11 @@ async def home(request):
 async def dashboard(request):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
+    await tenantInstance.getZones()
     rendered_template = await render(
         "dashboard_template.html",
         request, 
-        zoneList = tenantInstance.getZones(),
+        zoneList = tenantInstance.zones,
         totalSpots = tenantInstance.getTotalSpots(),
         takenSpots = tenantInstance.getTakenSpots()
     )

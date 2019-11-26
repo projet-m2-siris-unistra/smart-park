@@ -1,5 +1,5 @@
 <div class="bx--tile parking-widget">
-    <a href="{{ url_for("zones.view", zone=zoneItem.name) }}">
+    <a href="{{ url_for("zones.view", zone=zoneItem.name) }}/?id={{ zoneItem.id }}">
         <h4 id="widget-title">Parking {{ zoneItem.name }} <b>></b></h4>
     </a>
 
