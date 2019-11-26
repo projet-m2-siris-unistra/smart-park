@@ -9,6 +9,8 @@ from app.parkings import Tooling
 from app.parkings import ZoneManagement
 from app.parkings import TenantManagement
 
+from app.bus import Request
+
 bp = Blueprint("zones", url_prefix='/parking')
 
 # Handling Parkings zones
@@ -27,14 +29,15 @@ async def zone_creation_check(request):
 @bp.route('/<zone>')
 @bp.route('/<zone>/overview')
 async def view(request, zone):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zoneInstance = ZoneManagement(zone)
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_view='true', 
         zoneName=zone,
-        tenantName=tenant.name,
+        tenantName=tenantInstance.name,
         zoneTaken=zoneInstance.getNbTakenSpots(),
         zoneTotal=zoneInstance.getNbTotalSpots()
     )
@@ -42,35 +45,38 @@ async def view(request, zone):
 
 @bp.route('/<zone>/statistics')
 async def stats(request, zone):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zoneInstance = ZoneManagement(zone)
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_stats='true', 
         zoneName=zone,
-        tenantName=tenant.name,
+        tenantName=tenantInstance.name,
         statistics=zoneInstance.getAllStats()
     )
     return response.html(rendered_template)
 
 @bp.route('/<zone>/maintenance')
 async def maintenance(request, zone):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zoneInstance = ZoneManagement(zone)
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_maintenance='true',
         zoneName=zone,
-        tenantName=tenant.name,    
+        tenantName=tenantInstance.name,    
         spotList=zoneInstance.getSpotList()
     )
     return response.html(rendered_template)
 
 @bp.route('/<zone>/configuration')
 async def config(request, zone):
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zoneInstance = ZoneManagement(zone)
     spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
@@ -89,7 +95,8 @@ async def config(request, zone):
 
 @bp.route('/<zone>/submit-spots')
 async def submit_spots(request, zone):
-    tenant = TenantManagement(123)
+    tenant = TenantManagement(1)
+    await tenant.init(1)
     zoneInstance = ZoneManagement(zone)
     rendered_template = await render(
         'parking_template.html', 
@@ -106,7 +113,8 @@ async def submit_spots(request, zone):
 # Handling Parking Spots
 @bp.route('/<zone>/spots')
 async def spots(request, zone):
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zoneInstance = ZoneManagement(zone)
     spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
@@ -125,7 +133,8 @@ async def spots(request, zone):
 # Interface for deleting a zone
 @bp.route('/<zone>/remove')
 async def remove(request, zone):
-    tenant = TenantManagement(123)
+    tenant = TenantManagement(1)
+    await tenant.init(1)
     zoneInstance = ZoneManagement(zone)
     spotsJson = Tooling.jsonList(zoneInstance.getSpotList())
     rendered_template = await render(
@@ -140,7 +149,8 @@ async def remove(request, zone):
 async def remove_check(request, zone):
     # removing the zone
     # removing the spots if needed
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     rendered_template = await render(
         "dashboard_template.html",
         request, 

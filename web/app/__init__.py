@@ -3,6 +3,8 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from sanic import Sanic, response
 from sanic.response import json
 
+import json as js
+
 import app.accounts
 import app.bus
 import app.config
@@ -40,7 +42,7 @@ async def home(request):
 @app.route("/dashboard")
 async def dashboard(request):
     # request from ID
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
     rendered_template = await render(
         "dashboard_template.html",
         request, 
@@ -65,7 +67,7 @@ async def zones(request):
 
 @app.route("/map")
 async def map(request):
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
     zonesJson = Tooling.jsonList(tenantInstance.getZones())
     rendered_template = await render(
         "map_template.html",
@@ -94,11 +96,29 @@ async def statistics(request):
     )
     return response.html(rendered_template)
 
+@app.route("/devices")
+async def devices(request):
+    # Going through hierarchy for testing
+    devicesList = await bus.Request.getDevicesList()
+    devicesListJson = js.loads(devicesList)
+    rendered_template = await render(
+        "devices_template.html", 
+        request,
+        devices = devicesListJson
+    )
+    return response.html(rendered_template)
+
 
 @app.route("/ping")
 async def ping(request):
     ret = await bus.ping()
     return response.json({"data": ret})
+
+# Testing
+@app.route("/getTenant")
+async def getTenant(request):
+    ret = await bus.getTenant(1)
+    return response.json(ret)
 
 
 @click.command()

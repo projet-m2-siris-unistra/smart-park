@@ -3,7 +3,6 @@ import datetime
 
 from app.bus import Request
 
-
 class Tooling:
 
     # convert elements of list into Json
@@ -14,48 +13,38 @@ class Tooling:
             liste.append(js.dumps(item.toJson()))
         return liste
 
+    """
+    converting a string of format
+        "x1,y1 ; x2,y2 ; x3,y3"
+    into a list of coordinates of format
+        [[x1,y1], [x2,y2], [x3, y3]]
+    """
+    @staticmethod
+    def stringToCoordinates(arg):
+        liste = []
+        coorList = arg.split(";") # THIS WILL BE A ';' SOON...
+        liste.append(coorList)
+        return coorList
+        #for item in coorList:
+        #    coors = item.split(",")
+        #    liste.append(coors)
+        #    print("coors = ", coors)
 
 # Instance of a tenant
 class TenantManagement:
 
     def __init__(self, tenant_id):
-        #res = Request.getTenant(12)
         self.id = tenant_id
-        self.name = "Schmilbligheim"
-        self.coordinates = {'coordinates': [7.7475, 48.5827]}
         self.zones = []
+        # default data to see if DB requests are doing well
+        self.name = "NOT UPDATED"
+        self.coordinates = [7.9726, 49.0310] # Altenstadt (FR,67)
 
-    '''
-        NATS: topic = nom de la fonction
-              payload = parametres en JSON
-              communication en JSON 
-
-        exemple réponse sur une place (inclu objet device et zone)
-        {"place_id": 12}
-        {
-            "place_id": 12,
-            "zone": {
-                "zone_id": 4,
-                ...
-            },
-            "device": {
-                "device_id": 42,
-                "status": "occupied",
-                
-            }
-        } 
-            ==> extension sur une couche (remonte pas jusqu'au tenant)
-
-        # Send a request and expect a single response
-        # and trigger timeout if not faster than 1 second.
-        try:
-            response = await nc.request("help", b'help me', timeout=1)
-            print("Received response: {message}".format(
-                message=response.data.decode()))
-        except ErrTimeout:
-            print("Request timed out")
-
-    '''
+    async def init(self, tenant_id):
+        response = await Request.getTenant(tenant_id)
+        data = js.loads(response)
+        self.name = data['name']
+        self.coordinates = Tooling.stringToCoordinates(data['geo'])
 
     def getZones(self):
         # request the zones linked to this town
@@ -283,9 +272,14 @@ class SpotManagement:
 # instance of a device
 class DeviceManagement:
 
-    def __init__(self):
-        self.id = 12
-        self.battery = 100 # between 0 and 100
+    def __init__(self, device_id):
+        self.id = device_id
+        self.battery = -1 # between 0 and 100
         self.state = "free"
         # creation date
         # updated date
+
+    async def init(self, device_id):
+        response = await Request.getDevice(device_id)
+        data = js.loads(response)
+        self.battery

@@ -1,6 +1,7 @@
 import logging
 
 from nats.aio.client import Client as NATS
+import json
 
 logger = logging.getLogger(__name__)
 nc = NATS()
@@ -23,6 +24,10 @@ async def ping():
     response = await nc.request("ping", b"", timeout=1)
     return response.data.decode("utf-8")
 
+async def getTenant(tenant_id):
+    request = json.dumps({'tenant_id' : tenant_id})
+    response = await nc.request("tenants.get", bytes(request, "utf-8"), timeout=1)
+    return response.data.decode("utf-8")
 
 def setup(app):
     app.register_listener(init, "before_server_start")
