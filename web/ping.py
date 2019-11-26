@@ -2,7 +2,7 @@ import asyncio
 import sys
 
 from nats.aio.client import Client as NATS
-
+from nats.aio.errors import ErrTimeout
 
 async def run():
     nc = NATS()
@@ -11,9 +11,11 @@ async def run():
     payload = b""
     if len(sys.argv) == 3:
         payload = bytes(sys.argv[2], "utf-8")
-
-    response = await nc.request(sys.argv[1], payload, timeout=1)
-    print(response.data)
+    try:
+        response = await nc.request(sys.argv[1], payload, timeout=1)
+        print(response.data)
+    except ErrTimeout:
+        print("Timeout atteint : stop process")
 
     await nc.close()
 

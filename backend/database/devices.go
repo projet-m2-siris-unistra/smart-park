@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -63,6 +64,63 @@ type Device struct {
 	Battery  int         `json:"battery"`
 	State    DeviceState `json:"state"`
 	Timestamps
+}
+
+// UpdateBatteryDevice : update the battery device
+func UpdateBatteryDevice(ctx context.Context, deviceID int, battery int) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	result, err := pool.ExecContext(ctx, `
+		UPDATE devices SET battery = $1 
+		WHERE device_id = $2
+	`, battery, deviceID)
+
+	if err != nil {
+		return errors.New("error update device battery")
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return errors.New("error : device state - rows affected")
+	}
+
+	if rows < 0 {
+		log.Fatalf("expected to affect 1 row, affected %d", rows)
+	}
+	return nil
+}
+
+// UpdateStateDevice : update the state device
+func UpdateStateDevice(ctx context.Context, deviceID int, state string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	result1 := state == "free"
+	result2 := state == "occupied"
+	result3 := state == "notassigned"
+
+	if (result1 == false) && (result2 == false) && (result3 == false) {
+		return errors.New("invalid device state")
+	}
+
+	result, err := pool.ExecContext(ctx, `
+		UPDATE devices SET state = $1 
+		WHERE device_id = $2
+	`, state, deviceID)
+
+	if err != nil {
+		return errors.New("error update device state")
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return errors.New("error : device state - rows affected")
+	}
+
+	if rows < 0 {
+		log.Fatalf("expected to affect 1 row, affected %d", rows)
+	}
+	return nil
 }
 
 // GetDevice fetches the device by its ID

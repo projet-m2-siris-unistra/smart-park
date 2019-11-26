@@ -11,6 +11,17 @@ type getDeviceRequest struct {
 	DeviceID int `json:"device_id"`
 }
 
+type updateDeviceBatteryRequest struct {
+	Battery  int `json:"battery"`
+	DeviceID int `json:"device_id"`
+}
+
+type updateStateDeviceRequest struct {
+	DeviceID int    `json:"device_id"`
+	State    string `json:"state"`
+}
+
+/********************************** GET **********************************/
 func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, error) {
 	log.Println("handlers: handling getDevice")
 
@@ -22,3 +33,22 @@ func getDevices(ctx context.Context, request getDeviceRequest) ([]database.Devic
 
 	return database.GetDevices(ctx)
 }
+
+/********************************** GET **********************************/
+
+/********************************** UPDATE **********************************/
+func updateBatteryDevice(ctx context.Context, request updateDeviceBatteryRequest) error {
+	log.Println("handlers: handling updateDevice")
+
+	err := database.UpdateBatteryDevice(ctx, request.DeviceID, request.Battery)
+	return err
+}
+
+func updateStateDevice(ctx context.Context, request updateStateDeviceRequest) error {
+	log.Println("handlers: handling updateDevice")
+
+	err := database.UpdateStateDevice(ctx, request.DeviceID, request.State)
+	return err
+}
+
+/********************************** UPDATE **********************************/
