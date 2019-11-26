@@ -13,7 +13,8 @@ bp = Blueprint("spots", url_prefix='/spot')
 @bp.route('/<spot>')
 @bp.route('/<spot>/overview')
 async def overview(request, spot):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zone = ZoneManagement("CENTRE")
     rendered_template = await render(
         'spot_template.html', 
@@ -21,13 +22,14 @@ async def overview(request, spot):
         active_tab_overview='true', 
         spotName=spot,
         zoneName=zone.name,
-        tenantName=tenant.name
+        tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
 
 @bp.route('/<spot>/statistics')
 async def stats(request, spot):
     tenantInstance = TenantManagement(123)
+    await tenantInstance.init(1)
     zoneInstance = ZoneManagement("CENTRE")
     spotInstance = SpotManagement()
     rendered_template = await render(
@@ -43,7 +45,8 @@ async def stats(request, spot):
 
 @bp.route('/<spot>/maintenance')
 async def maintenance(request, spot):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zone = ZoneManagement("CENTRE")
     rendered_template = await render(
         'spot_template.html', 
@@ -51,13 +54,14 @@ async def maintenance(request, spot):
         active_tab_maintenance='true', 
         spotName=spot,
         zoneName=zone.name,
-        tenantName=tenant.name
+        tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
 
 @bp.route('/<spot>/configuration')
 async def config(request, spot):
-    tenant = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
     zone = ZoneManagement("CENTRE")
     rendered_template = await render(
         'spot_template.html', 
@@ -65,6 +69,6 @@ async def config(request, spot):
         active_tab_config='true', 
         spotName=spot,
         zoneName=zone.name,
-        tenantName=tenant.name
+        tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
