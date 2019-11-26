@@ -38,14 +38,14 @@ func getDevices(ctx context.Context, request getDeviceRequest) ([]database.Devic
 
 /********************************** UPDATE **********************************/
 func updateBatteryDevice(ctx context.Context, request updateDeviceBatteryRequest) error {
-	log.Println("handlers: handling updateDevice")
+	log.Println("handlers: handling updateBatteryDevice")
 
 	err := database.UpdateBatteryDevice(ctx, request.DeviceID, request.Battery)
 	return err
 }
 
 func updateStateDevice(ctx context.Context, request updateStateDeviceRequest) error {
-	log.Println("handlers: handling updateDevice")
+	log.Println("handlers: handling updateStateDevice")
 
 	err := database.UpdateStateDevice(ctx, request.DeviceID, request.State)
 	return err

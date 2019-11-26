@@ -16,6 +16,7 @@ var handlers = map[string]interface{}{
 	"devices.update.battery": updateBatteryDevice,
 	"devices.update.state":   updateStateDevice,
 	"tenants.get":            getTenant,
+	"tenants.update.geo":     updateGeoTenants,
 	"zones.get":              getZone,
 	"places.get":             getPlace,
 	"users.get":              getUser,
