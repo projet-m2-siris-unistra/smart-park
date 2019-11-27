@@ -11,20 +11,20 @@ import (
 )
 
 var handlers = map[string]interface{}{
-	"ping":                   ping,
-	"devices.get":            getDevice,
-	"devices.update.battery": updateBatteryDevice,
-	"devices.update.state":   updateStateDevice,
-	"tenants.get":            getTenant,
-	"tenants.update.geo":     updateGeoTenants,
-	"zones.get":              getZone,
-	"places.get":             getPlace,
-	"users.get":              getUser,
-	"devices.list":           getDevices,
-	"tenants.list":           getTenants,
-	"zones.list":             getZones,
-	"places.list":            getPlaces,
-	"users.list":             getUsers,
+	"ping":               ping,
+	"devices.get":        getDevice,
+	"devices.update":     updateDevice,
+	"devices.get.free":   getFreeDevices,
+	"tenants.get":        getTenant,
+	"tenants.update.geo": updateGeoTenants,
+	"zones.get":          getZone,
+	"places.get":         getPlace,
+	"users.get":          getUser,
+	"devices.list":       getDevices,
+	"tenants.list":       getTenants,
+	"zones.list":         getZones,
+	"places.list":        getPlaces,
+	"users.list":         getUsers,
 }
 
 // wrapHandler wraps a handler to do error handling and request/reply marshaling/unmarshaling

@@ -157,65 +157,146 @@ func GetDevices(ctx context.Context) ([]Device, error) {
 	return devices, nil
 }
 
+// GetFreeDevices : get all the avalaible devices
+func GetFreeDevices(ctx context.Context) ([]Device, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var devices []Device
+	var device Device
+	var i int
+	var d *string
+	var tmp null.String
+
+	i = 0
+	rows, err := pool.QueryContext(ctx,
+		`SELECT device_id, battery, state, created_at, updated_at FROM devices
+		WHERE state='free'`)
+
+	if err != nil {
+		return devices, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
+			&device.CreatedAt, &device.UpdatedAt)
+		if err != nil {
+			return devices, err
+		}
+		if tmp.IsZero() == true {
+			device.State = NotAssigned
+		} else {
+			d = tmp.Ptr()
+			switch *d {
+			case "free":
+				device.State = Free
+			case "occupied":
+				device.State = Occupied
+			default:
+				device.State = NotAssigned
+			}
+		}
+		devices = append(devices, device)
+		i = i + 1
+	}
+
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return devices, err
+	}
+
+	return devices, nil
+}
+
 /********************************** GET **********************************/
 
 /********************************** UPDATE **********************************/
 
-// UpdateBatteryDevice : update the battery device - need the device ID
-func UpdateBatteryDevice(ctx context.Context, deviceID int, battery int) error {
+// UpdateDevice : update a device - need the device ID
+func UpdateDevice(ctx context.Context, deviceID int, battery int, state string) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	result, err := pool.ExecContext(ctx, `
-		UPDATE devices SET battery = $1 
-		WHERE device_id = $2
-	`, battery, deviceID)
-
-	if err != nil {
-		return errors.New("error update device battery")
-	}
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return errors.New("error : device state - rows affected")
+	if (state == "") && (battery == 0) {
+		return errors.New("invalid input fields")
 	}
 
-	if rows < 0 {
-		log.Fatalf("expected to affect 1 row, affected %d", rows)
-	}
-	return nil
-}
+	// update on the battery only
+	if (state == "") && (battery != 0) {
 
-// UpdateStateDevice : update the state device - need the device ID
-func UpdateStateDevice(ctx context.Context, deviceID int, state string) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
+		result, err := pool.ExecContext(ctx, `
+			UPDATE devices SET battery = $1 
+			WHERE device_id = $2
+		`, battery, deviceID)
 
-	// have to verify if the input is correctly write
-	result1 := state == "free"
-	result2 := state == "occupied"
-	result3 := state == "notassigned"
+		if err != nil {
+			return errors.New("error update device battery")
+		}
 
-	if (result1 == false) && (result2 == false) && (result3 == false) {
-		return errors.New("invalid device state")
-	}
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : device state - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
 
-	result, err := pool.ExecContext(ctx, `
-		UPDATE devices SET state = $1 
-		WHERE device_id = $2
-	`, state, deviceID)
+		// update the state only
+	} else if (state != "") && (battery == 0) {
+		// have to verify if the input is correctly write
+		if ((state == "free") == false) && ((state == "occupied") == false) && ((state == "notassigned") == false) {
+			return errors.New("invalid device state")
+		}
 
-	if err != nil {
-		return errors.New("error update device state")
-	}
+		result, err := pool.ExecContext(ctx, `
+			UPDATE devices SET state = $1 
+			WHERE device_id = $2
+		`, state, deviceID)
 
-	// verify if there is one ou more rows affected
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return errors.New("error : device state - rows affected")
-	}
-	// checks the number of rows affected
-	if rows < 0 {
-		log.Fatalf("expected to affect 1 row, affected %d", rows)
+		if err != nil {
+			return errors.New("error update device state")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : device state - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+
+		// update the battery and the state
+	} else {
+
+		// have to verify if the input is correctly write
+		if ((state == "free") == false) && ((state == "occupied") == false) && ((state == "notassigned") == false) {
+			return errors.New("invalid device state")
+		}
+		result, err := pool.ExecContext(ctx, `
+			UPDATE devices SET battery = $1, state = $2
+			WHERE device_id = $3
+		`, battery, state, deviceID)
+
+		if err != nil {
+			return errors.New("error update device battery")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : device state - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+
 	}
 	return nil
 }

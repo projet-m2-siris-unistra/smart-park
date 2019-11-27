@@ -11,14 +11,10 @@ type getDeviceRequest struct {
 	DeviceID int `json:"device_id"`
 }
 
-type updateDeviceBatteryRequest struct {
-	Battery  int `json:"battery"`
-	DeviceID int `json:"device_id"`
-}
-
-type updateStateDeviceRequest struct {
+type updateDeviceRequest struct {
 	DeviceID int    `json:"device_id"`
-	State    string `json:"state"`
+	Battery  int    `json:"battery,omitempty"`
+	State    string `json:"state,omitempty"`
 }
 
 /********************************** GET **********************************/
@@ -26,6 +22,12 @@ func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, 
 	log.Println("handlers: handling getDevice")
 
 	return database.GetDevice(ctx, request.DeviceID)
+}
+
+func getFreeDevices(ctx context.Context, request getDeviceRequest) ([]database.Device, error) {
+	log.Println("handlers: handling getFreeDevices")
+
+	return database.GetFreeDevices(ctx)
 }
 
 func getDevices(ctx context.Context, request getDeviceRequest) ([]database.Device, error) {
@@ -37,17 +39,10 @@ func getDevices(ctx context.Context, request getDeviceRequest) ([]database.Devic
 /********************************** GET **********************************/
 
 /********************************** UPDATE **********************************/
-func updateBatteryDevice(ctx context.Context, request updateDeviceBatteryRequest) error {
-	log.Println("handlers: handling updateBatteryDevice")
+func updateDevice(ctx context.Context, request updateDeviceRequest) error {
+	log.Println("handlers: handling updateDevice")
 
-	err := database.UpdateBatteryDevice(ctx, request.DeviceID, request.Battery)
-	return err
-}
-
-func updateStateDevice(ctx context.Context, request updateStateDeviceRequest) error {
-	log.Println("handlers: handling updateStateDevice")
-
-	err := database.UpdateStateDevice(ctx, request.DeviceID, request.State)
+	err := database.UpdateDevice(ctx, request.DeviceID, request.Battery, request.State)
 	return err
 }
 

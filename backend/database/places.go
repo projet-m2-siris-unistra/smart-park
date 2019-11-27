@@ -40,7 +40,7 @@ func GetPlace(ctx context.Context, placeID int) (Place, error) {
 }
 
 // GetPlaces : get all the place
-func GetPlaces(ctx context.Context) ([]Place, error) {
+func GetPlaces(ctx context.Context, zoneID int) ([]Place, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -51,7 +51,7 @@ func GetPlaces(ctx context.Context) ([]Place, error) {
 	i = 0
 	rows, err := pool.QueryContext(ctx,
 		`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
-		FROM places`)
+		FROM places WHERE zone_id = $1`, zoneID)
 
 	if err != nil {
 		return places, err
