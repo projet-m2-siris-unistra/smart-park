@@ -36,11 +36,12 @@
     <div id='map' class="spot-config-map"></div>
 
     <script type="text/javascript">
-        window.spots = {{ spotList | tojson }};
+        window.spots = {{ spotList | safe }};
         window.polygon = {{ zonePolygon | tojson }};
         window.tenantCoor = {{ tenantCoor }};
         console.debug("zone-config:tenantCoor:"+window.tenantCoor);
         window.color = "{{ zoneColor }}";
+        window.zone_id = {{ zone_id }};
     </script>
 
     <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
