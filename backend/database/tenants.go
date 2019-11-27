@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"errors"
+	"log"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -14,6 +16,8 @@ type Tenant struct {
 	Geography null.String `json:"geo"`
 	Timestamps
 }
+
+/********************************** GET **********************************/
 
 // GetTenant : fetches the tenant by its ID
 func GetTenant(ctx context.Context, tenantID int) (Tenant, error) {
@@ -73,3 +77,34 @@ func GetTenants(ctx context.Context) ([]Tenant, error) {
 
 	return tenants, nil
 }
+
+/********************************** GET **********************************/
+
+/********************************** UPDATE **********************************/
+
+// UpdateGeoTenants : update geography of a tenant if it grows or reduces
+func UpdateGeoTenants(ctx context.Context, tenantID int, geo string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	result, err := pool.ExecContext(ctx, `
+		UPDATE tenants SET geo = $1 
+		WHERE tenant_id = $2
+	`, geo, tenantID)
+
+	if err != nil {
+		return errors.New("error update tenant geo")
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return errors.New("error : tenant geo - rows affected")
+	}
+
+	if rows < 0 {
+		log.Fatalf("expected to affect 1 row, affected %d", rows)
+	}
+	return nil
+}
+
+/********************************** UPDATE **********************************/

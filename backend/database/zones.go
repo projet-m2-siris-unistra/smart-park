@@ -106,8 +106,8 @@ func GetZone(ctx context.Context, zoneID int) (Zone, error) {
 	return zone, nil
 }
 
-// GetZones : get all the zone
-func GetZones(ctx context.Context) ([]Zone, error) {
+// GetZones : get all the zone by the tenant_id
+func GetZones(ctx context.Context, tenantID int) ([]Zone, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -119,8 +119,9 @@ func GetZones(ctx context.Context) ([]Zone, error) {
 
 	i = 0
 	rows, err := pool.QueryContext(ctx,
-		`SELECT zone_id, tenant_id, name, type, color, geo, created_at, updated_at
-		FROM zones `)
+		`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
+		FROM zones z, tenants t
+		WHERE z.tenant_id = $1`, tenantID)
 
 	if err != nil {
 		return zones, err

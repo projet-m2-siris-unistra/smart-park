@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -64,6 +65,8 @@ type Device struct {
 	State    DeviceState `json:"state"`
 	Timestamps
 }
+
+/********************************** GET **********************************/
 
 // GetDevice fetches the device by its ID
 func GetDevice(ctx context.Context, deviceID int) (Device, error) {
@@ -153,3 +156,68 @@ func GetDevices(ctx context.Context) ([]Device, error) {
 
 	return devices, nil
 }
+
+/********************************** GET **********************************/
+
+/********************************** UPDATE **********************************/
+
+// UpdateBatteryDevice : update the battery device - need the device ID
+func UpdateBatteryDevice(ctx context.Context, deviceID int, battery int) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	result, err := pool.ExecContext(ctx, `
+		UPDATE devices SET battery = $1 
+		WHERE device_id = $2
+	`, battery, deviceID)
+
+	if err != nil {
+		return errors.New("error update device battery")
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return errors.New("error : device state - rows affected")
+	}
+
+	if rows < 0 {
+		log.Fatalf("expected to affect 1 row, affected %d", rows)
+	}
+	return nil
+}
+
+// UpdateStateDevice : update the state device - need the device ID
+func UpdateStateDevice(ctx context.Context, deviceID int, state string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	// have to verify if the input is correctly write
+	result1 := state == "free"
+	result2 := state == "occupied"
+	result3 := state == "notassigned"
+
+	if (result1 == false) && (result2 == false) && (result3 == false) {
+		return errors.New("invalid device state")
+	}
+
+	result, err := pool.ExecContext(ctx, `
+		UPDATE devices SET state = $1 
+		WHERE device_id = $2
+	`, state, deviceID)
+
+	if err != nil {
+		return errors.New("error update device state")
+	}
+
+	// verify if there is one ou more rows affected
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return errors.New("error : device state - rows affected")
+	}
+	// checks the number of rows affected
+	if rows < 0 {
+		log.Fatalf("expected to affect 1 row, affected %d", rows)
+	}
+	return nil
+}
+
+/********************************** UPDATE **********************************/
