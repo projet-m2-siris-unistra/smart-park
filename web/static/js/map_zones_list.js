@@ -43,13 +43,13 @@ if (zones != null) {
                 .setLngLat(e.lngLat)
                 .setHTML(
                     "<h3>" + zone.name + "</h3>"
-                    + "<a class=\"bx--btn bx--btn--primary\" href=\"/parking/"+ zone.name +"\">Voir</a>"
+                    + "<a class=\"bx--btn bx--btn--primary\" href=\"/parking/zone/"+zone.id+"\">Voir</a>"
                 )
                 .addTo(map);
 
             // displaying the spots of the zone
             zone.spots.forEach(function(spot) {
-                                
+
                 console.debug("SPOT JSON:");
                 console.debug(spot);
 
@@ -62,9 +62,8 @@ if (zones != null) {
                         .setHTML(
                             '<h3>' + spot.name 
                             + '</h3><p>' + 'Etat du parking: ' + spot.state + '</p>'
-                            + "<a class=\"bx--btn bx--btn--primary"
-                            + "href=\"{{ url_for(\"spot.overview\", zone_id=zone.id, spot_id=spot.id) }}"
-                            + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
+                            + "<a class=\"bx--btn bx--btn--primary\" href=\"/parking/zone/"+ zone.id +"/spot/"+ spot.id +"\">Voir</a>"
+                            + "<a class=\"bx--btn bx--btn--danger\" href=\"#\">Supprimer</a>"
                         )
                     )
                     .addTo(map);
