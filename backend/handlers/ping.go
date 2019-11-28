@@ -4,17 +4,16 @@ import (
 	"context"
 	"log"
 
-	"github.com/nats-io/nats.go"
-
 	"github.com/projet-m2-siris-unistra/smart-park/backend/database"
 )
 
-func ping(m *nats.Msg) {
+func ping(ctx context.Context) (string, error) {
 	log.Println("handlers: handling ping")
-	ret, err := database.Ping(context.TODO())
+
+	ret, err := database.Ping(ctx)
 	if err != nil {
-		return
+		return "", err
 	}
 
-	m.Respond([]byte(ret))
+	return ret, nil
 }
