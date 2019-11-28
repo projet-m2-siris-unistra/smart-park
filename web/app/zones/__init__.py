@@ -81,7 +81,7 @@ async def maintenance(request, zone_id):
         zoneName=zoneInstance.name,
         zone_id=zone_id,
         tenantName=tenantInstance.name,    
-        spotList=zoneInstance.getSpotList()
+        spotList=zoneInstance.setSpots()
     )
     return response.html(rendered_template)
 
@@ -93,7 +93,7 @@ async def config(request, zone_id):
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
 
-    await zoneInstance.getSpotList()
+    await zoneInstance.setSpots()
     spotsJson = Tooling.jsonList(zoneInstance.spots)
 
     rendered_template = await render(
@@ -127,7 +127,7 @@ async def submit_spots(request, zone_id):
         zone_id=zone_id,
         tenantName=tenant.name,
         zonePolygon=zoneInstance.polygon,
-        spotList=zoneInstance.getSpotList()
+        spotList=zoneInstance.setSpots()
     )
     # checking spot list and adding to DB
     return response.html(rendered_template)
@@ -141,7 +141,7 @@ async def spots(request, zone_id):
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
 
-    await zoneInstance.getSpotList()
+    await zoneInstance.setSpots()
     spotsJson = Tooling.jsonList(zoneInstance.spots)
 
     rendered_template = await render(
@@ -170,6 +170,7 @@ async def remove(request, zone_id):
     rendered_template = await render(
         'zone_removing.html', 
         request,
+        zone_id=zone_id,
         zoneName=zoneInstance.name,
         tenantName=tenant.name
     )

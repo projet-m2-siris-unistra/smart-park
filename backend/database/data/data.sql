@@ -76,7 +76,7 @@ INSERT INTO places
 (
     (SELECT MIN(zone_id) FROM zones),
     'car',
-    '[7.739396,48.579816]',
+    '[7.746680,48.580402]',
     (SELECT MIN(device_id) FROM devices)
 ) ON CONFLICT DO NOTHING;
 

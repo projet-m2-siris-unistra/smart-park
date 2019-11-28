@@ -18,7 +18,7 @@
     <br>
     <p class="zone-config-field">
         <label>Supprimer la zone:</label>
-        <a class="bx--btn bx--btn--danger bx--btn--sm zone-modify-button" type="button" href="{{ url_for("zones.remove", zone=zoneName) }}">
+        <a class="bx--btn bx--btn--danger bx--btn--sm zone-modify-button" type="button" href="{{ url_for("zones.remove", zone_id=zone_id) }}">
             supprimer
         </a>
     </p>
@@ -39,11 +39,11 @@
         window.spots = {{ spotList | safe }};
         window.polygon = {{ zonePolygon | tojson }};
         window.tenantCoor = {{ tenantCoor }};
-        console.debug("zone-config:tenantCoor:"+window.tenantCoor);
         window.color = "{{ zoneColor }}";
         window.zone_id = {{ zone_id }};
     </script>
 
+    <script type="text/javascript" src="/static/js/map_create_map.js"></script>
     <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
     <script type="text/javascript" src="/static/js/map_spot_adding.js"></script>
     <script type="text/javascript" src="/static/js/map_polygon_draw.js"></script>

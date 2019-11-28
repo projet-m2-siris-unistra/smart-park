@@ -96,6 +96,8 @@ class ZoneManagement:
 
 
     def toJson(self):
+        if not (self.spots is None):
+            spotJson = self.spotsToJson()
         return {
             "id" : self.id,
             "name" : self.name,
@@ -104,8 +106,15 @@ class ZoneManagement:
             "desc" : self.desc,
             "type" : self.type,
             "color" : self.color,
-            "coordinates" : self.polygon
+            "coordinates" : self.polygon,
+            "spots" : spotJson
         }
+    
+    def spotsToJson(self):
+        listJson = []
+        for spot in self.spots:
+            listJson.append(spot.toJson())
+        return listJson
 
     # Getter / Setter #
 
@@ -119,7 +128,7 @@ class ZoneManagement:
         return 123
 
 
-    async def getSpotList(self):
+    async def setSpots(self):
         # requesting all spots belonging to this zone
         # loop for parsing all spots
         response = await Request.getSpots(self.id)

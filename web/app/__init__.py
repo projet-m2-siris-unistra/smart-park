@@ -79,14 +79,18 @@ async def map(request):
     await tenantInstance.init(1)
 
     await tenantInstance.setZones()
-    zonesJson = Tooling.jsonList(tenantInstance.zones)
 
+    for zone in tenantInstance.zones:
+        await zone.setSpots()
+
+    zonesJson = Tooling.jsonList(tenantInstance.zones)
+    
     rendered_template = await render(
         "map_template.html",
         request,
         tenantName=tenantInstance.name,
         tenantCoor=tenantInstance.coordinates,
-        zoneJsonList=zonesJson
+        zoneList=zonesJson
     )
     return response.html(rendered_template)
 
