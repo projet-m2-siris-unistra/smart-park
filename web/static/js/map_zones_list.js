@@ -1,7 +1,5 @@
 var zones = window.zones;
 
-// using: JSON.parse(zones.item)
-
 if (zones != null) {
         
     zones.forEach(function(zone) {
@@ -11,8 +9,11 @@ if (zones != null) {
         // drawing the zone
         map.on('load', function() {
             
+            console.debug("ZONE JSON: ");
+            console.debug(zone);
+
             polygonGeoJson = {
-                'id': 'zone-polygon-'+zone.name,
+                'id': 'zone-polygon-' + zone.id,
                 'type': 'fill',
                 'source': {
                     'type': 'geojson',
@@ -20,7 +21,7 @@ if (zones != null) {
                         'type': 'Feature',
                         'geometry': {
                             'type': 'Polygon',
-                            'coordinates': [zone.coordinates]
+                            'coordinates': [JSON.parse(zone.coordinates)]
                         }
                     }
                 },
@@ -33,8 +34,11 @@ if (zones != null) {
         });
 
         // displaying popup with buttons on click
-        map.on('click', 'zone-polygon-'+zone.name, function(e) {
+        map.on('click', 'zone-polygon-'+zone.id, function(e) {
+            
             console.debug("zone-polygon-"+zone.name+" clicked");
+            
+            // popup with link to zone
             new mapboxgl.Popup()
                 .setLngLat(e.lngLat)
                 .setHTML(
@@ -43,20 +47,23 @@ if (zones != null) {
                 )
                 .addTo(map);
 
-            // display the spots
+            // displaying the spots of the zone
             zone.spots.forEach(function(spot) {
-                var spot = JSON.parse(spot);
+                                
+                console.debug("SPOT JSON:");
+                console.debug(spot);
 
                 var el = document.createElement('div');
                 el.className = 'black-marker';
 
                 new mapboxgl.Marker(el)
-                    .setLngLat(spot.point.geometry.coordinates)
+                    .setLngLat(JSON.parse(spot.coordinates))
                     .setPopup(new mapboxgl.Popup({ offset: 25 })
                         .setHTML(
                             '<h3>' + spot.name 
                             + '</h3><p>' + 'Etat du parking: ' + spot.state + '</p>'
-                            + "<a class=\"bx--btn bx--btn--primary\" href=\"/spot/"+ spot.name +"\">Voir</a>"
+                            + "<a class=\"bx--btn bx--btn--primary"
+                            + "href=\"{{ url_for(\"spot.overview\", zone_id=zone.id, spot_id=spot.id) }}"
                             + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
                         )
                     )

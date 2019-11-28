@@ -8,19 +8,19 @@
         </div>
         <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
             <li class="bx--tabs__nav-item {% if active_tab_view %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-                <a class="bx--tabs__nav-link" href="{{ url_for("zones.view", zone=zoneName) }}">Vue d'ensemble</a>
+                <a class="bx--tabs__nav-link" href="{{ url_for("zones.view", zone_id=zone_id) }}">Vue d'ensemble</a>
             </li>
             <li class="bx--tabs__nav-item {% if active_tab_list %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-                <a class="bx--tabs__nav-link" href="{{ url_for("zones.spots", zone=zoneName) }}">Liste des places</a>
+                <a class="bx--tabs__nav-link" href="{{ url_for("zones.spots", zone_id=zone_id) }}">Liste des places</a>
             </li>
             <li class="bx--tabs__nav-item {% if active_tab_stats %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-                <a class="bx--tabs__nav-link" href="{{ url_for("zones.stats", zone=zoneName) }}">Statistiques</a>
+                <a class="bx--tabs__nav-link" href="{{ url_for("zones.stats", zone_id=zone_id) }}">Statistiques</a>
             </li>
             <li class="bx--tabs__nav-item {% if active_tab_maintenance %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-                    <a class="bx--tabs__nav-link" href="{{ url_for("zones.maintenance", zone=zoneName) }}">Maintenance</a>
+                    <a class="bx--tabs__nav-link" href="{{ url_for("zones.maintenance", zone_id=zone_id) }}">Maintenance</a>
             </li>
             <li class="bx--tabs__nav-item {% if active_tab_config %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
-                <a class="bx--tabs__nav-link" href="{{ url_for("zones.config", zone=zoneName) }}">Configuration</a>
+                <a class="bx--tabs__nav-link" href="{{ url_for("zones.config", zone_id=zone_id) }}">Configuration</a>
             </li>
         </ul>
     </div>

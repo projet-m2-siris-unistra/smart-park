@@ -1,19 +1,6 @@
 var spots = window.spots;
 var tenantCoor = window.tenantCoor;
-
-console.debug("tenantCoor: " + tenantCoor);
-
-// Create map
-mapboxgl.accessToken = 'pk.eyJ1IjoibGlvbmVsanVuZyIsImEiOiJjazI2azYxY3QwMGtyM2ZvYnJ4ZGY0Mjd0In0.fjgEahiiwwH58znbPwQShA';
-var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: tenantCoor.coordinates,
-    zoom: 14
-});
-
-// Add zoom and rotation controls to the map.
-map.addControl(new mapboxgl.NavigationControl());
+var zone_id = window.zone_id
 
 if (spots != null) {
 
@@ -27,12 +14,13 @@ if (spots != null) {
 
         // make a marker for each feature and add to the map
         new mapboxgl.Marker(el)
-            .setLngLat(marker.point.geometry.coordinates)
+            .setLngLat(JSON.parse(marker.coordinates))
             .setPopup(new mapboxgl.Popup({ offset: 25 })
                 .setHTML(
                     '<h3>' + marker.name 
-                    + '</h3><p>' + 'Etat du parking: ' + marker.state + '</p>'
-                    + "<a class=\"bx--btn bx--btn--primary\" href=\"/spot/"+ marker.name +"\">Voir</a>"
+                    + '</h3><p>' + 'Etat du parking: ' + marker.device.state + '</p>'
+                    + "<a class=\"bx--btn bx--btn--primary\" href=\"/parking/zone/"
+                    + zone_id + "/spot/" + marker.id + "\">Voir</a>"
                     + "<a class=\"bx--btn bx--btn--danger \" href=\"#\">Supprimer</a>"
                 )
             )

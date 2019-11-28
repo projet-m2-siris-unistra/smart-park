@@ -3,7 +3,6 @@ import datetime
 
 from app.bus import Request
 
-
 class Tooling:
 
     # convert elements of list into Json
@@ -15,65 +14,57 @@ class Tooling:
         return liste
 
 
+
 # Instance of a tenant
 class TenantManagement:
 
     def __init__(self, tenant_id):
-        #res = Request.getTenant(12)
         self.id = tenant_id
-        self.name = "Schmilbligheim"
-        self.coordinates = {'coordinates': [7.7475, 48.5827]}
         self.zones = []
+        # default data to see if DB requests are doing well
+        self.name = "NOT UPDATED"
+        self.coordinates = [7.9726, 49.0310] # Altenstadt (FR,67)
 
-    '''
-        NATS: topic = nom de la fonction
-              payload = parametres en JSON
-              communication en JSON 
 
-        exemple réponse sur une place (inclu objet device et zone)
-        {"place_id": 12}
-        {
-            "place_id": 12,
-            "zone": {
-                "zone_id": 4,
-                ...
-            },
-            "device": {
-                "device_id": 42,
-                "status": "occupied",
-                
-            }
-        } 
-            ==> extension sur une couche (remonte pas jusqu'au tenant)
+    async def init(self, tenant_id):
+        response = await Request.getTenant(tenant_id)
+        data = js.loads(response)
+        self.name = data['name']
+        self.coordinates = data['geo']
 
-        # Send a request and expect a single response
-        # and trigger timeout if not faster than 1 second.
-        try:
-            response = await nc.request("help", b'help me', timeout=1)
-            print("Received response: {message}".format(
-                message=response.data.decode()))
-        except ErrTimeout:
-            print("Request timed out")
 
-    '''
+    # Get the list of all the zones from this tenant
+    async def setZones(self):
+        reponse = await Request.getZones(self.id)
+        data = js.loads(reponse)
 
-    def getZones(self):
-        # request the zones linked to this town
-        zone = ZoneManagement("CENTRE")
-        zoneList = [zone]
-        return zoneList 
+        for item in data:
+            obj = ZoneManagement(item['zone_id'])
+            obj.staticInit(
+                item['name'],
+                item['type'],
+                '#' + item['color'],
+                item['geo']
+            )
+            self.zones.append(obj)
+
 
     def getTotalSpots(self):
         count = 0
-        zoneList = self.getZones()
-        for zone in zoneList:
+        if self.zones == []:
+            print("WARNING: tenant.zones empty")
+            return -1
+        for zone in self.zones:
             count += zone.getNbTotalSpots()
         return count
-    
+
+
     def getTakenSpots(self):
         count = 0
-        zoneList = self.getZones()
-        for zone in zoneList:
+        if self.zones == []:
+            print("WARNING: tenant.zones empty")
+            return -1
+        for zone in self.zones:
             count += zone.getNbTakenSpots()
         return count
 
@@ -81,61 +72,78 @@ class TenantManagement:
 # Instance of a zone
 class ZoneManagement:
 
-    def __init__(self, nameArg):
-        self.id = 1
-        self.name = nameArg
-        self.nb_total_spots = 456
-        self.nb_taken_spots = 123
+    def __init__(self, zone_id):
+        self.id = zone_id
+        # some default data to reveal further failed init
         self.desc = "Parking description"
-        self.type = "Payant"
-        self.color = "#f4e628"
         self.spots = []
 
+
+    def staticInit(self, name, type, color, polygon):
+        self.name = name
+        self.type = type
+        self.color = color
+        self.polygon = polygon
+
+
+    async def init(self, zone_id):
+        response = await Request.getZone(zone_id)
+        data = js.loads(response)
+        self.name = data['name']
+        self.type = data['type']
+        self.color = '#' + data['color']
+        self.polygon = data['geo']
+
+
     def toJson(self):
+        if not (self.spots is None):
+            spotJson = self.spotsToJson()
         return {
             "id" : self.id,
             "name" : self.name,
-            "nb_total_spots" : self.nb_total_spots,
-            "nb_taken_spots" : self.nb_taken_spots,
+            "nb_total_spots" : self.getNbTotalSpots(),
+            "nb_taken_spots" : self.getNbTakenSpots(),
             "desc" : self.desc,
             "type" : self.type,
             "color" : self.color,
-            "coordinates" : self.getPolygon(),
-            "spots" : Tooling.jsonList(self.getSpotList())
+            "coordinates" : self.polygon,
+            "spots" : spotJson
         }
+    
+    def spotsToJson(self):
+        listJson = []
+        for spot in self.spots:
+            listJson.append(spot.toJson())
+        return listJson
 
     # Getter / Setter #
 
     def getNbTotalSpots(self):
-        return self.nb_total_spots
+        # calculation from DB
+        return 321
+
 
     def getNbTakenSpots(self):
-        return self.nb_taken_spots
-    
+        # calculation from DB
+        return 123
 
-    # Data requests #
 
-    def getPolygon(self):
-        return [
-            [7.739396,48.579816],[7.742014,48.579957],
-            [7.744117,48.579134],[7.747464,48.578623],
-            [7.74888,48.57885],[7.751756,48.579929],
-            [7.755189,48.581831],[7.756906,48.583251],
-            [7.754288,48.58555],[7.753558,48.586061],
-            [7.751455,48.586743],[7.748537,48.58714],
-            [7.746906,48.586828],[7.744503,48.585834],
-            [7.740769,48.584244],[7.73901,48.582967],
-            [7.738409,48.581973],[7.738495,48.580781],
-            [7.739396,48.579816]
-        ]
-    
-    def getSpotList(self):
+    async def setSpots(self):
         # requesting all spots belonging to this zone
         # loop for parsing all spots
-        spot = SpotManagement()
-        spotList = [spot]
-        return spotList 
+        response = await Request.getSpots(self.id)
+        data = js.loads(response)
 
+        for item in data:
+            obj = SpotManagement(item['place_id'])
+            obj.staticInit(
+                item['place_id'],
+                item['geo'],
+                item['type'],
+                item['device_id']
+            )
+            await obj.setDevice(item['device_id'])
+            self.spots.append(obj)
 
      # Statistics #
 
@@ -150,6 +158,7 @@ class ZoneManagement:
             }
         return stats
     
+    
     def getWeeklyStats(self):
         stats = {
             'stats_type':'Hebdomadaire',
@@ -160,6 +169,7 @@ class ZoneManagement:
             'earning':12
             }
         return stats
+
 
     def getMonthlyStats(self):
         stats = {
@@ -172,6 +182,7 @@ class ZoneManagement:
             }
         return stats
 
+
     def getAnnualStats(self):
         stats = {
             'stats_type':'Annuelle',
@@ -183,6 +194,7 @@ class ZoneManagement:
             }
         return stats
     
+
     def getAllStats(self):
         stats = []
         stats.append(self.getDailyStats())
@@ -196,32 +208,53 @@ class ZoneManagement:
 # Instance of a parking spot 
 class SpotManagement:
 
-    def __init__(self):
-        self.id = 124
-        self.name = "CENTRE-124"
-        self.state = "free"
-        self.pointJson = self.getPoint()
-        self.coordinates = {7.7475, 48.5827}
-        self.device = "lul"
+    def __init__(self, spot_id):
+        self.id = spot_id
+        self.name = "default"
+        self.coordinates = [7.9726, 49.0310] # Altenstadt (FR,67)
+
+
+    async def init(self, spot_id):
+        response = await Request.getSpot(spot_id)
+        data = js.loads(response)
+        self.coordinates = data['geo']
+        self.type = data['type']
+        self.name = "PLACE-" + str(spot_id)
+        device_id = data['device_id']
+
+
+    def staticInit(self, spot_id, coordinates, type, device_id):
+        self.coordinates = coordinates
+        self.type = type
+        self.name = "PLACE-" + str(spot_id)
+
+
+    async def setDevice(self, device_id):
+        deviceInstance = DeviceManagement(device_id)
+        await deviceInstance.init(device_id)
+        self.device = deviceInstance
+
 
     def toJson(self):
         return {
             "id" : self.id,
             "name" : self.name,
-            "state" : self.state,
-            "point" : self.pointJson
+            "type" : self.type,
+            "coordinates" : self.coordinates,
+            "device" : self.device.toJson()
         }
 
     # Data requests # 
-
-    def getPoint(self):
-        return {
-            'type': 'Feature',
-            'geometry': {
-                'type': 'Point',
-                'coordinates': [7.7475, 48.5827]
-            }
-        }
+    
+    # When displaying marker, we customi
+    #def coordinatesGeoJson(self):
+    #    return {
+    #        'type': 'Feature',
+    #        'geometry': {
+    #            'type': 'Point',
+    #            'coordinates': self.coordinates
+    #        }
+    #    }
 
 
     # Statistics #
@@ -237,6 +270,7 @@ class SpotManagement:
             }
         return stats
     
+
     def getWeeklyStats(self):
         stats = {
             'stats_type':'Weekly',
@@ -247,6 +281,7 @@ class SpotManagement:
             'earning':12
             }
         return stats
+
 
     def getMonthlyStats(self):
         stats = {
@@ -259,6 +294,7 @@ class SpotManagement:
             }
         return stats
 
+
     def getAnnualStats(self):
         stats = {
             'stats_type':'Annual',
@@ -269,6 +305,7 @@ class SpotManagement:
             'earning':12
             }
         return stats
+
 
     def getAllStats(self):
         stats = []
@@ -283,9 +320,24 @@ class SpotManagement:
 # instance of a device
 class DeviceManagement:
 
-    def __init__(self):
-        self.id = 12
-        self.battery = 100 # between 0 and 100
-        self.state = "free"
-        # creation date
-        # updated date
+    def __init__(self, device_id):
+        self.id = device_id
+        # default values to see if request failed
+        self.battery = -1
+
+
+    async def init(self, device_id):
+        response = await Request.getDevice(device_id)
+        data = js.loads(response)
+
+        self.battery = data['battery']
+        self.state = data['state']
+
+
+    # returns objects attributs wrapped into Json
+    def toJson(self):
+        return {
+            "id" : self.id,
+            "state" : self.state,
+            "battery" : self.battery
+        }

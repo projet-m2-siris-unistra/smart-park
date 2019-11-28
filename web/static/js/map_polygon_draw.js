@@ -1,13 +1,14 @@
 var polygon = window.polygon;
 var color = window.color;
+var zone_id = window.zone_id;
 
 if (polygon != null) {
     // Loading elements on map 
     map.on('load', function() {
-
+        
         // Add zone on map
         polygonGeoJson = {
-            'id': 'zone-polygon',
+            'id': 'zone-polygon-' + zone_id,
             'type': 'fill',
             'source': {
                 'type': 'geojson',
@@ -15,7 +16,7 @@ if (polygon != null) {
                     'type': 'Feature',
                     'geometry': {
                         'type': 'Polygon',
-                        'coordinates': [polygon]
+                        'coordinates': [JSON.parse(polygon)]
                     }
                 }
             },

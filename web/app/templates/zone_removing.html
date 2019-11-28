@@ -23,7 +23,7 @@
                 <p class="bx--inline-notification__subtitle">Vous êtes entrain de supprimer une zone entière. Assurez vous de la pertinance de cette action.</p>
             </div>
         </div>
-        <a tabindex="0" class="bx--inline-notification__action-button bx--btn bx--btn--sm bx--btn--ghost" type="button" href="{{ url_for("zones.view", zone=zoneName) }}">
+        <a tabindex="0" class="bx--inline-notification__action-button bx--btn bx--btn--sm bx--btn--ghost" type="button" href="{{ url_for("zones.view", zone_id=zone_id) }}">
             Annuler
         </a>
         <button data-notification-btn class="bx--inline-notification__close-button" type="button" aria-label="close">
@@ -39,7 +39,7 @@
         <label for="bx--checkbox-new" class="bx--checkbox-label">Supprimer les places associées à la zone</label>
     </div>
     <br>
-    <a class="bx--btn bx--btn--danger" aria-label="danger" type="button" href="{{ url_for("zones.remove_check", zone=zoneName) }}" >
+    <a class="bx--btn bx--btn--danger" aria-label="danger" type="button" href="{{ url_for("zones.remove_check", zone_id=zone_id) }}" >
         Supprimer la zone
     </a>
 </div>
