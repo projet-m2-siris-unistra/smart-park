@@ -34,9 +34,7 @@ class TenantManagement:
 
 
     # Get the list of all the zones from this tenant
-    async def getZones(self):
-        # request the zones linked to this town
-        zoneList = []
+    async def setZones(self):
         reponse = await Request.getZones(self.id)
         data = js.loads(reponse)
 
@@ -106,8 +104,7 @@ class ZoneManagement:
             "desc" : self.desc,
             "type" : self.type,
             "color" : self.color,
-            "coordinates" : self.getPolygon(),
-            "spots" : Tooling.jsonList(self.getSpotList())
+            "coordinates" : self.polygon
         }
 
     # Getter / Setter #
@@ -116,10 +113,12 @@ class ZoneManagement:
         # calculation from DB
         return 321
 
+
     def getNbTakenSpots(self):
         # calculation from DB
         return 123
-    
+
+
     async def getSpotList(self):
         # requesting all spots belonging to this zone
         # loop for parsing all spots
@@ -207,24 +206,18 @@ class SpotManagement:
 
 
     async def init(self, spot_id):
-        response = await Request.getSpots(spot_id)
+        response = await Request.getSpot(spot_id)
         data = js.loads(response)
-
-        self.name = "PLACE-" + str(spot_id)
-        self.type = data['type']
         self.coordinates = data['geo']
-        
-        # Get device associated with this place
-        # we suppose there is one (compulsory when spot created)
+        self.type = data['type']
+        self.name = "PLACE-" + str(spot_id)
         device_id = data['device_id']
-        #self.setDevice(device_id) # get device from DB
 
 
     def staticInit(self, spot_id, coordinates, type, device_id):
-        self.name = "PLACE-" + str(spot_id)
         self.coordinates = coordinates
         self.type = type
-        #self.setDevice(device_id) # get device from DB
+        self.name = "PLACE-" + str(spot_id)
 
 
     async def setDevice(self, device_id):

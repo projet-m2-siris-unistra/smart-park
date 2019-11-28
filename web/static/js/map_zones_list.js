@@ -1,7 +1,5 @@
 var zones = window.zones;
 
-// using: JSON.parse(zones.item)
-
 if (zones != null) {
         
     zones.forEach(function(zone) {
@@ -11,8 +9,10 @@ if (zones != null) {
         // drawing the zone
         map.on('load', function() {
             
+            console.debug(zone);
+
             polygonGeoJson = {
-                'id': 'zone-polygon-'+zone.name,
+                'id': 'zone-polygon-' + zone.name,
                 'type': 'fill',
                 'source': {
                     'type': 'geojson',
@@ -20,7 +20,7 @@ if (zones != null) {
                         'type': 'Feature',
                         'geometry': {
                             'type': 'Polygon',
-                            'coordinates': [zone.coordinates]
+                            'coordinates': [JSON.parse(zone.coordinates)]
                         }
                     }
                 },
@@ -29,6 +29,7 @@ if (zones != null) {
                     'fill-opacity': 0.2
                 }
             }
+            console.debug(polygonGeoJson);
             map.addLayer(polygonGeoJson);
         });
 

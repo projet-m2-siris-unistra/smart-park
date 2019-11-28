@@ -43,7 +43,10 @@ async def home(request):
 async def dashboard(request):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
-    await tenantInstance.getZones()
+
+    await tenantInstance.setZones()
+    zonesJson = Tooling.jsonList(tenantInstance.zones)
+
     rendered_template = await render(
         "dashboard_template.html",
         request, 
@@ -58,10 +61,13 @@ async def dashboard(request):
 async def zones(request):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
+
+    await tenantInstance.setZones()
+
     rendered_template = await render(
         "tenant_zone_data_table.html", 
         request,
-        zoneList=tenantInstance.getZones(),
+        zoneList=tenantInstance.zones,
         tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
@@ -71,7 +77,10 @@ async def zones(request):
 async def map(request):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
-    zonesJson = Tooling.jsonList(tenantInstance.getZones())
+
+    await tenantInstance.setZones()
+    zonesJson = Tooling.jsonList(tenantInstance.zones)
+
     rendered_template = await render(
         "map_template.html",
         request,
@@ -80,6 +89,7 @@ async def map(request):
         zoneJsonList=zonesJson
     )
     return response.html(rendered_template)
+
 
 @app.route("/configuration")
 async def configuration(request):
@@ -90,6 +100,7 @@ async def configuration(request):
     )
     return response.html(rendered_template)
 
+
 @app.route("/statistics")
 async def statistics(request):
     rendered_template = await render(
@@ -98,6 +109,7 @@ async def statistics(request):
         knights="En cours de construction..."
     )
     return response.html(rendered_template)
+
 
 @app.route("/devices")
 async def devices(request):
@@ -116,6 +128,7 @@ async def devices(request):
 async def ping(request):
     ret = await bus.ping()
     return response.json({"data": ret})
+
 
 # Testing
 @app.route("/getTenant")

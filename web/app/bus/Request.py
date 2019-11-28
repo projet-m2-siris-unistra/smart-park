@@ -8,7 +8,7 @@ from app.bus import nc
 
 # Request tenant infos
 async def getTenant(tenant_id):
-    request = json.dumps({'tenant_id' : tenant_id})
+    request = json.dumps({'tenant_id' : int(tenant_id)})
     response = await nc.request("tenants.get", bytes(request, "utf-8"), timeout=1)
     return response.data.decode("utf-8")
 
@@ -36,14 +36,14 @@ async def getSpots(zone_id):
 
 # Request spot infos
 async def getSpot(spot_id):
-    request = json.dumps({'spot_id' : int(spot_id)})
+    request = json.dumps({'place_id' : int(spot_id)})
     response = await nc.request("places.get", bytes(request, "utf-8"), timeout=1)
     return response.data.decode("utf-8")
 
 
 # Request spot infos
 async def getDevice(device_id):
-    request = json.dumps({'device_id' : device_id})
+    request = json.dumps({'device_id' : int(device_id)})
     response = await nc.request("devices.get", bytes(request, "utf-8"), timeout=1)
     return response.data.decode("utf-8")
 

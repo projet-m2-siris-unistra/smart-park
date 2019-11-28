@@ -143,8 +143,6 @@ async def spots(request, zone_id):
 
     await zoneInstance.getSpotList()
     spotsJson = Tooling.jsonList(zoneInstance.spots)
-    print("spotJson: ", spotsJson)
-    print("spots: ", zoneInstance.spots)
 
     rendered_template = await render(
         'parking_template.html', 
