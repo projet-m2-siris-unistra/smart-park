@@ -3,6 +3,8 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from sanic import Sanic, response
 from sanic.response import json
 
+import json as js
+
 import app.accounts
 import app.bus
 import app.config
@@ -39,12 +41,16 @@ async def home(request):
 
 @app.route("/dashboard")
 async def dashboard(request):
-    # request from ID
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
+
+    await tenantInstance.setZones()
+    zonesJson = Tooling.jsonList(tenantInstance.zones)
+
     rendered_template = await render(
         "dashboard_template.html",
         request, 
-        zoneList = tenantInstance.getZones(),
+        zoneList = tenantInstance.zones,
         totalSpots = tenantInstance.getTotalSpots(),
         takenSpots = tenantInstance.getTakenSpots()
     )
@@ -53,11 +59,15 @@ async def dashboard(request):
 
 @app.route("/zones")
 async def zones(request):
-    tenantInstance = TenantManagement(123)
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
+
+    await tenantInstance.setZones()
+
     rendered_template = await render(
         "tenant_zone_data_table.html", 
         request,
-        zoneList=tenantInstance.getZones(),
+        zoneList=tenantInstance.zones,
         tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
@@ -65,16 +75,25 @@ async def zones(request):
 
 @app.route("/map")
 async def map(request):
-    tenantInstance = TenantManagement(123)
-    zonesJson = Tooling.jsonList(tenantInstance.getZones())
+    tenantInstance = TenantManagement(1)
+    await tenantInstance.init(1)
+
+    await tenantInstance.setZones()
+
+    for zone in tenantInstance.zones:
+        await zone.setSpots()
+
+    zonesJson = Tooling.jsonList(tenantInstance.zones)
+    
     rendered_template = await render(
         "map_template.html",
         request,
         tenantName=tenantInstance.name,
         tenantCoor=tenantInstance.coordinates,
-        zoneJsonList=zonesJson
+        zoneList=zonesJson
     )
     return response.html(rendered_template)
+
 
 @app.route("/configuration")
 async def configuration(request):
@@ -84,6 +103,7 @@ async def configuration(request):
         knights="En cours de construction..."
     )
     return response.html(rendered_template)
+
 
 @app.route("/statistics")
 async def statistics(request):
@@ -95,10 +115,31 @@ async def statistics(request):
     return response.html(rendered_template)
 
 
+@app.route("/devices")
+async def devices(request):
+    # Going through hierarchy for testing
+    devicesList = await bus.Request.getDevicesList()
+    devicesListJson = js.loads(devicesList)
+    rendered_template = await render(
+        "devices_template.html", 
+        request,
+        devices = devicesListJson
+    )
+    return response.html(rendered_template)
+
+
 @app.route("/ping")
 async def ping(request):
     ret = await bus.ping()
     return response.json({"data": ret})
+
+
+# Testing
+@app.route("/getTenant")
+async def getTenant(request):
+    ret = await bus.getTenant(1)
+    data = js.loads(ret)
+    return response.json(data["geo"])
 
 
 @click.command()

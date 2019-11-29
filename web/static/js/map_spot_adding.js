@@ -5,10 +5,15 @@ var count = 0;
 var spotsLimit = 20;
 var currentMarker;
 var addedMarkerList = [];
+var zone_id = window.zone_id;
 
 // When clicking on the zone: adds a marker
-map.on('click', 'zone-polygon', function(e) {
+map.on('click', 'zone-polygon-' + zone_id, function(e) {
+    
     if (polygonClickEnabled) {
+
+        console.debug("*Valid click*");
+    
         var coordinates = e.lngLat.wrap();
         currentMarker = new mapboxgl.Marker({
             draggable: true
@@ -23,6 +28,7 @@ map.on('click', 'zone-polygon', function(e) {
             .addTo(map);
         polygonClickEnabled = false;
     }
+
 });
 
 function validate_marker() {

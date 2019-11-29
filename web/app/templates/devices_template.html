@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Capteurs{% endblock %}
+
+{% block content %}
+
+<h3>Capteurs non associés</h3>
+
+<br>
+
+<!--
+  Copyright IBM Corp. 2016, 2018
+
+  This source code is licensed under the Apache-2.0 license found in the
+  LICENSE file in the root directory of this source tree.
+-->
+
+  <!-- Table -->
+  <table class="bx--data-table">
+        <thead>
+          <tr>
+                <th >
+                      <span class="bx--table-header-label">Nom</span>
+                </th>
+                <th >
+                      <span class="bx--table-header-label">Statut</span>
+                </th>
+                <th >
+                      <span class="bx--table-header-label">Batterie</span>
+                </th>
+          </tr>
+        </thead>
+
+        <!-- data table elements -->
+        {% for device in devices %}
+
+            <tbody>
+            <tr >
+                    <td >
+                        Capteur
+                    </td>
+                    <td >
+                        {{ device.state }}
+                    </td>
+                    <td >
+                        {{ device.battery }}%
+                    </td>
+                </tr>
+            </tbody>
+        
+        {% endfor %}
+        
+      </table>
+    
+    </div>
+
+<br>
+<br>    
+
+{% endblock %}
