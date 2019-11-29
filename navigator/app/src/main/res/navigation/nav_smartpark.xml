@@ -4,12 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_smartpark"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/home">
 
     <fragment
-        android:id="@+id/homeFragment"
+        android:id="@+id/home"
         android:name="fr.smartpark.navigator.HomeFragment"
         tools:layout="@layout/fragment_home"
-        android:label="HomeFragment" />
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/action_home_to_parking_zone_detail"
+            app:destination="@id/parkingZoneDetail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/parkingZoneDetail"
+        android:name="fr.smartpark.navigator.ParkingZoneDetailFragment"
+        tools:layout="@layout/fragment_parking_zone_detail"
+        android:label="ParkingZoneDetail" >
+        <argument
+            android:name="parkingZone"
+            app:argType="fr.smartpark.navigator.data.ParkingZone" />
+    </fragment>
 
 </navigation>

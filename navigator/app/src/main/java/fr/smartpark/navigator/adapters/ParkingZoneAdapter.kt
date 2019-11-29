@@ -1,11 +1,14 @@
 package fr.smartpark.navigator.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import fr.smartpark.navigator.HomeFragmentDirections
 import fr.smartpark.navigator.R
 import fr.smartpark.navigator.data.ParkingZone
 import fr.smartpark.navigator.databinding.FragmentParkingZoneItemBinding
@@ -31,9 +34,19 @@ class ParkingZoneAdapter : ListAdapter<ParkingZone, ParkingZoneAdapter.ViewHolde
     class ViewHolder(
         private val binding: FragmentParkingZoneItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+        private fun navigateToZone(zone: ParkingZone, view: View) {
+            val directions = HomeFragmentDirections.actionHomeToParkingZoneDetail(zone)
+            view.findNavController().navigate(directions)
+        }
+
         fun bind(item: ParkingZone) {
             binding.apply {
                 zone = item
+
+                setClickListener { view ->
+                    navigateToZone(item, view)
+                }
+
                 executePendingBindings()
             }
         }
