@@ -17,6 +17,11 @@ type updateDeviceRequest struct {
 	State    string `json:"state,omitempty"`
 }
 
+type newDeviceRequest struct {
+	Battery int    `json:"battery"`
+	State   string `json:"state"`
+}
+
 /********************************** GET **********************************/
 func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, error) {
 	log.Println("handlers: handling getDevice")
@@ -47,3 +52,13 @@ func updateDevice(ctx context.Context, request updateDeviceRequest) error {
 }
 
 /********************************** UPDATE **********************************/
+
+/********************************** CREATE **********************************/
+func newDevice(ctx context.Context, request newDeviceRequest) error {
+	log.Println("handlers: handling newDevice")
+
+	err := database.NewDevice(ctx, request.Battery, request.State)
+	return err
+}
+
+/********************************** CREATE **********************************/

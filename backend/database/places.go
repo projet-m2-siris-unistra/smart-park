@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"errors"
+	"log"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -16,6 +18,8 @@ type Place struct {
 	DeviceID  int         `json:"device_id"`
 	Timestamps
 }
+
+/********************************** GET **********************************/
 
 // GetPlace fetches the place by its ID
 func GetPlace(ctx context.Context, placeID int) (Place, error) {
@@ -76,3 +80,142 @@ func GetPlaces(ctx context.Context, zoneID int) ([]Place, error) {
 
 	return places, nil
 }
+
+/********************************** GET **********************************/
+
+/********************************** UPDATE **********************************/
+
+// UpdatePlace : update a place
+func UpdatePlace(ctx context.Context, placeID int, zoneID int,
+	placetype string, geo string, deviceID int) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	if (zoneID == 0) && (placetype == "") && (geo == "") && (deviceID == 0) {
+		return errors.New("invalid input fields (database/places.go")
+	}
+
+	// modify zoneID
+	if zoneID != 0 {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE places SET zone_id = $1 
+			WHERE place_id = $2
+		`, zoneID, placeID)
+
+		if err != nil {
+			return errors.New("error update place zone_id")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : place zone_id - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify type
+	if placetype != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE places SET type = $1 
+			WHERE place_id = $2
+		`, placetype, placeID)
+
+		if err != nil {
+			return errors.New("error update place type")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : place type - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify geo
+	if geo != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE places SET geo = $1 
+			WHERE place_id = $2
+		`, geo, placeID)
+
+		if err != nil {
+			return errors.New("error update place geo")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : place geo - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify deviceID
+	if deviceID != 0 {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE places SET device_id = $1 
+			WHERE place_id = $2
+		`, deviceID, placeID)
+
+		if err != nil {
+			return errors.New("error update place device_id")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : place device_id - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	return nil
+}
+
+/********************************** UPDATE **********************************/
+
+/********************************** CREATE **********************************/
+
+// NewPlace : insert a new place
+func NewPlace(ctx context.Context, zoneID int, placetype string,
+	geo string, deviceID int) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	_, err := pool.ExecContext(ctx,
+		`INSERT INTO places
+		(
+			zone_id, 
+			type,
+			geo,
+			device_id
+		) VALUES
+		(
+			$1,
+			$2,
+			$3,
+			$4
+		)`, zoneID, placetype, geo, deviceID)
+
+	if err != nil {
+		return errors.New("error new place")
+	}
+
+	return nil
+}
+
+/********************************** CREATE **********************************/

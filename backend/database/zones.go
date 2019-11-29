@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -67,6 +68,8 @@ type Zone struct {
 	Geography null.String `json:"geo"`
 	Timestamps
 }
+
+/********************************** GET **********************************/
 
 // GetZone fetches the zone by its ID
 func GetZone(ctx context.Context, zoneID int) (Zone, error) {
@@ -159,3 +162,166 @@ func GetZones(ctx context.Context, tenantID int) ([]Zone, error) {
 
 	return zones, nil
 }
+
+/********************************** GET **********************************/
+
+/********************************** UPDATE **********************************/
+
+// UpdateZone : update a user
+func UpdateZone(ctx context.Context, zoneID int, tenantID int,
+	name string, zonetype string, color string, geo string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	if (tenantID == 0) && (name == "") && (zonetype == "") && (color == "") && (geo == "") {
+		return errors.New("invalid input fields (database/zones.go")
+	}
+
+	// modify tenant_id
+	if tenantID != 0 {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE zones SET tenant_id = $1 
+			WHERE zone_id = $2
+		`, tenantID, zoneID)
+
+		if err != nil {
+			return errors.New("error update zone tenant_id")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : zone tenant_id - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify name
+	if name != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE zones SET name = $1 
+			WHERE zone_id = $2
+		`, name, zoneID)
+
+		if err != nil {
+			return errors.New("error update zone name")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : zone name - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify type
+	if zonetype != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE zones SET type = $1 
+			WHERE zone_id = $2
+		`, zonetype, zoneID)
+
+		if err != nil {
+			return errors.New("error update zone type")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : zone type - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify color
+	if color != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE zones SET color = $1 
+			WHERE zone_id = $2
+		`, color, zoneID)
+
+		if err != nil {
+			return errors.New("error update zone color")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : zone color - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify geo
+	if geo != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE zones SET geo = $1 
+			WHERE zone_id = $2
+		`, geo, zoneID)
+
+		if err != nil {
+			return errors.New("error update zone geo")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : zone geo - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	return nil
+}
+
+/********************************** UPDATE **********************************/
+
+/********************************** CREATE **********************************/
+
+// NewZone : insert a new place
+func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
+	color string, geo string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	_, err := pool.ExecContext(ctx,
+		`INSERT INTO zones
+		(
+			tenant_id, 
+			name,
+			type,
+			color,
+			geo
+		) VALUES
+		(
+			$1,
+			$2,
+			$3,
+			$4,
+			$5
+		)`, tenantID, name, zonetype, color, geo)
+
+	if err != nil {
+		return errors.New("error new place")
+	}
+
+	return nil
+}
+
+/********************************** CREATE **********************************/

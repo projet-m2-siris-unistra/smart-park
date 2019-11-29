@@ -220,7 +220,7 @@ func UpdateDevice(ctx context.Context, deviceID int, battery int, state string) 
 	defer cancel()
 
 	if (state == "") && (battery == 0) {
-		return errors.New("invalid input fields")
+		return errors.New("invalid input fields (database/devices.go")
 	}
 
 	// update on the battery only
@@ -302,3 +302,29 @@ func UpdateDevice(ctx context.Context, deviceID int, battery int, state string) 
 }
 
 /********************************** UPDATE **********************************/
+
+/********************************** CREATE **********************************/
+
+// NewDevice : insert a new device
+func NewDevice(ctx context.Context, battery int, state string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	_, err := pool.ExecContext(ctx,
+		`INSERT INTO 
+		devices (
+			battery, 
+			state
+		) VALUES (
+			$1,
+			$2
+		)`, battery, state)
+
+	if err != nil {
+		return errors.New("error new device")
+	}
+
+	return nil
+}
+
+/********************************** CREATE **********************************/

@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"errors"
+	"log"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -17,6 +19,8 @@ type User struct {
 	LastLogin null.Time `json:"last_login"`
 	Timestamps
 }
+
+/********************************** GET **********************************/
 
 // GetUser fetches the user by its ID
 func GetUser(ctx context.Context, userID int) (User, error) {
@@ -77,3 +81,110 @@ func GetUsers(ctx context.Context) ([]User, error) {
 
 	return users, nil
 }
+
+/********************************** GET **********************************/
+
+/********************************** UPDATE **********************************/
+
+// UpdateUser : update a user
+func UpdateUser(ctx context.Context, userID int, tenantID int,
+	username string, password string, email string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	if (tenantID == 0) && (username == "") && (password == "") && (email == "") {
+		return errors.New("invalid input fields (database/users.go")
+	}
+
+	// modify zoneID
+	if tenantID != 0 {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE users SET tenant_id = $1 
+			WHERE user_id = $2
+		`, tenantID, userID)
+
+		if err != nil {
+			return errors.New("error update user tenant_id")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : user tenant_id - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify username
+	if username != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE users SET username = $1 
+			WHERE user_id = $2
+		`, username, userID)
+
+		if err != nil {
+			return errors.New("error update users username")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : users username - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify password
+	if password != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE users SET password = $1 
+			WHERE user_id = $2
+		`, password, userID)
+
+		if err != nil {
+			return errors.New("error update users password")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : users password - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	// modify email
+	if email != "" {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE users SET email = $1 
+			WHERE user_id = $2
+		`, email, userID)
+
+		if err != nil {
+			return errors.New("error update user email")
+		}
+
+		// verify if there is one ou more rows affected
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : user email - rows affected")
+		}
+		// checks the number of rows affected
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	}
+
+	return nil
+}
+
+/********************************** UPDATE **********************************/

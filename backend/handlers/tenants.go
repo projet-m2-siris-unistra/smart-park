@@ -11,9 +11,10 @@ type getTenantRequest struct {
 	TenantID int `json:"tenant_id"`
 }
 
-type updateGeoTenantsRequest struct {
+type updateTenantsRequest struct {
 	TenantID  int    `json:"tenant_id"`
-	Geography string `json:"geo"`
+	Name      string `json:"name,omitempty"`
+	Geography string `json:"geo,omitempty"`
 }
 
 /********************************** GET **********************************/
@@ -33,10 +34,10 @@ func getTenants(ctx context.Context, request getTenantRequest) ([]database.Tenan
 
 /********************************** UPDATE **********************************/
 
-func updateGeoTenants(ctx context.Context, request updateGeoTenantsRequest) error {
+func updateTenants(ctx context.Context, request updateTenantsRequest) error {
 	log.Println("handlers: handling updateGeoTenants")
 
-	err := database.UpdateGeoTenants(ctx, request.TenantID, request.Geography)
+	err := database.UpdateTenants(ctx, request.TenantID, request.Name, request.Geography)
 	return err
 }
 

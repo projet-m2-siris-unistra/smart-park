@@ -82,27 +82,69 @@ func GetTenants(ctx context.Context) ([]Tenant, error) {
 
 /********************************** UPDATE **********************************/
 
-// UpdateGeoTenants : update geography of a tenant if it grows or reduces
-func UpdateGeoTenants(ctx context.Context, tenantID int, geo string) error {
+// UpdateTenants : update a tenant
+func UpdateTenants(ctx context.Context, tenantID int, name string, geo string) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	result, err := pool.ExecContext(ctx, `
-		UPDATE tenants SET geo = $1 
-		WHERE tenant_id = $2
-	`, geo, tenantID)
-
-	if err != nil {
-		return errors.New("error update tenant geo")
+	if (name == "") && (geo == "") {
+		return errors.New("invalid input fields (database/tenants.go)")
 	}
 
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return errors.New("error : tenant geo - rows affected")
-	}
+	if (name == "") && (geo != "") {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE tenants SET geo = $1 
+			WHERE tenant_id = $2
+		`, geo, tenantID)
 
-	if rows < 0 {
-		log.Fatalf("expected to affect 1 row, affected %d", rows)
+		if err != nil {
+			return errors.New("error update tenant geo")
+		}
+
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : tenant geo - rows affected")
+		}
+
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
+	} else if (name != "") && (geo == "") {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE tenants SET name = $1 
+			WHERE tenant_id = $2
+		`, name, tenantID)
+
+		if err != nil {
+			return errors.New("error update tenant name")
+		}
+
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : tenant name - rows affected")
+		}
+
+		if rows < 0 {
+			log.Fatalf("expected to affect  row, affected %d", rows)
+		}
+	} else {
+		result, err := pool.ExecContext(ctx, `
+			UPDATE tenants SET geo = $1, name = $2
+			WHERE tenant_id = $3
+		`, geo, name, tenantID)
+
+		if err != nil {
+			return errors.New("error update tenant")
+		}
+
+		rows, err := result.RowsAffected()
+		if err != nil {
+			return errors.New("error : tenant - rows affected")
+		}
+
+		if rows < 0 {
+			log.Fatalf("expected to affect 1 row, affected %d", rows)
+		}
 	}
 	return nil
 }
