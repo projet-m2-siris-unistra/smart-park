@@ -1,0 +1,58 @@
+[
+  {
+    "zoneId": "1",
+    "name": "Gare ferroviaire"
+  },
+  {
+    "zoneId": "2",
+    "name": "Centre ville"
+  },
+  {
+    "zoneId": "3",
+    "name": "Zone industrielle"
+  },
+  {
+    "zoneId": "4",
+    "name": "Centre commercial"
+  },
+  {
+    "zoneId": "5",
+    "name": "Université"
+  },
+  {
+    "zoneId": "6",
+    "name": "Relais Tram"
+  },
+  {
+    "zoneId": "7",
+    "name": "Hypermarché"
+  },
+  {
+    "zoneId": "8",
+    "name": "Port"
+  },
+  {
+    "zoneId": "9",
+    "name": "Vieille ville"
+  },
+  {
+    "zoneId": "10",
+    "name": "Cathédrale"
+  },
+  {
+    "zoneId": "11",
+    "name": "Tribunal"
+  },
+  {
+    "zoneId": "12",
+    "name": "Piscine municipale"
+  },
+  {
+    "zoneId": "13",
+    "name": "Place du marché"
+  },
+  {
+    "zoneId": "14",
+    "name": "Grand parc"
+  }
+]
