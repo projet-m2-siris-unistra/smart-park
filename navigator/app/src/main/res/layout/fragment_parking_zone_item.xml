@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:onClick="@{clickListener}"
         android:transitionName="@{@string/transition_zone_card(zone.zoneId)}"
+        android:background="@color/colorPrimaryDark"
         android:orientation="horizontal">
 
         <TextView

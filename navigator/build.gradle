@@ -24,6 +24,7 @@ buildscript {
         lifecycle_version = '2.2.0-rc02'
         material_version = '1.1.0-beta02'
         navigation_version = '2.1.0'
+        play_services_version = '17.0.0'
         recycler_view_version = '1.1.0'
         room_version = '2.2.2'
         runner_version = '1.0.1'
@@ -49,6 +50,9 @@ allprojects {
     repositories {
         google()
         jcenter()
+        flatDir {
+            dirs 'libs'
+        }
     }
 }
 
