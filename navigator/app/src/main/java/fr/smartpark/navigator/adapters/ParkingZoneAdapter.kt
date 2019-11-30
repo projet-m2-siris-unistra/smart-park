@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -36,7 +37,11 @@ class ParkingZoneAdapter : ListAdapter<ParkingZone, ParkingZoneAdapter.ViewHolde
     ) : RecyclerView.ViewHolder(binding.root) {
         private fun navigateToZone(zone: ParkingZone, view: View) {
             val directions = HomeFragmentDirections.actionHomeToParkingZoneDetail(zone)
-            view.findNavController().navigate(directions)
+            val extras = FragmentNavigatorExtras(
+                binding.zoneId to binding.zoneId.transitionName,
+                binding.zoneName to binding.zoneName.transitionName
+            )
+            view.findNavController().navigate(directions, extras)
         }
 
         fun bind(item: ParkingZone) {
