@@ -10,9 +10,11 @@
             type="android.view.View.OnClickListener" />
     </data>
     <LinearLayout
+        android:id="@+id/zone_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="@{clickListener}"
+        android:transitionName="@{@string/transition_zone_card(zone.zoneId)}"
         android:orientation="horizontal">
 
         <TextView
@@ -21,7 +23,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
             android:text="@{zone.zoneId}"
-            android:transitionName="@{@string/transition_zone_id(zone.zoneId)}"
             android:textAppearance="?attr/textAppearanceListItem" />
 
         <TextView
@@ -30,7 +31,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
             android:text="@{zone.name}"
-            android:transitionName="@{@string/transition_zone_name(zone.zoneId)}"
             android:textAppearance="?attr/textAppearanceListItem" />
     </LinearLayout>
 </layout>

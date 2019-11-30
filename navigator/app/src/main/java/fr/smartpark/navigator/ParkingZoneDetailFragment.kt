@@ -18,7 +18,8 @@ class ParkingZoneDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition =
-            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
+            TransitionInflater.from(context).inflateTransition(R.transition.parking_detail)
+        postponeEnterTransition()
     }
 
     override fun onCreateView(
@@ -35,6 +36,7 @@ class ParkingZoneDetailFragment : Fragment() {
         binding.apply {
             zone = args.parkingZone
             executePendingBindings()
+            startPostponedEnterTransition()
         }
     }
 }

@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">SmartPark Navigator</string>
 
-    <string name="transition_zone_id">zone id %s</string>
-    <string name="transition_zone_name">zone name %s</string>
+    <string name="transition_zone_card">zone card %s</string>
 </resources>
