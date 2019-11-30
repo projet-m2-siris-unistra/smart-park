@@ -2,6 +2,9 @@
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
+        <import type="android.graphics.Color"/>
+        <import type="androidx.databinding.adapters.Converters"/>
+
         <variable
             name="zone"
             type="fr.smartpark.navigator.data.ParkingZone" />
@@ -10,8 +13,9 @@
     <LinearLayout
         android:id="@+id/zone_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:transitionName="@{@string/transition_zone_card(zone.zoneId)}"
+        android:background="@{Converters.convertColorToDrawable(Color.parseColor(zone.color))}"
         android:orientation="horizontal">
 
         <TextView

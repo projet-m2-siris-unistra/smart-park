@@ -2,9 +2,15 @@
 <transitionSet
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:interpolator/fast_out_slow_in"
-    android:transitionOrdering="together">
-    <fade />
-    <changeClipBounds />
-    <changeTransform />
-    <changeBounds />
+    android:transitionOrdering="sequential">
+
+    <fade android:fadingMode="fade_out" />
+
+    <transitionSet android:transitionOrdering="together">
+        <changeClipBounds />
+        <changeTransform />
+        <changeBounds />
+    </transitionSet>
+
+    <fade android:fadingMode="fade_in" />
 </transitionSet>

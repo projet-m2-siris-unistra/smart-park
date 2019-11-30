@@ -1,58 +1,72 @@
 [
   {
     "zoneId": "1",
-    "name": "Gare ferroviaire"
+    "name": "Gare ferroviaire",
+    "color": "#B71C1C"
   },
   {
     "zoneId": "2",
-    "name": "Centre ville"
+    "name": "Centre ville",
+    "color": "#311B92"
   },
   {
     "zoneId": "3",
-    "name": "Zone industrielle"
+    "name": "Zone industrielle",
+    "color": "#01579B"
   },
   {
     "zoneId": "4",
-    "name": "Centre commercial"
+    "name": "Centre commercial",
+    "color": "#1B5E20"
   },
   {
     "zoneId": "5",
-    "name": "Université"
+    "name": "Université",
+    "color": "#BF360C"
   },
   {
     "zoneId": "6",
-    "name": "Relais Tram"
+    "name": "Relais Tram",
+    "color": "#263238"
   },
   {
     "zoneId": "7",
-    "name": "Hypermarché"
+    "name": "Hypermarché",
+    "color": "#880E4F"
   },
   {
     "zoneId": "8",
-    "name": "Port"
+    "name": "Port",
+    "color": "#1A237E"
   },
   {
     "zoneId": "9",
-    "name": "Vieille ville"
+    "name": "Vieille ville",
+    "color": "#006064"
   },
   {
     "zoneId": "10",
-    "name": "Cathédrale"
+    "name": "Cathédrale",
+    "color": "#33691E"
   },
   {
     "zoneId": "11",
-    "name": "Tribunal"
+    "name": "Tribunal",
+    "color": "#3E2723"
   },
   {
     "zoneId": "12",
-    "name": "Piscine municipale"
+    "name": "Piscine municipale",
+    "color": "#4A148C"
   },
   {
     "zoneId": "13",
-    "name": "Place du marché"
+    "name": "Place du marché",
+    "color": "#0D47A1"
   },
   {
     "zoneId": "14",
-    "name": "Grand parc"
+    "name": "Grand parc",
+    "color": "#004D40"
   }
 ]

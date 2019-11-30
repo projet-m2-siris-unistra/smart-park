@@ -10,5 +10,6 @@ import kotlinx.android.parcel.Parcelize
 @Entity(tableName = "zones")
 data class ParkingZone(
     @PrimaryKey @ColumnInfo(name = "id") val zoneId: String,
-    val name: String
+    val name: String,
+    val color: String
 ) : Parcelable
