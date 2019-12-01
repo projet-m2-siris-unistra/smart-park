@@ -1,4 +1,4 @@
-DROP TABLE users:
+DROP TABLE users;
 DROP TABLE places;
 DROP TABLE devices;
 DROP TABLE zones;

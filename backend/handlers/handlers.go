@@ -31,6 +31,7 @@ var handlers = map[string]interface{}{
 	"devices.new":      newDevice,
 	"places.new":       newPlace,
 	"zones.new":        newZone,
+	"faker.new":	createFakeData,
 }
 
 // wrapHandler wraps a handler to do error handling and request/reply marshaling/unmarshaling
