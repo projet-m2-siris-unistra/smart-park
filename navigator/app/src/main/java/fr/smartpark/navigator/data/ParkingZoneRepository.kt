@@ -2,6 +2,7 @@ package fr.smartpark.navigator.data
 
 class ParkingZoneRepository private constructor(private val zoneDao: ParkingZoneDao) {
     fun getZones() = zoneDao.getZones()
+    fun getZone(id: String) = zoneDao.getZone(id)
 
     companion object {
         @Volatile

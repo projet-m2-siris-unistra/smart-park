@@ -1,7 +1,7 @@
 package fr.smartpark.navigator
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import fr.smartpark.navigator.databinding.ActivityMainBinding
 

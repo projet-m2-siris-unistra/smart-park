@@ -5,17 +5,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.FragmentNavigatorExtras
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import fr.smartpark.navigator.HomeFragmentDirections
 import fr.smartpark.navigator.R
 import fr.smartpark.navigator.data.ParkingZone
 import fr.smartpark.navigator.databinding.FragmentParkingZoneItemBinding
 
-class ParkingZoneAdapter : ListAdapter<ParkingZone, ParkingZoneAdapter.ViewHolder>(ParkingZoneDiffCallback()) {
+class ParkingZoneAdapter :
+    ListAdapter<ParkingZone, ParkingZoneAdapter.ViewHolder>(ParkingZoneDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             DataBindingUtil.inflate(

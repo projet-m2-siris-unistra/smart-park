@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import fr.smartpark.navigator.data.ParkingZoneRepository
 
-class ParkingZoneListViewModelFactory(
-    private val repository: ParkingZoneRepository
+class ParkingZoneDetailViewModelFactory(
+    private val zoneRepository: ParkingZoneRepository,
+    private val zoneId: String
 ) : ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>) =
-        ParkingZoneListViewModel(repository) as T
+        ParkingZoneDetailViewModel(zoneRepository, zoneId) as T
 }

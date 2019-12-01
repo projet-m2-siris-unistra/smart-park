@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import fr.smartpark.navigator.data.ParkingZone
 import fr.smartpark.navigator.data.ParkingZoneRepository
 
-class ParkingZoneListViewModel internal constructor(zoneRepository: ParkingZoneRepository) :
-    ViewModel() {
-    val zones: LiveData<List<ParkingZone>> = zoneRepository.getZones()
+class ParkingZoneDetailViewModel internal constructor(
+    zoneRepository: ParkingZoneRepository,
+    zoneId: String
+) : ViewModel() {
+    val zone: LiveData<ParkingZone> = zoneRepository.getZone(zoneId)
 }

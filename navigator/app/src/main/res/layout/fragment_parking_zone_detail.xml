@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.graphics.Color"/>
         <import type="androidx.databinding.adapters.Converters"/>
@@ -9,29 +10,58 @@
             name="zone"
             type="fr.smartpark.navigator.data.ParkingZone" />
     </data>
-
-    <LinearLayout
-        android:id="@+id/zone_card"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:transitionName="@{@string/transition_zone_card(zone.zoneId)}"
-        android:background="@{Converters.convertColorToDrawable(Color.parseColor(zone.color))}"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/zone_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="@{zone.zoneId}"
-            android:textAppearance="?attr/textAppearanceListItem" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/zone_card"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@{Converters.convertColorToDrawable(Color.parseColor(zone.color))}"
+            android:transitionName="@{@string/transition_zone_card(zone.zoneId)}"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/zone_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="@{zone.name}"
-            android:textAppearance="?attr/textAppearanceListItem" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/zone_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@{zone.zoneId}"
+                android:textAppearance="?attr/textAppearanceListItem"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="ID" />
+
+            <TextView
+                android:id="@+id/zone_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{zone.name}"
+                android:textAppearance="?attr/textAppearanceListItem"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/zone_id"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Zone name" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/zone_card">
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

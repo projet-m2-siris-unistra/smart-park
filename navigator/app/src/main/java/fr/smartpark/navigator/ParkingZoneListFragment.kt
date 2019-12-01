@@ -1,15 +1,14 @@
 package fr.smartpark.navigator
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.observe
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import fr.smartpark.navigator.adapters.ParkingZoneAdapter
 import fr.smartpark.navigator.databinding.FragmentParkingZoneListBinding
-
 import fr.smartpark.navigator.utilities.InjectorUtils
 import fr.smartpark.navigator.viewmodels.ParkingZoneListViewModel
 

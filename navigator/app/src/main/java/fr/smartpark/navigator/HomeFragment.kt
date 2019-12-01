@@ -1,9 +1,6 @@
 package fr.smartpark.navigator
 
 
-import android.R.attr.left
-import android.R.attr.right
-import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

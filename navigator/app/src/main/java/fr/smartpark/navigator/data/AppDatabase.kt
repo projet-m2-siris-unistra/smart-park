@@ -15,7 +15,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun zonesDao(): ParkingZoneDao
 
     companion object {
-        @Volatile private var instance: AppDatabase? = null
+        @Volatile
+        private var instance: AppDatabase? = null
 
         operator fun invoke(context: Context) =
             instance ?: synchronized(this) {
