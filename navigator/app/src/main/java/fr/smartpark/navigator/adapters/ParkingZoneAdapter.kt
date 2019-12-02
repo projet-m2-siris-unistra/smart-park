@@ -40,6 +40,7 @@ class ParkingZoneAdapter :
             val directions = HomeFragmentDirections.actionHomeToParkingZoneDetail(zone)
 
             val extras = FragmentNavigatorExtras(
+                binding.zoneCardContent.root to binding.zoneCardContent.root.transitionName,
                 binding.zoneCard to binding.zoneCard.transitionName
             )
 

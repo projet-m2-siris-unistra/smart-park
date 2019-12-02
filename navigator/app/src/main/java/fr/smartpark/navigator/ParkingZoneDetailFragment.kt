@@ -10,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionInflater
-import androidx.transition.TransitionManager
 import fr.smartpark.navigator.databinding.FragmentParkingZoneDetailBinding
 import fr.smartpark.navigator.utilities.InjectorUtils
 import fr.smartpark.navigator.viewmodels.ParkingZoneDetailViewModel
@@ -31,7 +30,6 @@ class ParkingZoneDetailFragment : Fragment() {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition =
             TransitionInflater.from(context).inflateTransition(R.transition.parking_detail)
-        postponeEnterTransition()
     }
 
     override fun onCreateView(
@@ -52,9 +50,7 @@ class ParkingZoneDetailFragment : Fragment() {
         binding.apply {
             // Fallback to zone passed in args
             zone = viewModel.zone.value ?: args.parkingZone
-            TransitionManager.beginDelayedTransition(zoneCard)
             executePendingBindings()
-            startPostponedEnterTransition()
         }
     }
 }

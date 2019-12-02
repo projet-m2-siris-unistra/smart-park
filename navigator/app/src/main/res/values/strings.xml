@@ -2,4 +2,7 @@
     <string name="app_name">SmartPark Navigator</string>
 
     <string name="transition_zone_card">zone card %s</string>
+    <string name="transition_zone_card_content">zone card content %s</string>
+
+    <string name="parking_zone_available">%d parking spaces available</string>
 </resources>

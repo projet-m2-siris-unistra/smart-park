@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
@@ -14,44 +16,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:id="@+id/zone_card"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@{Converters.convertColorToDrawable(Color.parseColor(zone.color))}"
-            android:transitionName="@{@string/transition_zone_card(zone.zoneId)}"
+            tools:background="@color/colorPrimaryDark"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            android:transitionName="@{@string/transition_zone_card(zone.zoneId)}">
 
-            <TextView
-                android:id="@+id/zone_id"
-                android:layout_width="wrap_content"
+            <include
+                android:id="@+id/zone_card_content"
+                layout="@layout/parking_zone_card"
+                bind:zone="@{zone}"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
-                android:text="@{zone.zoneId}"
-                android:textAppearance="?attr/textAppearanceListItem"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="ID" />
-
-            <TextView
-                android:id="@+id/zone_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@{zone.name}"
-                android:textAppearance="?attr/textAppearanceListItem"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/zone_id"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Zone name" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_gravity="center" />
+        </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -59,8 +43,14 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/zone_card">
+            app:layout_constraintTop_toBottomOf="@+id/zone_card">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:text="Lorem ipsum."
+                tools:text="@tools:sample/lorem/random" />
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

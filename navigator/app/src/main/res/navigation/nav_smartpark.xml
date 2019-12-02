@@ -13,7 +13,9 @@
         android:label="HomeFragment" >
         <action
             android:id="@+id/action_home_to_parking_zone_detail"
-            app:destination="@id/parkingZoneDetail" />
+            app:destination="@id/parkingZoneDetail"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:popEnterAnim="@anim/fragment_fade_enter" />
     </fragment>
 
     <fragment

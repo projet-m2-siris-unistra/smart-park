@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="zone"
+            type="fr.smartpark.navigator.data.ParkingZone" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:transitionName="@{@string/transition_zone_card_content(zone.zoneId)}"
+        tools:background="@color/colorPrimaryDark"
+        tools:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/zone_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/text_margin"
+            android:layout_marginTop="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="@{zone.name}"
+            tools:text="Zone name" />
+
+        <TextView
+            android:id="@+id/zone_availability"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/text_margin"
+            android:layout_marginBottom="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceSubtitle2"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/zone_name"
+            app:layout_constraintTop_toBottomOf="@+id/zone_name"
+            android:text="@{@string/parking_zone_available(3)}"
+            tools:text="@string/parking_zone_available" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

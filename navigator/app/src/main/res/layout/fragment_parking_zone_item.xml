@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
@@ -15,7 +17,7 @@
             type="android.view.View.OnClickListener" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:id="@+id/zone_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,33 +25,12 @@
         android:onClick="@{clickListener}"
         android:transitionName="@{@string/transition_zone_card(zone.zoneId)}">
 
-        <TextView
-            android:id="@+id/zone_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@{zone.zoneId}"
-            android:textAppearance="?attr/textAppearanceListItem"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="ID" />
+        <include
+            android:id="@+id/zone_card_content"
+            layout="@layout/parking_zone_card"
+            bind:zone="@{zone}"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/zone_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@{zone.name}"
-            android:textAppearance="?attr/textAppearanceListItem"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/zone_id"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Zone name" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </layout>
