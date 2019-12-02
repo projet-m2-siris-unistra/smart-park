@@ -69,6 +69,7 @@ class TenantManagement:
         return count
 
 
+
 # Instance of a zone
 class ZoneManagement:
 
@@ -243,19 +244,6 @@ class SpotManagement:
             "coordinates" : self.coordinates,
             "device" : self.device.toJson()
         }
-
-    # Data requests # 
-    
-    # When displaying marker, we customi
-    #def coordinatesGeoJson(self):
-    #    return {
-    #        'type': 'Feature',
-    #        'geometry': {
-    #            'type': 'Point',
-    #            'coordinates': self.coordinates
-    #        }
-    #    }
-
 
     # Statistics #
 
