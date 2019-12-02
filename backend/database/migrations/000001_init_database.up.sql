@@ -59,7 +59,7 @@ CREATE TABLE places
 (
 	place_id   serial      PRIMARY KEY,
 	zone_id    integer     REFERENCES zones(zone_id),
-	type       varchar(50) UNIQUE NOT NULL, -- type (moto, car)
+	type       varchar(50) NOT NULL, -- type (moto, car)
 	geo        text,       --GEOGRAPHY(point)
 	device_id  integer     REFERENCES devices(device_id),
 	created_at timestamptz NOT NULL DEFAULT NOW(),
