@@ -23,7 +23,10 @@ async def getZone(zone_id):
 # This will return a list of zones from a tenant
 async def getZones(tenant_id):
     request = json.dumps({'tenant_id' : int(tenant_id)})
-    response = await nc.request("zones.list", bytes(request, "utf-8"), timeout=1)
+    try:
+        response = await nc.request("zones.list", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> getZones -> timeout reached")
     return response.data.decode("utf-8")
 
 

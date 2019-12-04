@@ -2,6 +2,8 @@ import click
 from jinja2 import Environment, PackageLoader, select_autoescape
 from sanic import Sanic, response
 from sanic.response import json
+from sanic.handlers import ErrorHandler
+from sanic.exceptions import ServerError
 
 import json as js
 
@@ -45,6 +47,9 @@ async def dashboard(request):
     await tenantInstance.init(1)
 
     await tenantInstance.setZones()
+    if tenantInstance.zones is None:
+        raise ServerError("No zones in DB", status_code=500)
+
     zonesJson = Tooling.jsonList(tenantInstance.zones)
 
     rendered_template = await render(
@@ -63,6 +68,8 @@ async def zones(request):
     await tenantInstance.init(1)
 
     await tenantInstance.setZones()
+    if tenantInstance.zones is None:
+        raise ServerError("No zones in DB", status_code=500)
 
     rendered_template = await render(
         "tenant_zone_data_table.html", 
@@ -79,6 +86,8 @@ async def map(request):
     await tenantInstance.init(1)
 
     await tenantInstance.setZones()
+    if tenantInstance.zones is None:
+        raise ServerError("No zones in DB", status_code=500)
 
     for zone in tenantInstance.zones:
         await zone.setSpots()
@@ -146,3 +155,18 @@ async def getTenant(request):
 @config.run_params
 def run():
     app.run(host=config.env("HOST"), port=config.env("PORT"), debug=config.env("DEBUG"))
+
+
+
+# Errors & Exepction handling
+
+@app.exception(ServerError)
+async def serverErrorHandler(request, exception):
+    print(exception)
+    rendered_template = await render(
+        "server_error_template.html", 
+        request,
+        errCode = exception,
+        knights = "Veuillez nous excuser, une erreur interne vient de se produire...",
+    )
+    return response.html(rendered_template)
