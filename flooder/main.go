@@ -6,22 +6,19 @@ import (
 	"math/rand"
 	"os"
 	"os/signal"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/nats-io/nats.go"
 )
 
-// sensor structure
-
-type infos struct {
+type deviceInfos struct {
 	ID      int    `json:"device_id"`
 	State   string `json:"state"`
 	Battery int    `json:"battery"`
 }
 
-// return true or false
+type listRequest struct{}
+type listResponse []deviceInfos
 
 func rand2() bool {
 	return rand.Int31()&0x01 == 0
@@ -29,11 +26,10 @@ func rand2() bool {
 
 var nc *nats.Conn
 
-// message flood
-
 func flood(id int) {
+	time.Sleep(time.Second * time.Duration(rand.Intn(60)))
 	for {
-		bat := rand.Intn(1500)
+		bat := rand.Intn(100)
 		occ := rand2()
 
 		state := "free"
@@ -41,27 +37,24 @@ func flood(id int) {
 			state = "occupied"
 		}
 
-		test := infos{
+		payload := deviceInfos{
 			ID:      id,
 			State:   state,
 			Battery: bat,
 		}
 
-		requestBody, err := json.Marshal(test)
+		requestBody, err := json.Marshal(payload)
 
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		err = nc.Publish("devices.update.battery", requestBody)
+		log.Printf("sending update %v", payload)
+		err = nc.Publish("devices.update", requestBody)
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = nc.Publish("devices.update.state", requestBody)
-		if err != nil {
-			log.Fatal(err)
-		}
-		time.Sleep(time.Minute)
+		time.Sleep(time.Minute + time.Second*time.Duration(rand.Intn(5)))
 	}
 }
 
@@ -78,21 +71,28 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ids := os.Getenv("DEVICE_IDS")
-	for _, id := range strings.Split(ids, ",") {
-		i, err := strconv.Atoi(id)
-		if err != nil {
-			log.Fatal(err)
-		}
+	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		go flood(i)
+	var resp listResponse
+	req := listRequest{}
+	err = c.Request("devices.list", req, &resp, 100*time.Millisecond)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, device := range resp {
+		log.Printf("starting to flood %v", device)
+		go flood(device.ID)
 	}
 
 	// handle SIGINT signal
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	<-c
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, os.Interrupt)
+	<-ch
 
 	// close connection
-	nc.Close()
+	c.Close()
 }
