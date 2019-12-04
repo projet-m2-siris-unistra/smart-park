@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+<<<<<<< HEAD
 type deviceInfos struct {
 	DeviceName      string `json:"deviceName"`
 	DevEUI          string `json:"devEUI"`
@@ -68,8 +70,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	//w.Write([]byte("DeviceName : %s, DevEUI : %s, Battery : %s\n",u.deviceName, u.devEUI, u.applicationName))
 
 
-	w.Write([]byte("ok"))
-}
+
 
 func main() {
 	var err error
