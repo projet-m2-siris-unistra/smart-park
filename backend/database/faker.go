@@ -12,6 +12,12 @@ import (
 	"github.com/brianvoe/gofakeit"
 )
 
+// define global variables to delimiting the geo's tenant
+var minlatitude float64
+var maxlatitude float64
+var minlongitude float64
+var maxlongitude float64
+
 // Faker : insert fake data into the database
 func Faker(ctx context.Context, tenants int, zones int, devices int, places int, users int) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -22,7 +28,10 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 	if tenants > 0 {
 		for n := 0; n <= tenants; n++ {
 			nameTenant := gofakeit.City()
-			GeoTenant := NewGeos()
+			GeoTenant, errgeo := NewGeoTenant()
+			if errgeo != nil {
+				return errors.New("error new geo's tenant, function Faker, faker.go")
+			}
 			_, err := pool.ExecContext(ctx,
 				`INSERT INTO tenants
 				(
@@ -35,7 +44,7 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 				)`, nameTenant, GeoTenant)
 
 			if err != nil {
-				return errors.New("error new device")
+				return errors.New("error new tenant, function Faker, faker.go")
 			}
 		}
 	}
@@ -47,7 +56,10 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 			colorZone, err := RandomHex(6)
 			colorZone = strings.ToUpper(colorZone)
 			colorZone = colorZone[0:6]
-			geoZone := NewGeos()
+			geoZone, errgeo := NewGeoZone()
+			if errgeo != nil {
+				return errors.New("error new geo's zone, function Faker, faker.go")
+			}
 			_, err = pool.ExecContext(ctx,
 				`INSERT INTO zones
 				(
@@ -66,14 +78,14 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 				)`, tenantIDZone, nameZone, typeZone, colorZone, geoZone)
 
 			if err != nil {
-				return errors.New("error new zone")
+				return errors.New("error new zone, function Faker, faker.go")
 			}
 		}
 	}
 
 	if devices > 0 {
 		for n := 0; n <= devices; n++ {
-			batteryDevice := rand.Intn(100)
+			batteryDevice := Random(0, 100)
 			stateDevice := StateDeviceRandom()
 			_, err := pool.ExecContext(ctx,
 				`INSERT INTO 
@@ -86,7 +98,7 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 				)`, batteryDevice, stateDevice)
 
 			if err != nil {
-				return errors.New("error new device")
+				return errors.New("error new device, function Faker, faker.go")
 			}
 		}
 	}
@@ -96,7 +108,10 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 			deviceIDPlace := RandomDeviceRow(ctx)
 			zoneIDPlace := RandomZoneRow(ctx)
 			typePlace := ""
-			geoPlace := NewGeo()
+			geoPlace, errgeo := NewGeo()
+			if errgeo != nil {
+				return errors.New("error new geo's place, function Faker, faker.go")
+			}
 			_, err := pool.ExecContext(ctx,
 				`INSERT INTO places
 				(
@@ -113,7 +128,7 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 				)`, zoneIDPlace, typePlace, geoPlace, deviceIDPlace)
 
 			if err != nil {
-				return errors.New("error new place")
+				return errors.New("error new place, function Faker, faker.go")
 			}
 		}
 	}
@@ -140,7 +155,7 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 				)`, tenantIDUser, nameUser, passwordUser, emailUser)
 
 			if err != nil {
-				return errors.New("error new user")
+				return errors.New("error new user, function Faker, faker.go")
 			}
 		}
 	}
@@ -148,34 +163,111 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 	return nil
 }
 
-// NewGeos : create a string which has a list of coordinates
-func NewGeos() string {
+// NewGeoTenant : create a string which has a list of coordinates for a tenant
+func NewGeoTenant() (string, error) {
 	var result string
+	var err error
+	var latitude float64
+	var longitude float64
 	result = "["
-	for n := 0; n <= rand.Intn(10); n++ {
-		tmpLongitude := fmt.Sprintf("%f", gofakeit.Longitude())
-		tmpLatitude := fmt.Sprintf("%f", gofakeit.Latitude())
-		result = result + "[" + tmpLongitude + "," + tmpLatitude + "],"
+
+	// do a list of corrected approximative values of longitude
+	minlongitude = gofakeit.Longitude()
+	maxlongitude, err = gofakeit.LongitudeInRange(minlongitude, 180)
+	if err != nil {
+		return "", errors.New("error : wrong longitude, function NewGeoTenant, faker.go")
+	}
+
+	// do a list of corrected approximative values of latitude
+	minlatitude = gofakeit.Latitude()
+	maxlatitude, err = gofakeit.LatitudeInRange(minlatitude, 90)
+	if err != nil {
+		return "", errors.New("error : wrong latitude, function NewGeoTenant, faker.go")
+	}
+
+	for n := 0; n <= Random(2, 10); n++ {
+		if n != 0 {
+			result = result + ","
+		}
+
+		longitude, err = RandomFloat64(minlongitude, maxlongitude)
+		if err != nil {
+			return "", errors.New("error : wrong longitude, function NewGeoTenant, faker.go")
+		}
+
+		latitude, err = RandomFloat64(minlatitude, maxlatitude)
+		if err != nil {
+			return "", errors.New("error : wrong latitude, function NewGeoTenant, faker.go")
+		}
+
+		// format string and concat with result
+		tmpLongitude := fmt.Sprintf("%f", longitude)
+		tmpLatitude := fmt.Sprintf("%f", latitude)
+		result = result + "[" + tmpLongitude + "," + tmpLatitude + "]"
 	}
 	result = result + "]"
-	return result
+	return result, nil
 }
 
 // NewGeo : create a string which has coordinates
-func NewGeo() string {
+func NewGeo() (string, error) {
 	var result string
-	tmpLongitude := fmt.Sprintf("%f", gofakeit.Longitude())
-	tmpLatitude := fmt.Sprintf("%f", gofakeit.Latitude())
+	var err error
+	var latitude float64
+	var longitude float64
+
+	longitude, err = RandomFloat64(minlongitude, maxlongitude)
+	if err != nil {
+		return "", errors.New("error : wrong longitude, function NewGeo, faker.go")
+	}
+
+	latitude, err = RandomFloat64(minlatitude, maxlatitude)
+	if err != nil {
+		return "", errors.New("error : wrong latitude, function NewGeo, faker.go")
+	}
+
+	tmpLongitude := fmt.Sprintf("%f", longitude)
+	tmpLatitude := fmt.Sprintf("%f", latitude)
 	result = result + "[" + tmpLongitude + "," + tmpLatitude + "],"
-	return result
+	return result, nil
+}
+
+// NewGeoZone : create a string which has a list of coordinates for a zone and fit with the geo's tenant
+func NewGeoZone() (string, error) {
+	var result string
+	var err error
+	var latitude float64
+	var longitude float64
+
+	result = "["
+
+	for n := 0; n <= Random(2, 10); n++ {
+		longitude, err = RandomFloat64(minlongitude, maxlongitude)
+		if err != nil {
+			return "", errors.New("error : wrong longitude, function NewGeoZone, faker.go")
+		}
+
+		latitude, err = RandomFloat64(minlatitude, maxlatitude)
+		if err != nil {
+			return "", errors.New("error : wrong latitude, function NewGeoZone, faker.go")
+		}
+
+		// format string and concat with result
+		tmpLongitude := fmt.Sprintf("%f", longitude)
+		tmpLatitude := fmt.Sprintf("%f", latitude)
+		result = result + "[" + tmpLongitude + "," + tmpLatitude + "],"
+	}
+	result = result + "]"
+	return result, nil
+
 }
 
 // TypeZoneRandom : return a type zone
 func TypeZoneRandom() string {
-	n := rand.Intn(2)
-	if n == 0 {
+	n := Random(1, 3)
+	if n == 1 {
 		return "paid"
-	} else if n == 1 {
+	} else if n == 2 {
 		return "blue"
 	} else {
 		return "free"
@@ -184,8 +276,8 @@ func TypeZoneRandom() string {
 
 // StateDeviceRandom : return a type zone
 func StateDeviceRandom() string {
-	n := rand.Intn(1)
-	if n == 0 {
+	n := Random(1, 2)
+	if n == 1 {
 		return "occupied"
 	}
 
@@ -256,4 +348,18 @@ func RandomHex(n int) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(bytes), nil
+}
+
+// Random : defines how to create the random number
+func Random(min, max int) int {
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	return r1.Intn(max-min) + min
+}
+
+// RandomFloat64 : defines how to create the random float64
+func RandomFloat64(min, max float64) (float64, error) {
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	return min + r1.Float64()*(max-min), nil
 }
