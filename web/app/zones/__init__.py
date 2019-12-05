@@ -19,12 +19,14 @@ async def create_zone(request):
     rendered_template = await render("zone_creation.html", request)
     return response.html(rendered_template)
 
+
 @bp.route('/zone-creation-check', methods=['POST'])
 async def zone_creation_check(request):
     # Checking args
     # Adding args to database
     # Linking to zone management
     return response.json(request.form)
+
 
 @bp.route('/<zone_id>')
 @bp.route('/<zone_id>/overview')
@@ -47,6 +49,7 @@ async def view(request, zone_id):
     )
     return response.html(rendered_template)
 
+
 @bp.route('/<zone_id>/statistics')
 async def stats(request, zone_id):
     tenantInstance = TenantManagement(1)
@@ -66,6 +69,7 @@ async def stats(request, zone_id):
     )
     return response.html(rendered_template)
 
+
 @bp.route('/<zone_id>/maintenance')
 async def maintenance(request, zone_id):
     tenantInstance = TenantManagement(1)
@@ -84,6 +88,7 @@ async def maintenance(request, zone_id):
         spotList=zoneInstance.setSpots()
     )
     return response.html(rendered_template)
+
 
 @bp.route('/<zone_id>/configuration')
 async def config(request, zone_id):
@@ -111,6 +116,7 @@ async def config(request, zone_id):
     )
     return response.html(rendered_template)
 
+
 @bp.route('/<zone_id>/submit-spots')
 async def submit_spots(request, zone_id):
     tenant = TenantManagement(1)
@@ -131,6 +137,7 @@ async def submit_spots(request, zone_id):
     )
     # checking spot list and adding to DB
     return response.html(rendered_template)
+
 
 # Handling Parking Spots
 @bp.route('/<zone_id>/spots')
@@ -158,6 +165,7 @@ async def spots(request, zone_id):
     )
     return response.html(rendered_template)
 
+
 # Interface for deleting a zone
 @bp.route('/<zone_id>/remove')
 async def remove(request, zone_id):
@@ -175,6 +183,7 @@ async def remove(request, zone_id):
         tenantName=tenant.name
     )
     return response.html(rendered_template)
+
 
 @bp.route('/<zone_id>/remove-check')
 async def remove_check(request, zone_id):
