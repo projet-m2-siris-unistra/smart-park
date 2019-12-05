@@ -2,9 +2,8 @@ package handlers
 
 import (
 	"context"
-	"log"
-
 	"github.com/projet-m2-siris-unistra/smart-park/backend/database"
+	"log"
 )
 
 type newFakeDataRequest struct {
