@@ -52,9 +52,9 @@ func loadTLS(prefix string) (*tls.Config, error) {
 }
 
 type deviceInfos struct {
-	DeviceName      string `json:"deviceName"`
-	DevEUI          string `json:"devEUI"`
-	ApplicationName string `json:"applicationName"`
+	DeviceName     string `json:"deviceName"`
+	DevEUI         string `json:"devEUI"`
+	PresenceSensor int    `json:"presenceSensor"`
 }
 
 type outputInfos struct {
@@ -91,7 +91,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var out outputInfos
 
 	out.DeviceEUI = u.DevEUI
-	out.State = "occupied"
+	if u.PresenceSensor == 1 {
+		out.State = "occupied"
+	} else {
+		out.State = "free"
+	}
 	out.Battery = 43
 
 	requestBody, err3 := json.Marshal(out)
@@ -105,9 +109,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	//w.Write([]byte("DeviceName : %s, DevEUI : %s, Battery : %s\n",u.deviceName, u.devEUI, u.applicationName))
-
 	w.Write([]byte("ok"))
 }
 
