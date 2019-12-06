@@ -11,27 +11,27 @@ import (
 )
 
 var handlers = map[string]interface{}{
-	"ping":             ping,
-	"devices.get":      getDevice,
-	"devices.get.free": getFreeDevices,
-	"tenants.get":      getTenant,
-	"zones.get":        getZone,
-	"places.get":       getPlace,
-	"users.get":        getUser,
-	"devices.list":     getDevices,
-	"tenants.list":     getTenants,
-	"zones.list":       getZones,
-	"places.list":      getPlaces,
-	"users.list":       getUsers,
-	"devices.update":   updateDevice,
-	"tenants.update":   updateTenants,
-	"zones.update":     updateZone,
-	"places.update":    updatePlace,
-	"users.update":     updateUser,
-	"devices.new":      newDevice,
-	"places.new":       newPlace,
-	"zones.new":        newZone,
-	"faker.new":	createFakeData,
+	"ping":             ping, 				// ping database server
+	"devices.get":      getDevice, 			// get a device by its id
+	"devices.get.free": getFreeDevices, 	// get all free devices
+	"tenants.get":      getTenant, 			// get a tenant by its id
+	"zones.get":        getZone, 			// get a zone by its id 
+	"places.get":       getPlace, 			// get a places by its id
+	"users.get":        getUser, 			// get a user by his/her id
+	"devices.list":     getDevices, 		// get all devices
+	"tenants.list":     getTenants, 		// get all tenants
+	"zones.list":       getZones, 			// get all zones by the tenant's id
+	"places.list":      getPlaces, 			// get all places by the zones' id
+	"users.list":       getUsers, 			// get all users
+	"devices.update":   updateDevice, 		// update devices' field
+	"tenants.update":   updateTenants, 		// update tenants' field
+	"zones.update":     updateZone, 		// update zones' field
+	"places.update":    updatePlace, 		// update places' field
+	"users.update":     updateUser, 		// update users' field
+	"devices.new":      newDevice, 			// create new device
+	"places.new":       newPlace, 			// create new place
+	"zones.new":        newZone, 			// create new zone
+	"faker.new":		createFakeData, 	// create fake data into the database (all tables)
 }
 
 // wrapHandler wraps a handler to do error handling and request/reply marshaling/unmarshaling

@@ -85,7 +85,7 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 
 	if devices > 0 {
 		for n := 0; n <= devices; n++ {
-			batteryDevice := Random(0, 100)
+			batteryDevice := Random(0, 101)
 			stateDevice := StateDeviceRandom()
 			_, err := pool.ExecContext(ctx,
 				`INSERT INTO 
@@ -264,7 +264,7 @@ func NewGeoZone() (string, error) {
 
 // TypeZoneRandom : return a type zone
 func TypeZoneRandom() string {
-	n := Random(1, 3)
+	n := Random(1, 4)
 	if n == 1 {
 		return "paid"
 	} else if n == 2 {
@@ -276,7 +276,7 @@ func TypeZoneRandom() string {
 
 // StateDeviceRandom : return a type zone
 func StateDeviceRandom() string {
-	n := Random(1, 2)
+	n := Random(1, 3)
 	if n == 1 {
 		return "occupied"
 	}
