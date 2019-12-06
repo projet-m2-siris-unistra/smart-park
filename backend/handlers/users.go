@@ -11,6 +11,11 @@ type getUserRequest struct {
 	UserID int `json:"user_id"`
 }
 
+type getUsersRequest struct {
+	Limite int `json:"limit,omitempty"`
+	Offset int `json:"offset,omitempty"`
+}
+
 type updateUserRequest struct {
 	UserID   int    `json:"user_id"`
 	TenantID int    `json:"tenant_id,omitempty"`
@@ -27,10 +32,10 @@ func getUser(ctx context.Context, request getUserRequest) (database.User, error)
 	return database.GetUser(ctx, request.UserID)
 }
 
-func getUsers(ctx context.Context, request getUserRequest) ([]database.User, error) {
+func getUsers(ctx context.Context, request getUsersRequest) ([]database.User, error) {
 	log.Println("handlers: handling getUsers")
 
-	return database.GetUsers(ctx)
+	return database.GetUsers(ctx, request.Limite, request.Offset)
 }
 
 /********************************** GET **********************************/

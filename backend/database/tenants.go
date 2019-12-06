@@ -42,37 +42,116 @@ func GetTenant(ctx context.Context, tenantID int) (Tenant, error) {
 }
 
 // GetTenants : get all the tenant
-func GetTenants(ctx context.Context) ([]Tenant, error) {
+func GetTenants(ctx context.Context, limite int, offset int) ([]Tenant, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	var tenants []Tenant
 	var tenant Tenant
 	var i int
-
+ 
 	i = 0
-	rows, err := pool.QueryContext(ctx,
-		`SELECT tenant_id, name, geo, created_at, updated_at FROM tenants`)
+	if (limite != 0 && offset != 0) {
 
-	if err != nil {
-		return tenants, err
-	}
-	defer rows.Close()
+		rows, err := pool.QueryContext(ctx,
+			`SELECT tenant_id, name, geo, created_at, updated_at 
+			FROM tenants ORDER BY tenant_id LIMIT $1 OFFSET $2`, limite, offset)
 
-	for rows.Next() {
-		err = rows.Scan(&tenant.TenantID, &tenant.Name, &tenant.Geography,
-			&tenant.CreatedAt, &tenant.UpdatedAt)
 		if err != nil {
 			return tenants, err
 		}
-		tenants = append(tenants, tenant)
-		i = i + 1
-	}
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(&tenant.TenantID, &tenant.Name, &tenant.Geography,
+				&tenant.CreatedAt, &tenant.UpdatedAt)
+			if err != nil {
+				return tenants, err
+			}
+			tenants = append(tenants, tenant)
+			i = i + 1
+		}
+	
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return tenants, err
+		}
 
-	// get any error encountered during iteration
-	err = rows.Err()
-	if err != nil {
-		return tenants, err
+	} else if (limite != 0) {
+
+		rows, err := pool.QueryContext(ctx,
+			`SELECT tenant_id, name, geo, created_at, updated_at 
+			FROM tenants ORDER BY tenant_id OFFSET $1`, offset)
+
+		if err != nil {
+			return tenants, err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(&tenant.TenantID, &tenant.Name, &tenant.Geography,
+				&tenant.CreatedAt, &tenant.UpdatedAt)
+			if err != nil {
+				return tenants, err
+			}
+			tenants = append(tenants, tenant)
+			i = i + 1
+		}
+	
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return tenants, err
+		}
+	} else if (offset != 0) {
+
+		rows, err := pool.QueryContext(ctx,
+			`SELECT tenant_id, name, geo, created_at, updated_at 
+			FROM tenants ORDER BY tenant_id LIMIT $1`, limite)
+
+		if err != nil {
+			return tenants, err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(&tenant.TenantID, &tenant.Name, &tenant.Geography,
+				&tenant.CreatedAt, &tenant.UpdatedAt)
+			if err != nil {
+				return tenants, err
+			}
+			tenants = append(tenants, tenant)
+			i = i + 1
+		}
+	
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return tenants, err
+		}
+	} else {
+
+		rows, err := pool.QueryContext(ctx,
+			`SELECT tenant_id, name, geo, created_at, updated_at 
+			FROM tenants ORDER BY tenant_id`)
+
+		if err != nil {
+			return tenants, err
+		}
+		defer rows.Close()
+		for rows.Next() {
+			err = rows.Scan(&tenant.TenantID, &tenant.Name, &tenant.Geography,
+				&tenant.CreatedAt, &tenant.UpdatedAt)
+			if err != nil {
+				return tenants, err
+			}
+			tenants = append(tenants, tenant)
+			i = i + 1
+		}
+	
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return tenants, err
+		}
 	}
 
 	return tenants, nil

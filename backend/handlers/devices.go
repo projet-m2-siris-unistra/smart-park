@@ -11,6 +11,11 @@ type getDeviceRequest struct {
 	DeviceID int `json:"device_id"`
 }
 
+type getDevicesRequest struct {
+	Limite int `json:"limit,omitempty"`
+	Offset int `json:"offset,omitempty"`
+}
+
 type updateDeviceRequest struct {
 	DeviceID int    `json:"device_id"`
 	Battery  int    `json:"battery,omitempty"`
@@ -29,16 +34,16 @@ func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, 
 	return database.GetDevice(ctx, request.DeviceID)
 }
 
-func getFreeDevices(ctx context.Context, request getDeviceRequest) ([]database.Device, error) {
+func getFreeDevices(ctx context.Context, request getDevicesRequest) ([]database.Device, error) {
 	log.Println("handlers: handling getFreeDevices")
 
-	return database.GetFreeDevices(ctx)
+	return database.GetFreeDevices(ctx, request.Limite, request.Offset)
 }
 
-func getDevices(ctx context.Context, request getDeviceRequest) ([]database.Device, error) {
+func getDevices(ctx context.Context, request getDevicesRequest) ([]database.Device, error) {
 	log.Println("handlers: handling getDevices")
 
-	return database.GetDevices(ctx)
+	return database.GetDevices(ctx, request.Limite, request.Offset)
 }
 
 /********************************** GET **********************************/
