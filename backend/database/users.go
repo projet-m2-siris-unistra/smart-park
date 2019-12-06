@@ -45,7 +45,7 @@ func GetUser(ctx context.Context, userID int) (User, error) {
 }
 
 // GetUsers : get all the user
-func GetUsers(ctx context.Context) ([]User, error) {
+func GetUsers(ctx context.Context, limite int, offset int) ([]User, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -54,29 +54,107 @@ func GetUsers(ctx context.Context) ([]User, error) {
 	var i int
 
 	i = 0
-	rows, err := pool.QueryContext(ctx,
-		`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
-		FROM users `)
 
-	if err != nil {
-		return users, err
-	}
-	defer rows.Close()
+	if (limite != 0 && offset != 0) {
+		rows, err := pool.QueryContext(ctx,
+			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
+			FROM users LIMIT $1 OFFSET $2`, limite, offset)
 
-	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
-			&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
 		if err != nil {
 			return users, err
 		}
-		users = append(users, user)
-		i = i + 1
-	}
+		defer rows.Close()
 
-	// get any error encountered during iteration
-	err = rows.Err()
-	if err != nil {
-		return users, err
+		for rows.Next() {
+			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
+				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
+			if err != nil {
+				return users, err
+			}
+			users = append(users, user)
+			i = i + 1
+		}
+		
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return users, err
+		}
+	} else if (limite != 0) {
+		rows, err := pool.QueryContext(ctx,
+			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
+			FROM users LIMIT $1`, limite)
+
+		if err != nil {
+			return users, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
+				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
+			if err != nil {
+				return users, err
+			}
+			users = append(users, user)
+			i = i + 1
+		}
+		
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return users, err
+		}
+	} else if (offset != 0) {
+		rows, err := pool.QueryContext(ctx,
+			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
+			FROM users OFFSET $1`, offset)
+
+		if err != nil {
+			return users, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
+				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
+			if err != nil {
+				return users, err
+			}
+			users = append(users, user)
+			i = i + 1
+		}
+		
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return users, err
+		}
+	} else {
+		rows, err := pool.QueryContext(ctx,
+			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
+			FROM users`)
+
+		if err != nil {
+			return users, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
+				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
+			if err != nil {
+				return users, err
+			}
+			users = append(users, user)
+			i = i + 1
+		}
+		
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return users, err
+		}
 	}
 
 	return users, nil

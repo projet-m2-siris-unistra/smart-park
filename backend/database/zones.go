@@ -110,7 +110,7 @@ func GetZone(ctx context.Context, zoneID int) (Zone, error) {
 }
 
 // GetZones : get all the zone by the tenant_id
-func GetZones(ctx context.Context, tenantID int) ([]Zone, error) {
+func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
@@ -121,43 +121,162 @@ func GetZones(ctx context.Context, tenantID int) ([]Zone, error) {
 	var d *string
 
 	i = 0
-	rows, err := pool.QueryContext(ctx,
+	if (limite != 0 && offset != 0) {
+		rows, err := pool.QueryContext(ctx,
 		`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
 		FROM zones z, tenants t
-		WHERE z.tenant_id = $1`, tenantID)
+		WHERE z.tenant_id = $1 LIMIT $2 OFFSET $3`, tenantID, limite, offset)
 
-	if err != nil {
-		return zones, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
-			&zone.CreatedAt, &zone.UpdatedAt)
 		if err != nil {
 			return zones, err
 		}
-		if tmp.IsZero() == true {
-			zone.Type = FreeZone
-		} else {
-			d = tmp.Ptr()
-			switch *d {
-			case "paid":
-				zone.Type = Paid
-			case "blue":
-				zone.Type = Blue
-			default:
-				zone.Type = FreeZone
-			}
-		}
-		zones = append(zones, zone)
-		i = i + 1
-	}
+		defer rows.Close()
 
-	// get any error encountered during iteration
-	err = rows.Err()
-	if err != nil {
-		return zones, err
+		for rows.Next() {
+			err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
+				&zone.CreatedAt, &zone.UpdatedAt)
+			if err != nil {
+				return zones, err
+			}
+			if tmp.IsZero() == true {
+				zone.Type = FreeZone
+			} else {
+				d = tmp.Ptr()
+				switch *d {
+				case "paid":
+					zone.Type = Paid
+				case "blue":
+					zone.Type = Blue
+				default:
+					zone.Type = FreeZone
+				}
+			}
+			zones = append(zones, zone)
+			i = i + 1
+		}
+
+		// get any error encountered during iteration
+		err = rows.Err()
+		if err != nil {
+			return zones, err
+		}
+	} else if (limite != 0) {
+		rows, err := pool.QueryContext(ctx,
+			`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
+			FROM zones z, tenants t
+			WHERE z.tenant_id = $1 LIMIT $2`, tenantID, limite)
+	
+			if err != nil {
+				return zones, err
+			}
+			defer rows.Close()
+	
+			for rows.Next() {
+				err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
+					&zone.CreatedAt, &zone.UpdatedAt)
+				if err != nil {
+					return zones, err
+				}
+				if tmp.IsZero() == true {
+					zone.Type = FreeZone
+				} else {
+					d = tmp.Ptr()
+					switch *d {
+					case "paid":
+						zone.Type = Paid
+					case "blue":
+						zone.Type = Blue
+					default:
+						zone.Type = FreeZone
+					}
+				}
+				zones = append(zones, zone)
+				i = i + 1
+			}
+	
+			// get any error encountered during iteration
+			err = rows.Err()
+			if err != nil {
+				return zones, err
+			}
+	} else if (offset != 0) {
+		rows, err := pool.QueryContext(ctx,
+			`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
+			FROM zones z, tenants t
+			WHERE z.tenant_id = $1 OFFSET $2`, tenantID, offset)
+	
+			if err != nil {
+				return zones, err
+			}
+			defer rows.Close()
+	
+			for rows.Next() {
+				err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
+					&zone.CreatedAt, &zone.UpdatedAt)
+				if err != nil {
+					return zones, err
+				}
+				if tmp.IsZero() == true {
+					zone.Type = FreeZone
+				} else {
+					d = tmp.Ptr()
+					switch *d {
+					case "paid":
+						zone.Type = Paid
+					case "blue":
+						zone.Type = Blue
+					default:
+						zone.Type = FreeZone
+					}
+				}
+				zones = append(zones, zone)
+				i = i + 1
+			}
+	
+			// get any error encountered during iteration
+			err = rows.Err()
+			if err != nil {
+				return zones, err
+			}
+	} else {
+		rows, err := pool.QueryContext(ctx,
+			`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
+			FROM zones z, tenants t
+			WHERE z.tenant_id = $1`, tenantID)
+	
+			if err != nil {
+				return zones, err
+			}
+			defer rows.Close()
+	
+			for rows.Next() {
+				err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
+					&zone.CreatedAt, &zone.UpdatedAt)
+				if err != nil {
+					return zones, err
+				}
+				if tmp.IsZero() == true {
+					zone.Type = FreeZone
+				} else {
+					d = tmp.Ptr()
+					switch *d {
+					case "paid":
+						zone.Type = Paid
+					case "blue":
+						zone.Type = Blue
+					default:
+						zone.Type = FreeZone
+					}
+				}
+				zones = append(zones, zone)
+				i = i + 1
+			}
+	
+			// get any error encountered during iteration
+			err = rows.Err()
+			if err != nil {
+				return zones, err
+			}
 	}
 
 	return zones, nil

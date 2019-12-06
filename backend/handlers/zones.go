@@ -14,6 +14,8 @@ type getZoneRequest struct {
 // get all Zone of a tenant
 type getZonesRequest struct {
 	TenantID int `json:"tenant_id"`
+	Limite int `json:"limit,omitempty"`
+	Offset int `json:"offset,omitempty"`
 }
 
 type updateZoneRequest struct {
@@ -44,7 +46,7 @@ func getZone(ctx context.Context, request getZoneRequest) (database.Zone, error)
 func getZones(ctx context.Context, request getZonesRequest) ([]database.Zone, error) {
 	log.Println("handlers: handling getZones of a tenant")
 
-	return database.GetZones(ctx, request.TenantID)
+	return database.GetZones(ctx, request.TenantID, request.Limite, request.Offset)
 }
 
 /********************************** GET **********************************/
