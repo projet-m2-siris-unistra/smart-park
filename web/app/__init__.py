@@ -22,11 +22,22 @@ app = Sanic(__name__)
 app.register_listener(config.load, "before_server_start")
 bus.setup(app) # app.nc ==> connected object
 
+app.config['WTF_CSRF_SECRET_KEY'] = '*Dieu Quentin*'
+
 app.static("/static", "./static")
 
 app.blueprint(accounts.bp)
 app.blueprint(zones.bp)
 app.blueprint(spots.bp)
+
+
+# NOTE
+# session should be setup somewhere, SanicWTF expects request['session'] is a
+# dict like session object.
+session = {}
+@app.middleware('request')
+async def add_session(request):
+    request['session'] = session
 
 
 # Handling navigation

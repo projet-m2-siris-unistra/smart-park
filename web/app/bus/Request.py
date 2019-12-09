@@ -30,6 +30,18 @@ async def getZones(tenant_id):
     return response.data.decode("utf-8")
 
 
+# Add a zone to database
+async def createZone(tenant_id, name, type, color, polygon):
+    request = json.dumps({
+        'tenant_id' : int(tenant_id),
+        'name' : name,
+        'type' : type,
+        'color' : color,
+        'geo' : polygon
+    })
+    await nc.publish("zones.new", bytes(request, "utf-8"))
+
+
 # Returns all the spots associated to zone_id
 async def getSpots(zone_id):
     request = json.dumps({'zone_id' : int(zone_id)})

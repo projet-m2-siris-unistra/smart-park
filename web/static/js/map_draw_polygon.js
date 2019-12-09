@@ -38,8 +38,9 @@ function showPolygonArea(e) {
 
     // Get the GeoJson of the drawn polygon
     var shape_string = JSON.stringify(e.layer.toGeoJSON());
-    var coor = e.layer.toGeoJSON().geometry.coordinates[0];
+    var coor = JSON.stringify(e.layer.toGeoJSON().geometry.coordinates[0]);
     console.debug(shape_string);
     console.debug(coor);
-    document.getElementById('coordinates-input').value = coor;
+    document.getElementById('coordinates').value = coor;
+    document.getElementById('show-polygon').innerHTML = "<p>" + coor + "</p>";
 }

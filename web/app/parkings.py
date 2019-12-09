@@ -73,6 +73,9 @@ class TenantManagement:
 # Instance of a zone
 class ZoneManagement:
 
+    # ID for non persistent objects (I.e. not in DB)
+    notAssigned = -1
+
     def __init__(self, zone_id):
         self.id = zone_id
         # some default data to reveal further failed init
@@ -94,6 +97,17 @@ class ZoneManagement:
         self.type = data['type']
         self.color = '#' + data['color']
         self.polygon = data['geo']
+
+
+    async def create(self, tenant_id):
+        response = await Request.createZone(
+            tenant_id,
+            self.name,
+            self.type,
+            self.color,
+            self.polygon
+        )
+        # Checking response ?
 
 
     def toJson(self):

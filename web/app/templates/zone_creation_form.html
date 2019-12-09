@@ -1,5 +1,5 @@
 
-<form class="sp-formular" action="zone-creation-check" method="post">
+<form class="sp-formular" action="create_zone" method="post">
     <h3>Création d'une zone de parking</h3>
     
     <br>
@@ -11,7 +11,7 @@
             Ce nom unique identifiera la zone.
         </div>
         <div class="bx--text-input__field-wrapper">
-            <input id="text-input-1" type="text" class="bx--text-input" name="name" placeholder="Nom" value="">
+            <input id="text-input-1" type="text" class="bx--text-input" name="name" placeholder="Nom" value="" required>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
             Indiquer le type de parking que contiendra la zone.
         </div>
         <div class="bx--select-input__wrapper">
-            <select name="type" id="select-id" class="bx--select-input " value="">
+            <select name="type" id="select-id" class="bx--select-input " value="" required>
                 <option class="bx--select-option" value="" disabled selected hidden>Choisissez une option</option>  
                 <option class="bx--select-option" value="free" >Gratuit</option>           
                 <option class="bx--select-option" value="charge" >Payant</option>  
@@ -40,19 +40,23 @@
         <div class="bx--form__helper-text">
             Choisissez une couleur associée à la zone. Cela facilitera sa reconnaissance sur les cartes.
         </div>
-        <input type="color" name="color" value="#ff0000">
+        <input type="color" name="color" value="#ff0000" required>
     </div>
 
     <!-- Geographic area selection -->
     <div class="bx--form-item">
         <div id='map' class="zone-creation-map"></div>
         <script src='/static/js/map_draw_polygon.js'></script>
-        <input id="coordinates-input" type="hidden" name="coordinates" value="">
+        <input type="hidden" id="coordinates" name="coordinates" value="" required>
+        <div id="show-polygon">
+            
+        </div>
+        {{ form.polygon }}
     </div>
 
     <!-- Button for validation -->
     <div class="bx--form-item">
-        <button class="bx--btn bx--btn--primary" type="submit">Suivant</button>
+        <button class="bx--btn bx--btn--primary" type="submit" name="validate">Suivant</button>
     </div>
 
 </form>

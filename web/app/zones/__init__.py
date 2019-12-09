@@ -3,6 +3,10 @@ import json as js
 from sanic import Blueprint, response
 from sanic.response import json
 
+from sanic_wtf import SanicForm
+from wtforms import PasswordField, StringField, SubmitField, HiddenField, SelectField
+from wtforms.validators import DataRequired, Length
+
 from app.templating import render
 
 from app.parkings import Tooling
@@ -13,26 +17,67 @@ from app.bus import Request
 
 bp = Blueprint("zones", url_prefix='/parking/zone')
 
+
+
+# Creation form
+class CreationForm(SanicForm):
+    name = StringField(label='name')
+        #validators=[DataRequired(), Length(max=40)])
+    type = SelectField('type', 
+        #validators=[DataRequired()],
+        choices=[
+            ('free', 'Gratuit'),
+            ('charge', 'Payant'),
+            ('blue', 'Zone bleue')
+        ])
+    color = StringField('color')
+        #validators=[DataRequired()])
+    polygon = StringField('coordinates')
+        #validators=[DataRequired(), Length(max=1200)])
+    submit = SubmitField(label='validate')
+
+
 # Handling Parkings zones
-@bp.route('/create_zone')
+@bp.route('/create_zone', methods=['POST', 'GET'])
 async def create_zone(request):
-    rendered_template = await render("zone_creation.html", request)
+    #zoneInstance = ZoneManagement(ZoneManagement.notAssigned)
+    form = CreationForm(request)
+
+    name = form.name.data
+    print("Name=", name)
+    type = form.type.data
+    print("Type=", type)
+    color = form.color.data
+    print("Color=", color)
+    polygon = form.polygon.data
+    print("Polygon=", polygon)
+
+    # form.validate() or form.validate_on_submit() ???!!!
+    if request.method == 'POST' and form.validate_on_submit():
+        print("Form validated")
+        name = form.name.data
+        print("Name=", name)
+        #polygon = form.polygon.data
+        #type = form.type.data
+        #color = form.color.data
+        # create the zone object
+        # zoneInstance = ZoneManagement(ZoneManagement.notAssigned)
+        # zoneInstance.create(tenant_id=1)
+        return response.redirect('/dashboard')
+
+    rendered_template = await render(
+        "zone_creation.html", 
+        request,
+        form=form
+    )
     return response.html(rendered_template)
-
-
-@bp.route('/zone-creation-check', methods=['POST'])
-async def zone_creation_check(request):
-    # Checking args
-    # Adding args to database
-    # Linking to zone management
-    return response.json(request.form)
 
 
 @bp.route('/<zone_id>')
 @bp.route('/<zone_id>/overview')
 async def view(request, zone_id):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(tenant_id=1)
+    await tenantInstance.init(tenant_id=1)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -52,8 +97,8 @@ async def view(request, zone_id):
 
 @bp.route('/<zone_id>/statistics')
 async def stats(request, zone_id):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(tenant_id=1)
+    await tenantInstance.init(tenant_id=1)
    
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -61,7 +106,7 @@ async def stats(request, zone_id):
     rendered_template = await render(
         'parking_template.html', 
         request,
-        active_tab_stats='true', 
+        active_tab_stats='true',
         zoneName=zoneInstance.name,
         zone_id=zone_id,
         tenantName=tenantInstance.name,
@@ -72,8 +117,8 @@ async def stats(request, zone_id):
 
 @bp.route('/<zone_id>/maintenance')
 async def maintenance(request, zone_id):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(tenant_id=1)
+    await tenantInstance.init(tenant_id=1)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -92,8 +137,8 @@ async def maintenance(request, zone_id):
 
 @bp.route('/<zone_id>/configuration')
 async def config(request, zone_id):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(tenant_id=1)
+    await tenantInstance.init(tenant_id=1)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -119,8 +164,8 @@ async def config(request, zone_id):
 
 @bp.route('/<zone_id>/submit-spots')
 async def submit_spots(request, zone_id):
-    tenant = TenantManagement(1)
-    await tenant.init(1)
+    tenant = TenantManagement(tenant_id=1)
+    await tenant.init(tenant_id=1)
     
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -142,8 +187,8 @@ async def submit_spots(request, zone_id):
 # Handling Parking Spots
 @bp.route('/<zone_id>/spots')
 async def spots(request, zone_id):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(tenant_id=1)
+    await tenantInstance.init(tenant_id=1)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -169,8 +214,8 @@ async def spots(request, zone_id):
 # Interface for deleting a zone
 @bp.route('/<zone_id>/remove')
 async def remove(request, zone_id):
-    tenant = TenantManagement(1)
-    await tenant.init(1)
+    tenant = TenantManagement(tenant_id=1)
+    await tenant.init(tenant_id=1)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
