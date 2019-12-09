@@ -40,10 +40,7 @@ async def createZone(tenant_id, name, type, color, polygon):
         'geo' : polygon
     })
     print("createZone request = ", request)
-    try:
-        response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=1)
-    except ErrTimeout:
-        print("WARNING: bus/Request.py -> createZone -> timeout reached")
+    response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=1)
 
 
 # Returns all the spots associated to zone_id

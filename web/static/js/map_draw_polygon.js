@@ -31,16 +31,13 @@ function showPolygonAreaEdited(e) {
 function showPolygonArea(e) {
     featureGroup.clearLayers();
     featureGroup.addLayer(e.layer);
-    area = (LGeo.area(e.layer) / 1000000).toFixed(2);
     
+    area = (LGeo.area(e.layer) / 1000000).toFixed(2);   
     e.layer.bindPopup(area + ' km<sup>2</sup>');
     e.layer.openPopup();
 
     // Get the GeoJson of the drawn polygon
-    var shape_string = JSON.stringify(e.layer.toGeoJSON());
     var coor = JSON.stringify(e.layer.toGeoJSON().geometry.coordinates[0]);
-    console.debug(shape_string);
     console.debug(coor);
-    document.getElementById('coordinates').value = coor;
-    document.getElementById('show-polygon').innerHTML = "<p>" + coor + "</p>";
+    document.getElementById('polygon').value = coor;
 }
