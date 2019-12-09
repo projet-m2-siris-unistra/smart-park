@@ -100,6 +100,7 @@ class ZoneManagement:
 
 
     async def create(self, tenant_id):
+        print("ZoneInstance.create called")
         response = await Request.createZone(
             tenant_id,
             self.name,
@@ -149,16 +150,17 @@ class ZoneManagement:
         response = await Request.getSpots(self.id)
         data = js.loads(response)
 
-        for item in data:
-            obj = SpotManagement(item['place_id'])
-            obj.staticInit(
-                item['place_id'],
-                item['geo'],
-                item['type'],
-                item['device_id']
-            )
-            await obj.setDevice(item['device_id'])
-            self.spots.append(obj)
+        if data is not None:
+            for item in data:
+                obj = SpotManagement(item['place_id'])
+                obj.staticInit(
+                    item['place_id'],
+                    item['geo'],
+                    item['type'],
+                    item['device_id']
+                )
+                await obj.setDevice(item['device_id'])
+                self.spots.append(obj)
 
      # Statistics #
 

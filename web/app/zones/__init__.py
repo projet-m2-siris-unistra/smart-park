@@ -45,8 +45,8 @@ class CreationForm(SanicForm):
     color = StringField(
         widget=BXInput(input_type="color"),
         label='Couleur',
-        description='Choisissez une ,couleur associée à la zone. Cela facilitera sa reconnaissance sur les cartes.'
-        validators=[DataRequired()])
+        description='Choisissez une ,couleur associée à la zone. Cela facilitera sa reconnaissance sur les cartes.',
+        validators=[DataRequired()]
     )
 
     polygon = StringField('Coordonnées', widget=BXInput(input_type='text'))
@@ -72,17 +72,26 @@ async def create_zone(request):
     polygon = form.polygon.data
     print("Polygon=", polygon)
 
-    # form.validate() or form.validate_on_submit() ???!!!
     if form.validate_on_submit():
         print("Form validated")
-        name = form.name.data
-        print("Name=", name)
-        #polygon = form.polygon.data
-        #type = form.type.data
-        #color = form.color.data
         # create the zone object
-        # zoneInstance = ZoneManagement(ZoneManagement.notAssigned)
-        # zoneInstance.create(tenant_id=1)
+        """
+        zoneInstance = ZoneManagement(ZoneManagement.notAssigned)
+        zoneInstance.staticInit(
+            name=name,
+            type=type,
+            color=color,
+            polygon=polygon
+        )
+        zoneInstance.create(tenant_id=1)
+        """
+        await Request.createZone(
+            tenant_id=1, 
+            name=name, 
+            type=type, 
+            color=color[1:].upper(), # cut the '#' and upper letters 
+            polygon=polygon
+        )
         return response.redirect('/dashboard')
 
     rendered_template = await render(
