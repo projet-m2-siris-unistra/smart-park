@@ -4,69 +4,32 @@
 
     <h3>Création d'une zone de parking</h3>
 
-    <br>
+    <section>
+      <!-- Name of the zone -->
+      {{ form.name }}
 
-    {% if form.errors %}
-      <ul>
-      {% for field, errors in form.errors.items() %}
-        <li>{{ field }}: {{ errors | join("<br />") | safe }}</li>
-      {% endfor %}
-      </ul>
-    {% endif %}
+      {{ form.type }}
 
-    <!-- Name of the zone -->
-    <div class="bx--form-item bx--text-input-wrapper">
-        <label for="text-input-1" class="bx--label">Nom</label>
-        <div class="bx--form__helper-text">
-            Ce nom unique identifiera la zone.
-        </div>
-        <div class="bx--text-input__field-wrapper">
-            <input id="text-input-1" type="text" class="bx--text-input" name="name" placeholder="Nom" value="" required>
-        </div>
-    </div>
+      <!-- Color associated with the zone -->
+      <div class="bx--form-item">
+          <label for="select-id" class="bx--label">Couleur</label>
+          <div class="bx--form__helper-text">
+              Choisissez une couleur associée à la zone. Cela facilitera sa reconnaissance sur les cartes.
+          </div>
+          <input type="color" name="color" value="#ff0000" required>
+      </div>
 
-    <!-- Type of the zone -->
-    <div class="bx--form-item">
-        <label for="select-id" class="bx--label">Type de la zone</label>
-        <div class="bx--form__helper-text">
-            Indiquer le type de parking que contiendra la zone.
-        </div>
-        <div class="bx--select-input__wrapper">
-            <select name="type" id="select-id" class="bx--select-input " value="" required>
-                <option class="bx--select-option" value="" disabled selected hidden>Choisissez une option</option>
-                <option class="bx--select-option" value="free" >Gratuit</option>
-                <option class="bx--select-option" value="charge" >Payant</option>
-                <option class="bx--select-option" value="blue" >Zone bleue</option>
-            </select>
-            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--select__arrow" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
-                <path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path>
-            </svg>
-        </div>
-    </div>
+      <!-- Geographic area selection -->
+      <div class="bx--form-item">
+          <div id='map' class="zone-creation-map"></div>
+          <script src='/static/js/map_draw_polygon.js'></script>
+          <input type="hidden" id="coordinates" name="coordinates" value="" required>
+          <div id="show-polygon">
 
-    <!-- Color associated with the zone -->
-    <div class="bx--form-item">
-        <label for="select-id" class="bx--label">Couleur</label>
-        <div class="bx--form__helper-text">
-            Choisissez une couleur associée à la zone. Cela facilitera sa reconnaissance sur les cartes.
-        </div>
-        <input type="color" name="color" value="#ff0000" required>
-    </div>
+          </div>
+          {{ form.polygon }}
+      </div>
 
-    <!-- Geographic area selection -->
-    <div class="bx--form-item">
-        <div id='map' class="zone-creation-map"></div>
-        <script src='/static/js/map_draw_polygon.js'></script>
-        <input type="hidden" id="coordinates" name="coordinates" value="" required>
-        <div id="show-polygon">
-
-        </div>
-        {{ form.polygon }}
-    </div>
-
-    <!-- Button for validation -->
-    <div class="bx--form-item">
-        <button class="bx--btn bx--btn--primary" type="submit" name="validate">Suivant</button>
-    </div>
+      {{ form.submit }}
 
 </form>
