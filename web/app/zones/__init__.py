@@ -21,10 +21,10 @@ bp = Blueprint("zones", url_prefix='/parking/zone')
 
 # Creation form
 class CreationForm(SanicForm):
-    name = StringField(label='name')
-        #validators=[DataRequired(), Length(max=40)])
+    name = StringField(label='name',
+        validators=[DataRequired(), Length(max=40)])
     type = SelectField('type', 
-        #validators=[DataRequired()],
+        validators=[DataRequired()],
         choices=[
             ('free', 'Gratuit'),
             ('charge', 'Payant'),
@@ -53,7 +53,7 @@ async def create_zone(request):
     print("Polygon=", polygon)
 
     # form.validate() or form.validate_on_submit() ???!!!
-    if request.method == 'POST' and form.validate_on_submit():
+    if form.validate_on_submit():
         print("Form validated")
         name = form.name.data
         print("Name=", name)

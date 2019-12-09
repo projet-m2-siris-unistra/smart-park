@@ -4,6 +4,7 @@ from sanic import Sanic, response
 from sanic.response import json
 from sanic.handlers import ErrorHandler
 from sanic.exceptions import ServerError
+from sanic_session import Session, InMemorySessionInterface
 
 import json as js
 
@@ -19,6 +20,7 @@ from app.parkings import ZoneManagement
 from app.parkings import Tooling
 
 app = Sanic(__name__)
+session = Session(app, interface=InMemorySessionInterface())
 app.register_listener(config.load, "before_server_start")
 bus.setup(app) # app.nc ==> connected object
 
@@ -29,15 +31,6 @@ app.static("/static", "./static")
 app.blueprint(accounts.bp)
 app.blueprint(zones.bp)
 app.blueprint(spots.bp)
-
-
-# NOTE
-# session should be setup somewhere, SanicWTF expects request['session'] is a
-# dict like session object.
-session = {}
-@app.middleware('request')
-async def add_session(request):
-    request['session'] = session
 
 
 # Handling navigation

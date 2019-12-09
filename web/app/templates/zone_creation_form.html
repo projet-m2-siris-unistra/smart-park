@@ -1,8 +1,18 @@
 
 <form class="sp-formular" action="create_zone" method="post">
+    {{ form.csrf_token }}
+
     <h3>Création d'une zone de parking</h3>
-    
+
     <br>
+
+    {% if form.errors %}
+      <ul>
+      {% for field, errors in form.errors.items() %}
+        <li>{{ field }}: {{ errors | join("<br />") | safe }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
 
     <!-- Name of the zone -->
     <div class="bx--form-item bx--text-input-wrapper">
@@ -23,10 +33,10 @@
         </div>
         <div class="bx--select-input__wrapper">
             <select name="type" id="select-id" class="bx--select-input " value="" required>
-                <option class="bx--select-option" value="" disabled selected hidden>Choisissez une option</option>  
-                <option class="bx--select-option" value="free" >Gratuit</option>           
-                <option class="bx--select-option" value="charge" >Payant</option>  
-                <option class="bx--select-option" value="blue" >Zone bleue</option>          
+                <option class="bx--select-option" value="" disabled selected hidden>Choisissez une option</option>
+                <option class="bx--select-option" value="free" >Gratuit</option>
+                <option class="bx--select-option" value="charge" >Payant</option>
+                <option class="bx--select-option" value="blue" >Zone bleue</option>
             </select>
             <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--select__arrow" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
                 <path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path>
@@ -49,7 +59,7 @@
         <script src='/static/js/map_draw_polygon.js'></script>
         <input type="hidden" id="coordinates" name="coordinates" value="" required>
         <div id="show-polygon">
-            
+
         </div>
         {{ form.polygon }}
     </div>
