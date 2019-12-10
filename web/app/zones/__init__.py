@@ -12,7 +12,7 @@ from app.parkings import TenantManagement
 
 from app.bus import Request
 
-from app.forms.zones import CreationForm
+from app.forms.zones import CreationForm, ConfigurationForm
 
 bp = Blueprint("zones", url_prefix='/parking/zone')
 
@@ -38,7 +38,7 @@ async def create_zone(request):
             tenant_id=1, 
             name=name, 
             type=type, 
-            color=color[1:].upper(), # cut the '#' and upper letters 
+            color=Tooling.formatColor(color),
             polygon=polygon
         )
         return response.redirect('/dashboard')
@@ -115,20 +115,35 @@ async def maintenance(request, zone_id):
 
 @bp.route('/<zone_id>/configuration', methods=['POST', 'GET'])
 async def config(request, zone_id):
+    changes = False
+    
     tenantInstance = TenantManagement(tenant_id=1)
     await tenantInstance.init(tenant_id=1)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
+    
+    form = ConfigurationForm(request, zoneInstance)
 
     await zoneInstance.setSpots()
     spotsJson = Tooling.jsonList(zoneInstance.spots)
 
-    if request.method == 'POST':
-        print("Form validated")
-        print("args: ", request.args)
-        print("raw_args: ", request.raw_args)
-        #return response.redirect()
+    if form.validate_on_submit():
+
+        if form.delete.data:
+            print("Zone deletion")
+
+        else:
+            print("Form validated")
+            await Request.updateZone(
+                zone_id=zone_id,
+                tenant_id=1, 
+                name=form.name.data, 
+                type=form.type.data, 
+                color=Tooling.formatColor(form.color.data),
+                polygon=""
+            )
+            return response.redirect("/dashboard")
 
     rendered_template = await render(
         'parking_template.html', 
@@ -141,6 +156,8 @@ async def config(request, zone_id):
         zoneInstance=zoneInstance,
         zoneColor=zoneInstance.color,
         tenantCoor=tenantInstance.coordinates,
+        changesApplied=changes,
+        form=form,
         spotList=spotsJson
     )
     return response.html(rendered_template)

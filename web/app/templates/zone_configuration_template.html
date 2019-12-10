@@ -1,60 +1,39 @@
-<form class="sp-formular" action="{{ url_for("zones.config", zone_id=zone_id) }}" method="POST">
+{% if changesApplied == True %}
+<!-- Changes notification -->
+<div data-notification class="bx--inline-notification bx--inline-notification--success" role="alert">
+    <div class="bx--inline-notification__details">
+        <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--inline-notification__icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10,1c-4.9,0-9,4.1-9,9s4.1,9,9,9s9-4,9-9S15,1,10,1z M8.7,13.5l-3.2-3.2l1-1l2.2,2.2l4.8-4.8l1,1L8.7,13.5z"></path><path fill="none" d="M8.7,13.5l-3.2-3.2l1-1l2.2,2.2l4.8-4.8l1,1L8.7,13.5z" data-icon-path="inner-path" opacity="0"></path></svg>
+        <div class="bx--inline-notification__text-wrapper">
+            <p class="bx--inline-notification__title">Modifications enregistrées</p>
+        </div>
+    </div>
+    <button data-notification-btn class="bx--inline-notification__close-button" type="button" aria-label="close">
+        <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--inline-notification__close-icon" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z"></path></svg>
+    </button>
+</div>
+{% endif %}
+
+
+<form class="sp-formular" action="{{ url_for("zones.config", zone_id=zone_id) }}" method="post">
+    {{ form.csrf_token }}
+
     <div class="zone-div">
         <h4>Général</h4>
 
-        <br>
+        <section>
 
-        <div class="zone-config-div" id="name-div">
-            <p class="zone-config-field">
-                <label>Nom:</label> {{ zoneName }}
-                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()" id="name-button">
-                    modifier
-                </button>
-            </p>
+            {{ form.name }}
 
-        </div>
+            {{ form.type }}
 
-        <div class="zone-config-div" id="desc-div">
-            <p class="zone-config-field">
-                <label>Description:</label> {{ zoneInstance.desc }}
-                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button"  onclick="modify_desc()" id="desc-button">
-                    modifier
-                </button>
-            </p>
+            {{ form.color }}
 
-        </div>
-
-        <div class="zone-config-div" id="type-div">
-            <p class="zone-config-field">
-                <label>Type:</label> {{ zoneInstance.type }}
-                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_type()" id="type-button">
-                    modifier
-                </button>
-            </p>
+            {{ form.submit }}
             
-        </div>
+            {{ form.delete }}
 
-        <div class="zone-config-div" id="color-div">
-            <p class="zone-config-field">
-                <label>Couleur:</label><label id="zone-show-color"></label>
-                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_color()" id="color-button">
-                    modifier
-                </button>
-            </p>
-            
-        </div>
+        </section>
 
-        <div class="zone-config-div" id="validation-div">
-            
-        </div>
-        
-        <br>
-        <p class="zone-config-field">
-            <label>Supprimer la zone:</label>
-            <a class="bx--btn bx--btn--danger zone-modify-button" type="button" href="{{ url_for("zones.remove", zone_id=zone_id) }}">
-                supprimer
-            </a>
-        </p>
     </div>
 </form>
 

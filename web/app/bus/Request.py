@@ -40,13 +40,27 @@ async def createZone(tenant_id, name, type, color, polygon):
         'geo' : polygon
     })
     print("createZone request = ", request)
-    response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=1)
+    response = await nc.publish("zones.new", bytes(request, "utf-8"), timeout=1)
+
+
+# Update a zone
+async def updateZone(zone_id, tenant_id, name, type, color, polygon):
+    request = json.dumps({
+        'zone_id' : int(zone_id),
+        'tenant_id' : int(tenant_id),
+        'name' : name,
+        'type' : type,
+        'color' : color,
+        'polygon' : polygon
+    })
+    print("updateZone request = ", request)
+    response = await nc.publish("zones.update", bytes(request, "utf-8"))
 
 
 # Returns all the spots associated to zone_id
 async def getSpots(zone_id):
     request = json.dumps({'zone_id' : int(zone_id)})
-    response = await nc.request("places.list", bytes(request, "utf-8"), timeout=1)
+    response = await nc.request("places.list", bytes(request, "utf-8"))
     return response.data.decode("utf-8")
 
 

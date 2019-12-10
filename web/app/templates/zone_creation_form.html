@@ -10,14 +10,7 @@
 
       {{ form.type }}
 
-      <!-- Color associated with the zone -->
-      <div class="bx--form-item">
-          <label for="select-id" class="bx--label">Couleur</label>
-          <div class="bx--form__helper-text">
-              Choisissez une couleur associée à la zone. Cela facilitera sa reconnaissance sur les cartes.
-          </div>
-          <input type="color" name="color" value="#ff0000" required>
-      </div>
+      {{ form.color }}
 
       <!-- Geographic area selection -->
       <div class="bx--form-item">
@@ -27,5 +20,7 @@
       </div>
 
       {{ form.submit }}
+      
+    </section>
 
 </form>

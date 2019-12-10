@@ -267,3 +267,10 @@ label {
     padding-top: 30px;
     padding-bottom: 30px;
 }
+
+/* DEVICES */
+.devices-table {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+}

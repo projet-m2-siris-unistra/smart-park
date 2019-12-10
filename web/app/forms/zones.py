@@ -6,8 +6,7 @@ from app.forms.widgets import BXInput, BXSelect, BXSubmit
 
 
 
-# Creation form
-class CreationForm(SanicForm):
+class BaseForm(SanicForm):
     name = StringField(
         widget=BXInput(input_type="text"),
         label='Nom',
@@ -29,14 +28,32 @@ class CreationForm(SanicForm):
 
     color = StringField(
         widget=BXInput(input_type="color"),
+        render_kw={'class' : ''},
         label='Couleur',
         description='Choisissez une ,couleur associée à la zone. Cela facilitera sa reconnaissance sur les cartes.',
         validators=[DataRequired()]
     )
 
+
+
+# Creation form
+class CreationForm(BaseForm):
     polygon = HiddenField()
 
     submit = SubmitField(
         widget=BXSubmit(),
         label='Suivant'
+    )
+
+
+class ConfigurationForm(CreationForm):
+    submit = SubmitField(
+        widget=BXSubmit(),
+        label='Enregistrer'
+    )
+
+    delete = SubmitField(
+        widget=BXSubmit(),
+        render_kw={'color': 'danger'},
+        label="Supprimer"
     )

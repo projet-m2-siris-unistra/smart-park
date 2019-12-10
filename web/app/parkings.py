@@ -14,6 +14,12 @@ class Tooling:
         return liste
 
 
+    # format #ffffff color into right format
+    @staticmethod
+    def formatColor(arg):
+        return arg[1:].upper()
+
+
 
 # Instance of a tenant
 class TenantManagement:
