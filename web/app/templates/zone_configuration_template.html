@@ -47,9 +47,9 @@
 
     <script type="text/javascript">
         window.spots = {{ spotList | safe }};
-        window.polygon = {{ zonePolygon | tojson }};
-        window.tenantCoor = {{ tenantCoor }};
-        window.color = "{{ zoneColor }}";
+        window.polygon = {{ zoneInstance.polygon | tojson }};
+        window.tenantCoor = {{ tenantInstance.coordinates }};
+        window.color = "{{ zoneInstance.color }}";
         window.zone_id = {{ zone_id }};
     </script>
 
@@ -58,7 +58,7 @@
             height: 20px;
             width: 40px;
             vertical-align: middle;
-            background-color: {{ zoneColor }}; 
+            background-color: {{ zoneInstance.color }}; 
             border: 1px solid black;
             display: inline-block;
             margin-left: 10px;

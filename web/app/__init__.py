@@ -59,9 +59,7 @@ async def dashboard(request):
     rendered_template = await render(
         "dashboard_template.html",
         request, 
-        zoneList = tenantInstance.zones,
-        totalSpots = tenantInstance.getTotalSpots(),
-        takenSpots = tenantInstance.getTakenSpots()
+        tenantInstance=tenantInstance
     )
     return response.html(rendered_template)
 
@@ -78,8 +76,7 @@ async def zones(request):
     rendered_template = await render(
         "tenant_zone_data_table.html", 
         request,
-        zoneList=tenantInstance.zones,
-        tenantName=tenantInstance.name
+        tenantInstance=tenantInstance
     )
     return response.html(rendered_template)
 
@@ -101,8 +98,7 @@ async def map(request):
     rendered_template = await render(
         "map_template.html",
         request,
-        tenantName=tenantInstance.name,
-        tenantCoor=tenantInstance.coordinates,
+        tenantInstance=tenantInstance,
         zoneList=zonesJson
     )
     return response.html(rendered_template)
@@ -147,19 +143,10 @@ async def ping(request):
     return response.json({"data": ret})
 
 
-# Testing
-@app.route("/getTenant")
-async def getTenant(request):
-    ret = await bus.getTenant(1)
-    data = js.loads(ret)
-    return response.json(data["geo"])
-
-
 @click.command()
 @config.run_params
 def run():
     app.run(host=config.env("HOST"), port=config.env("PORT"), debug=config.env("DEBUG"))
-
 
 
 # Errors & Exepction handling

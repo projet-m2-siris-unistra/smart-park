@@ -64,11 +64,9 @@ async def view(request, zone_id):
         'parking_template.html', 
         request,
         active_tab_view='true', 
-        zoneName=zoneInstance.name,
         zone_id=zone_id,
-        tenantName=tenantInstance.name,
-        zoneTaken=zoneInstance.getNbTakenSpots(),
-        zoneTotal=zoneInstance.getNbTotalSpots()
+        zoneInstance=zoneInstance,
+        tenantInstance=tenantInstance
     )
     return response.html(rendered_template)
 
@@ -85,9 +83,9 @@ async def stats(request, zone_id):
         'parking_template.html', 
         request,
         active_tab_stats='true',
-        zoneName=zoneInstance.name,
         zone_id=zone_id,
-        tenantName=tenantInstance.name,
+        zoneInstance=zoneInstance,
+        tenantInstance=tenantInstance,
         statistics=zoneInstance.getAllStats()
     )
     return response.html(rendered_template)
@@ -100,15 +98,15 @@ async def maintenance(request, zone_id):
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
+    await zoneInstance.setSpots()
 
     rendered_template = await render(
         'parking_template.html', 
         request,
         active_tab_maintenance='true',
-        zoneName=zoneInstance.name,
         zone_id=zone_id,
-        tenantName=tenantInstance.name,    
-        spotList=zoneInstance.setSpots()
+        zoneInstance=zoneInstance,
+        tenantInstance=tenantInstance
     )
     return response.html(rendered_template)
 
@@ -122,11 +120,9 @@ async def config(request, zone_id):
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
+    await zoneInstance.setSpots()
     
     form = ConfigurationForm(request, zoneInstance)
-
-    await zoneInstance.setSpots()
-    spotsJson = Tooling.jsonList(zoneInstance.spots)
 
     if form.validate_on_submit():
 
@@ -149,39 +145,13 @@ async def config(request, zone_id):
         'parking_template.html', 
         request,
         active_tab_config='true',
-        zoneName=zoneInstance.name,
-        tenantName=tenantInstance.name,
         zone_id=zone_id,
-        zonePolygon=zoneInstance.polygon,
         zoneInstance=zoneInstance,
-        zoneColor=zoneInstance.color,
-        tenantCoor=tenantInstance.coordinates,
-        changesApplied=changes,
+        tenantInstance=tenantInstance,
         form=form,
-        spotList=spotsJson
+        spotList=Tooling.jsonList(zoneInstance.spots),
+        changesApplied=changes
     )
-    return response.html(rendered_template)
-
-
-@bp.route('/<zone_id>/submit-spots')
-async def submit_spots(request, zone_id):
-    tenant = TenantManagement(tenant_id=1)
-    await tenant.init(tenant_id=1)
-    
-    zoneInstance = ZoneManagement(zone_id)
-    await zoneInstance.init(zone_id)
-
-    rendered_template = await render(
-        'parking_template.html', 
-        request,
-        active_tab_list='true', 
-        zoneName=zoneInstance.name,
-        zone_id=zone_id,
-        tenantName=tenant.name,
-        zonePolygon=zoneInstance.polygon,
-        spotList=zoneInstance.setSpots()
-    )
-    # checking spot list and adding to DB
     return response.html(rendered_template)
 
 
@@ -193,7 +163,6 @@ async def spots(request, zone_id):
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
-
     await zoneInstance.setSpots()
     spotsJson = Tooling.jsonList(zoneInstance.spots)
 
@@ -201,12 +170,9 @@ async def spots(request, zone_id):
         'parking_template.html', 
         request,
         active_tab_list='true', 
-        zoneName=zoneInstance.name,
-        tenantName=tenantInstance.name,
         zone_id=zone_id,
-        tenantCoor=tenantInstance.coordinates,
-        zonePolygon=zoneInstance.polygon,
-        zoneColor=zoneInstance.color,
+        zoneInstance=zoneInstance,
+        tenantInstance=tenantInstance,
         spotList=spotsJson
     )
     return response.html(rendered_template)
@@ -225,8 +191,8 @@ async def remove(request, zone_id):
         'zone_removing.html', 
         request,
         zone_id=zone_id,
-        zoneName=zoneInstance.name,
-        tenantName=tenantInstance.name
+        zoneInstance=zoneInstance,
+        tenantInstance=tenantInstance
     )
     return response.html(rendered_template)
 
@@ -247,9 +213,7 @@ async def remove_check(request, zone_id):
     rendered_template = await render(
         "dashboard_template.html",
         request, 
-        zoneList=tenantInstance.zones,
-        totalSpots=tenantInstance.getTotalSpots(),
-        takenSpots=tenantInstance.getTakenSpots(),
+        tenantInstance=tenantInstance,
         removed_zone=True
     )
     return response.html(rendered_template)

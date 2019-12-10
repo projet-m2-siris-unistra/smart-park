@@ -28,9 +28,9 @@ async def overview(request, spot_id, zone_id):
         active_tab_overview='true', 
         zone_id=zone_id,
         spot_id=spot_id,
-        spotName=spotInstance.name,
-        zoneName=zoneInstance.name,
-        tenantName=tenantInstance.name
+        tenantInstance=tenantInstance,
+        zoneInstance=zoneInstance,
+        spotInstance=spotInstance
     )
     return response.html(rendered_template)
 
@@ -50,12 +50,12 @@ async def stats(request, spot_id, zone_id):
         'spot_template.html', 
         request,
         active_tab_stats='true', 
-        spotName=spotInstance.name,
         zone_id=zone_id,
         spot_id=spot_id,
-        zoneName=zoneInstance.name,
+        tenantInstance=tenantInstance,
+        zoneInstance=zoneInstance,
+        spotInstance=spotInstance,
         statistics=spotInstance.getAllStats(),
-        tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
 
@@ -77,9 +77,9 @@ async def maintenance(request, spot_id, zone_id):
         active_tab_maintenance='true', 
         zone_id=zone_id,
         spot_id=spot_id,
-        spotName=spotInstance.name,
-        zoneName=zoneInstance.name,
-        tenantName=tenantInstance.name
+        tenantInstance=tenantInstance,
+        zoneInstance=zoneInstance,
+        spotInstance=spotInstance
     )
     return response.html(rendered_template)
 
@@ -101,8 +101,8 @@ async def config(request, spot_id, zone_id):
         active_tab_config='true', 
         zone_id=zone_id,
         spot_id=spot_id,
-        spotName=spotInstance.name,
-        zoneName=zoneInstance.name,
-        tenantName=tenantInstance.name
+        tenantInstance=tenantInstance,
+        zoneInstance=zoneInstance,
+        spotInstance=spotInstance,
     )
     return response.html(rendered_template)

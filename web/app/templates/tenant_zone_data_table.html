@@ -7,7 +7,7 @@
 <div class="bx--data-table-container" data-table>
     <div class="bx--data-table-header">
         <h4 class="bx--data-table-header__title">Liste des zones</h4>
-        <p class="bx--data-table-header__description">{{ tenantName }}</p>
+        <p class="bx--data-table-header__description">{{ tenantInstance.name }}</p>
     </div>
     <!-- Toolbar Content -->
     <section class="bx--table-toolbar ">
@@ -168,7 +168,7 @@
         
         <tbody>
 
-            {% for item in zoneList %}
+            {% for item in tenantInstance.zones %}
                 {% include "zone_element.html" %}
             {% endfor %}
 

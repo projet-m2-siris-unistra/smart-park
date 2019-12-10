@@ -5,9 +5,9 @@
 
 <script type="text/javascript">
     window.spots = {{ spotList | safe }};
-    window.polygon = {{ zonePolygon | tojson }};
-    window.color = "{{ zoneColor }}";
-    window.tenantCoor = {{ tenantCoor }};
+    window.polygon = {{ zoneInstance.polygon | tojson }};
+    window.color = "{{ zoneInstance.color }}";
+    window.tenantCoor = {{ tenantInstance.coordinates }};
     window.zone_id = {{ zone_id }};
 </script>
 
