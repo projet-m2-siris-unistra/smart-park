@@ -2,6 +2,7 @@ import json as js
 
 from sanic import Blueprint, response
 from sanic.response import json
+from sanic.exceptions import ServerError
 
 from app.templating import render
 
@@ -20,7 +21,6 @@ bp = Blueprint("zones", url_prefix='/parking/zone')
 # Handling Parkings zones
 @bp.route('/create_zone', methods=['POST', 'GET'])
 async def create_zone(request):
-    #zoneInstance = ZoneManagement(ZoneManagement.notAssigned)
     form = CreationForm(request)
 
     name = form.name.data
@@ -34,17 +34,6 @@ async def create_zone(request):
 
     if form.validate_on_submit():
         print("Form validated")
-        # create the zone object
-        """
-        zoneInstance = ZoneManagement(ZoneManagement.notAssigned)
-        zoneInstance.staticInit(
-            name=name,
-            type=type,
-            color=color,
-            polygon=polygon
-        )
-        zoneInstance.create(tenant_id=1)
-        """
         await Request.createZone(
             tenant_id=1, 
             name=name, 
@@ -124,7 +113,7 @@ async def maintenance(request, zone_id):
     return response.html(rendered_template)
 
 
-@bp.route('/<zone_id>/configuration')
+@bp.route('/<zone_id>/configuration', methods=['POST', 'GET'])
 async def config(request, zone_id):
     tenantInstance = TenantManagement(tenant_id=1)
     await tenantInstance.init(tenant_id=1)
@@ -134,6 +123,12 @@ async def config(request, zone_id):
 
     await zoneInstance.setSpots()
     spotsJson = Tooling.jsonList(zoneInstance.spots)
+
+    if request.method == 'POST':
+        print("Form validated")
+        print("args: ", request.args)
+        print("raw_args: ", request.raw_args)
+        #return response.redirect()
 
     rendered_template = await render(
         'parking_template.html', 
@@ -203,8 +198,8 @@ async def spots(request, zone_id):
 # Interface for deleting a zone
 @bp.route('/<zone_id>/remove')
 async def remove(request, zone_id):
-    tenant = TenantManagement(tenant_id=1)
-    await tenant.init(tenant_id=1)
+    tenantInstance = TenantManagement(tenant_id=1)
+    await tenantInstance.init(tenant_id=1)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -214,7 +209,7 @@ async def remove(request, zone_id):
         request,
         zone_id=zone_id,
         zoneName=zoneInstance.name,
-        tenantName=tenant.name
+        tenantName=tenantInstance.name
     )
     return response.html(rendered_template)
 
@@ -225,12 +220,17 @@ async def remove_check(request, zone_id):
     # removing the spots if needed
 
     # temporary redirection to dashboard of tenant
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(tenant_id=1)
+    await tenantInstance.init(tenant_id=1)
+
+    await tenantInstance.setZones()
+    if tenantInstance.zones is None:
+        raise ServerError("No zones in DB", status_code=500)
+
     rendered_template = await render(
         "dashboard_template.html",
         request, 
-        zoneList=tenantInstance.getZones(),
+        zoneList=tenantInstance.zones,
         totalSpots=tenantInstance.getTotalSpots(),
         takenSpots=tenantInstance.getTakenSpots(),
         removed_zone=True

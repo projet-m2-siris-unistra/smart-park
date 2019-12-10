@@ -159,6 +159,15 @@ h4, h3 {
     vertical-align: middle;
 }
 
+ #validation-div {
+    margin-top: 20px;
+    margin-bottom: 40px;
+ }
+
+.zone-config-div{
+    margin-top: 15px;    
+}
+
 .zone-modify-button {
     display: inline;
     margin: 0;

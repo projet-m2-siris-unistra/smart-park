@@ -1,31 +1,62 @@
+<form class="sp-formular" action="{{ url_for("zones.config", zone_id=zone_id) }}" method="POST">
+    <div class="zone-div">
+        <h4>Général</h4>
 
-<div class="zone-div">
-    <a name="general"></a> 
-    <h4>Général</h4>
-    <br>
-    <p class="zone-config-field">
-        <label>Nom:</label> {{ zoneName }}
-        <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()">
-            modifier
-        </button>
-    </p>
-    <p class="zone-config-field">
-        <label>Description:</label> {{ zoneInstance.desc }}
-        <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()">
-            modifier
-        </button>
-    </p>
-    <br>
-    <p class="zone-config-field">
-        <label>Supprimer la zone:</label>
-        <a class="bx--btn bx--btn--danger bx--btn--sm zone-modify-button" type="button" href="{{ url_for("zones.remove", zone_id=zone_id) }}">
-            supprimer
-        </a>
-    </p>
-    <div id="validate-general">
+        <br>
 
+        <div class="zone-config-div" id="name-div">
+            <p class="zone-config-field">
+                <label>Nom:</label> {{ zoneName }}
+                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_name()" id="name-button">
+                    modifier
+                </button>
+            </p>
+
+        </div>
+
+        <div class="zone-config-div" id="desc-div">
+            <p class="zone-config-field">
+                <label>Description:</label> {{ zoneInstance.desc }}
+                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button"  onclick="modify_desc()" id="desc-button">
+                    modifier
+                </button>
+            </p>
+
+        </div>
+
+        <div class="zone-config-div" id="type-div">
+            <p class="zone-config-field">
+                <label>Type:</label> {{ zoneInstance.type }}
+                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_type()" id="type-button">
+                    modifier
+                </button>
+            </p>
+            
+        </div>
+
+        <div class="zone-config-div" id="color-div">
+            <p class="zone-config-field">
+                <label>Couleur:</label><label id="zone-show-color"></label>
+                <button class="bx--btn bx--btn--ghost bx--btn--sm zone-modify-button" type="button" onclick="modify_color()" id="color-button">
+                    modifier
+                </button>
+            </p>
+            
+        </div>
+
+        <div class="zone-config-div" id="validation-div">
+            
+        </div>
+        
+        <br>
+        <p class="zone-config-field">
+            <label>Supprimer la zone:</label>
+            <a class="bx--btn bx--btn--danger zone-modify-button" type="button" href="{{ url_for("zones.remove", zone_id=zone_id) }}">
+                supprimer
+            </a>
+        </p>
     </div>
-</div>
+</form>
 
 <div class="zone-div">
 
@@ -43,11 +74,24 @@
         window.zone_id = {{ zone_id }};
     </script>
 
+    <style>
+        #zone-show-color {
+            height: 20px;
+            width: 40px;
+            vertical-align: middle;
+            background-color: {{ zoneColor }}; 
+            border: 1px solid black;
+            display: inline-block;
+            margin-left: 10px;
+        }/**/
+    </style>
+
     <script type="text/javascript" src="/static/js/map_create_map.js"></script>
     <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
     <script type="text/javascript" src="/static/js/map_spot_adding.js"></script>
     <script type="text/javascript" src="/static/js/map_polygon_draw.js"></script>
 
+    <script type="text/javascript" src="/static/js/zone_config.js"></script>
 
     <br>
    
@@ -64,18 +108,3 @@
     </div>
 
 </div>
-
-<script type="text/javascript">
-    var modify = false;
-    var button = document.createElement('button');
-    button.textContent = "Enregistrer";
-    button.className = "bx--btn bx--btn--primary";
-    button.type = "submit";
-    
-    function modify_name() {
-        if (!modify) {
-            modify = true;
-            document.getElementById('validate-general').append(button);
-        }
-    }
-</script>
