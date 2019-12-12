@@ -124,13 +124,21 @@ async def config(request, zone_id):
     
     form = ConfigurationForm(request, zoneInstance)
 
+    print("delete data:", form.delete.data)
+    print("submit data: ", form.submit.data)
+    print("name data: ", form.name.data)
+
     if form.validate_on_submit():
+
+        print("delete data:", form.delete.data)
+        print("submit data: ", form.submit.data)
 
         if form.delete.data:
             print("Zone deletion")
 
-        else:
+        elif form.submit.data:
             print("Form validated")
+            changes = True
             await Request.updateZone(
                 zone_id=zone_id,
                 tenant_id=1, 
@@ -139,7 +147,9 @@ async def config(request, zone_id):
                 color=Tooling.formatColor(form.color.data),
                 polygon=""
             )
-            return response.redirect("/dashboard")
+
+        else:
+            print("WARNING: Wrong button clicked")
 
     rendered_template = await render(
         'parking_template.html', 

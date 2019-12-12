@@ -13,6 +13,7 @@ import app.bus
 import app.config
 import app.zones
 import app.spots
+import app.devices
 
 from app.templating import render
 from app.parkings import TenantManagement
@@ -31,6 +32,8 @@ app.static("/static", "./static")
 app.blueprint(accounts.bp)
 app.blueprint(zones.bp)
 app.blueprint(spots.bp)
+app.blueprint(devices.bp)
+
 
 
 # Handling navigation
@@ -120,19 +123,6 @@ async def statistics(request):
         "base_template.html", 
         request, 
         knights="En cours de construction..."
-    )
-    return response.html(rendered_template)
-
-
-@app.route("/devices")
-async def devices(request):
-    # Going through hierarchy for testing
-    devicesList = await bus.Request.getDevicesList()
-    devicesListJson = js.loads(devicesList)
-    rendered_template = await render(
-        "devices_template.html", 
-        request,
-        devices = devicesListJson
     )
     return response.html(rendered_template)
 

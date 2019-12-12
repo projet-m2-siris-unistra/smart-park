@@ -78,6 +78,15 @@ async def getDevice(device_id):
     return response.data.decode("utf-8")
 
 
-async def getDevicesList():
+# Request all devices of a tenant
+async def getDevices(tenant_id):
+    #request = json.dumps({'tenant_id' : int(tenant_id)})
     response = await nc.request("devices.list", b"{}", timeout=1)
+    return response.data.decode("utf-8")
+
+
+# Request all NOT ASSIGNED devices
+async def getFreeDevices(tenant_id):
+    request = json.dumps({'tenant_id' : int(tenant_id)})
+    response = await nc.request("devices.get.free", bytes(request, "utf-8"), timeout=1)
     return response.data.decode("utf-8")

@@ -64,10 +64,12 @@ class BXSelect(Select):
 
 
 class BXSubmit(Input):
-    def __call__(self, field, color="primary", **kwargs):
+    def __call__(self, field, color="primary", type="submit", **kwargs):
         kwargs.setdefault("class", f"bx--btn bx--btn--{color}")
+        kwargs.setdefault("type", f"{type}")
+        kwargs.setdefault("value", field.label.text)
         return Markup(f"""
             <div class="bx--form-item">
-                <button {self.html_params(name=field.name, type="submit", **kwargs)}>{escape(field.label.text)}</button>
+                <input {self.html_params(name=field.name, **kwargs)} />
             </div>
         """)

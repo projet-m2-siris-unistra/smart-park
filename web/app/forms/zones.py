@@ -46,6 +46,7 @@ class CreationForm(BaseForm):
     )
 
 
+# Configuration form
 class ConfigurationForm(CreationForm):
     submit = SubmitField(
         widget=BXSubmit(),

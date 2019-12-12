@@ -27,6 +27,7 @@ class TenantManagement:
     def __init__(self, tenant_id):
         self.id = tenant_id
         self.zones = []
+        self.devices = []
         # default data to see if DB requests are doing well
         self.name = "NOT UPDATED"
         self.coordinates = [7.9726, 49.0310] # Altenstadt (FR,67)
@@ -47,12 +48,28 @@ class TenantManagement:
         for item in data:
             obj = ZoneManagement(item['zone_id'])
             obj.staticInit(
-                item['name'],
-                item['type'],
-                '#' + item['color'],
-                item['geo']
+                name=item['name'],
+                type=item['type'],
+                color='#' + item['color'],
+                polygon=item['geo']
             )
             self.zones.append(obj)
+
+
+    # Get the list of all the NOT ASSIGNED devices of this tenant
+    async def setDevices(self):
+        reponse = await Request.getDevices(self.id)
+        data = js.loads(reponse)
+
+        print("setDevices DATA: ", data)
+        for item in data:
+            obj = DeviceManagement(item['device_id'])
+            obj.staticInit(
+                eui="eb228ed2043331ce",
+                battery=item['battery'],
+                state=item['state']
+            )
+            self.devices.append(obj)
 
 
     def getTotalSpots(self):
@@ -340,14 +357,23 @@ class DeviceManagement:
         response = await Request.getDevice(device_id)
         data = js.loads(response)
 
+        self.eui = "eb228ed2043331ce"
         self.battery = data['battery']
         self.state = data['state']
+
+
+    # Manual initialization of a device object
+    async def staticInit(self, eui, battery, state):
+        self.eui = eui
+        self.battery = battery
+        self.state = state
 
 
     # returns objects attributs wrapped into Json
     def toJson(self):
         return {
             "id" : self.id,
+            "eui" : self.eui,
             "state" : self.state,
             "battery" : self.battery
         }
