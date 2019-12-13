@@ -31,6 +31,11 @@ type newDeviceRequest struct {
 	DeviceEUI string 	`json:"device_eui"`
 }
 
+type resultListDevice struct {
+	Count int `json:"count"`
+	Data []database.Device `json:"data"`
+}
+
 /********************************** GET **********************************/
 func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, error) {
 	log.Println("handlers: handling getDevice")
@@ -38,16 +43,36 @@ func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, 
 	return database.GetDevice(ctx, request.DeviceID)
 }
 
-func getFreeDevices(ctx context.Context, request getDevicesRequest) ([]database.Device, error) {
+func getFreeDevices(ctx context.Context, request getDevicesRequest) (resultListDevice, error) {
 	log.Println("handlers: handling getFreeDevices")
 
-	return database.GetFreeDevices(ctx, request.Limite, request.Offset)
+	var result resultListDevice
+	var err error 
+	result.Count, err = database.CountDevice(ctx)
+	if err != nil {
+		return result, err
+	}
+	result.Data, err = database.GetFreeDevices(ctx, request.Limite, request.Offset)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
-func getDevices(ctx context.Context, request getDevicesRequest) ([]database.Device, error) {
+func getDevices(ctx context.Context, request getDevicesRequest) (resultListDevice, error) {
 	log.Println("handlers: handling getDevices")
 
-	return database.GetDevices(ctx, request.Limite, request.Offset)
+	var result resultListDevice
+	var err error 
+	result.Count, err = database.CountDevice(ctx)
+	if err != nil {
+		return result, err
+	}
+	result.Data, err = database.GetDevices(ctx, request.Limite, request.Offset)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 /********************************** GET **********************************/

@@ -32,6 +32,11 @@ type newPlaceRequest struct {
 	DeviceID  int    `json:"device_id"`
 }
 
+type resultListPlace struct {
+	Count int `json:"count"`
+	Data []database.Place `json:"data"`
+}
+
 /********************************** GET **********************************/
 
 func getPlace(ctx context.Context, request getPlaceRequest) (database.Place, error) {
@@ -40,10 +45,20 @@ func getPlace(ctx context.Context, request getPlaceRequest) (database.Place, err
 	return database.GetPlace(ctx, request.PlaceID)
 }
 
-func getPlaces(ctx context.Context, request getPlacesRequest) ([]database.Place, error) {
+func getPlaces(ctx context.Context, request getPlacesRequest) (resultListPlace, error) {
 	log.Println("handlers: handling getPlaces")
 
-	return database.GetPlaces(ctx, request.ZoneID, request.Limite, request.Offset)
+	var result resultListPlace
+	var err error 
+	result.Count, err = database.CountPlace(ctx)
+	if err != nil {
+		return result, err
+	}
+	result.Data, err = database.GetPlaces(ctx, request.ZoneID, request.Limite, request.Offset)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 /********************************** GET **********************************/

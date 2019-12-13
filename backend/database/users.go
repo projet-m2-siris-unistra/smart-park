@@ -191,6 +191,24 @@ func UpdateUser(ctx context.Context, userID int, tenantID int,
 
 /********************************** OPTIONS **********************************/
 
+
+// CountUser : count number of rows
+func CountUser(ctx context.Context) (int, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	
+	var count int
+
+	count = -1
+
+	row := pool.QueryRow("SELECT COUNT(*) FROM users")
+	err := row.Scan(&count)
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
 // CheckArgUser : check limit and offset arguments
 func CheckArgUser(limite int, offset int) (int, int) {
 

@@ -35,6 +35,11 @@ type newZoneRequest struct {
 	Geography string `json:"geo"`
 }
 
+type resultListZone struct {
+	Count int `json:"count"`
+	Data []database.Zone `json:"data"`
+}
+
 /********************************** GET **********************************/
 
 func getZone(ctx context.Context, request getZoneRequest) (database.Zone, error) {
@@ -43,10 +48,20 @@ func getZone(ctx context.Context, request getZoneRequest) (database.Zone, error)
 	return database.GetZone(ctx, request.ZoneID)
 }
 
-func getZones(ctx context.Context, request getZonesRequest) ([]database.Zone, error) {
+func getZones(ctx context.Context, request getZonesRequest) (resultListZone, error) {
 	log.Println("handlers: handling getZones of a tenant")
 
-	return database.GetZones(ctx, request.TenantID, request.Limite, request.Offset)
+	var result resultListZone
+	var err error 
+	result.Count, err = database.CountZone(ctx)
+	if err != nil {
+		return result, err
+	}
+	result.Data, err = database.GetZones(ctx, request.TenantID, request.Limite, request.Offset)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 /********************************** GET **********************************/

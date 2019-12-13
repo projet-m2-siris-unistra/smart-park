@@ -231,6 +231,23 @@ func NewPlace(ctx context.Context, zoneID int, placetype string,
 
 /********************************** OPTIONS **********************************/
 
+// CountPlace : count number of rows
+func CountPlace(ctx context.Context) (int, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	
+	var count int
+
+	count = -1
+
+	row := pool.QueryRow("SELECT COUNT(*) FROM places")
+	err := row.Scan(&count)
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
 // CheckArgPlace : check limit and offset arguments
 func CheckArgPlace(limite int, offset int) (int, int) {
 

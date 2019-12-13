@@ -24,6 +24,11 @@ type updateUserRequest struct {
 	Email    string `json:"email,omitempty"`
 }
 
+type resultListUser struct {
+	Count int `json:"count"`
+	Data []database.User `json:"data"`
+}
+
 /********************************** GET **********************************/
 
 func getUser(ctx context.Context, request getUserRequest) (database.User, error) {
@@ -32,10 +37,20 @@ func getUser(ctx context.Context, request getUserRequest) (database.User, error)
 	return database.GetUser(ctx, request.UserID)
 }
 
-func getUsers(ctx context.Context, request getUsersRequest) ([]database.User, error) {
+func getUsers(ctx context.Context, request getUsersRequest) (resultListUser, error) {
 	log.Println("handlers: handling getUsers")
 
-	return database.GetUsers(ctx, request.Limite, request.Offset)
+	var result resultListUser
+	var err error 
+	result.Count, err = database.CountUser(ctx)
+	if err != nil {
+		return result, err
+	}
+	result.Data, err = database.GetUsers(ctx, request.Limite, request.Offset)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 /********************************** GET **********************************/

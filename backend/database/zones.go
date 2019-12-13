@@ -334,6 +334,23 @@ func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
 
 /********************************** OPTIONS **********************************/
 
+// CountZone : count number of rows
+func CountZone(ctx context.Context) (int, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	
+	var count int
+
+	count = -1
+
+	row := pool.QueryRow("SELECT COUNT(*) FROM tenants")
+	err := row.Scan(&count)
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
 // CheckArgZone : check limit and offset arguments
 func CheckArgZone(limite int, offset int) (int, int) {
 

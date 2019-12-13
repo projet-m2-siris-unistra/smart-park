@@ -365,6 +365,23 @@ func NewDevice(ctx context.Context, battery int, state string, tenantID int,
 
 /********************************** OPTIONS **********************************/
 
+// CountDevice : count number of rows
+func CountDevice(ctx context.Context) (int, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	
+	var count int
+
+	count = -1
+
+	row := pool.QueryRow("SELECT COUNT(*) FROM devices")
+	err := row.Scan(&count)
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
 // CheckArgDevice : check limit and offset arguments
 func CheckArgDevice(limite int, offset int) (int, int) {
 

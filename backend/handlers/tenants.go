@@ -22,6 +22,11 @@ type updateTenantsRequest struct {
 	Geography string `json:"geo,omitempty"`
 }
 
+type resultListTenant struct {
+	Count int `json:"count"`
+	Data []database.Tenant `json:"data"`
+}
+
 /********************************** GET **********************************/
 func getTenant(ctx context.Context, request getTenantRequest) (database.Tenant, error) {
 	log.Println("handlers: handling getTenant")
@@ -29,10 +34,20 @@ func getTenant(ctx context.Context, request getTenantRequest) (database.Tenant, 
 	return database.GetTenant(ctx, request.TenantID)
 }
 
-func getTenants(ctx context.Context, request getTenantsRequest) ([]database.Tenant, error) {
+func getTenants(ctx context.Context, request getTenantsRequest) (resultListTenant, error) {
 	log.Println("handlers: handling getTenants")
 
-	return database.GetTenants(ctx, request.Limite, request.Offset)
+	var result resultListTenant
+	var err error 
+	result.Count, err = database.CountTenant(ctx)
+	if err != nil {
+		return result, err
+	}
+	result.Data, err = database.GetTenants(ctx, request.Limite, request.Offset)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
 }
 
 /********************************** GET **********************************/

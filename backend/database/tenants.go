@@ -147,6 +147,23 @@ func UpdateTenants(ctx context.Context, tenantID int, name string, geo string) (
 
 /********************************** OPTIONS **********************************/
 
+// CountTenant : count number of rows
+func CountTenant(ctx context.Context) (int, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	
+	var count int
+
+	count = -1
+
+	row := pool.QueryRow("SELECT COUNT(*) FROM tenants")
+	err := row.Scan(&count)
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
 // CheckArgTenant : check limit and offset arguments
 func CheckArgTenant(limite int, offset int) (int, int) {
 
