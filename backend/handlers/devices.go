@@ -20,11 +20,15 @@ type updateDeviceRequest struct {
 	DeviceID int    `json:"device_id"`
 	Battery  int    `json:"battery,omitempty"`
 	State    string `json:"state,omitempty"`
+	TenantID int 		`json:"tenant_id,omitempty"`
+	DeviceEUI string 	`json:"device_eui,omitempty"`
 }
 
 type newDeviceRequest struct {
 	Battery int    `json:"battery"`
 	State   string `json:"state"`
+	TenantID int 		`json:"tenant_id"`
+	DeviceEUI string 	`json:"device_eui"`
 }
 
 /********************************** GET **********************************/
@@ -49,21 +53,21 @@ func getDevices(ctx context.Context, request getDevicesRequest) ([]database.Devi
 /********************************** GET **********************************/
 
 /********************************** UPDATE **********************************/
-func updateDevice(ctx context.Context, request updateDeviceRequest) error {
+func updateDevice(ctx context.Context, request updateDeviceRequest) (database.DeviceResponse, error) {
 	log.Println("handlers: handling updateDevice")
 
-	err := database.UpdateDevice(ctx, request.DeviceID, request.Battery, request.State)
-	return err
+	return database.UpdateDevice(ctx, request.DeviceID, request.Battery, request.State, request.TenantID, 
+		request.DeviceEUI)
 }
 
 /********************************** UPDATE **********************************/
 
 /********************************** CREATE **********************************/
-func newDevice(ctx context.Context, request newDeviceRequest) error {
+func newDevice(ctx context.Context, request newDeviceRequest) (database.DeviceResponse, error) {
 	log.Println("handlers: handling newDevice")
 
-	err := database.NewDevice(ctx, request.Battery, request.State)
-	return err
+	return database.NewDevice(ctx, request.Battery, request.State, request.TenantID, 
+		request.DeviceEUI)
 }
 
 /********************************** CREATE **********************************/

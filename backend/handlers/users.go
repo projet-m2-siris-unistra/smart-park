@@ -41,12 +41,11 @@ func getUsers(ctx context.Context, request getUsersRequest) ([]database.User, er
 /********************************** GET **********************************/
 
 /********************************** UPDATE **********************************/
-func updateUser(ctx context.Context, request updateUserRequest) error {
+func updateUser(ctx context.Context, request updateUserRequest) (database.UserResponse, error)  {
 	log.Println("handlers: handling updateUser")
 
-	err := database.UpdateUser(ctx, request.UserID, request.TenantID, request.Username,
+	return database.UpdateUser(ctx, request.UserID, request.TenantID, request.Username,
 		request.Password, request.Email)
-	return err
 }
 
 /********************************** UPDATE **********************************/

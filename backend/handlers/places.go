@@ -50,23 +50,21 @@ func getPlaces(ctx context.Context, request getPlacesRequest) ([]database.Place,
 
 /********************************** UPDATE **********************************/
 
-func updatePlace(ctx context.Context, request updatePlaceRequest) error {
+func updatePlace(ctx context.Context, request updatePlaceRequest) (database.PlaceResponse, error) {
 	log.Println("handlers: handling updatePlace")
 
-	err := database.UpdatePlace(ctx, request.PlaceID, request.ZoneID,
+	return database.UpdatePlace(ctx, request.PlaceID, request.ZoneID,
 		request.Type, request.Geography, request.DeviceID)
-	return err
 }
 
 /********************************** UPDATE **********************************/
 
 /********************************** CREATE **********************************/
-func newPlace(ctx context.Context, request newPlaceRequest) error {
+func newPlace(ctx context.Context, request newPlaceRequest) (database.PlaceResponse, error) {
 	log.Println("handlers: handling newPlace")
 
-	err := database.NewPlace(ctx, request.ZoneID,
+	return database.NewPlace(ctx, request.ZoneID,
 		request.Type, request.Geography, request.DeviceID)
-	return err
 }
 
 /********************************** CREATE **********************************/

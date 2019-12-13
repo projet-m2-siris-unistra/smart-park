@@ -87,15 +87,21 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 		for n := 0; n <= devices; n++ {
 			batteryDevice := Random(0, 101)
 			stateDevice := StateDeviceRandom()
+			tenantID4Device := RandomTenantRow(ctx)
+			deviceEUI := RandomEUIGenerator()
 			_, err := pool.ExecContext(ctx,
 				`INSERT INTO 
 				devices (
 					battery, 
-					state
+					state,
+					tenant_id,
+					device_eui
 				) VALUES (
 					$1,
-					$2
-				)`, batteryDevice, stateDevice)
+					$2,
+					$3,
+					$4
+				)`, batteryDevice, stateDevice, tenantID4Device, deviceEUI)
 
 			if err != nil {
 				return errors.New("error new device, function Faker, faker.go")
@@ -362,4 +368,18 @@ func RandomFloat64(min, max float64) (float64, error) {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 	return min + r1.Float64()*(max-min), nil
+}
+
+// RandomEUIGenerator : generates fake EUI
+func RandomEUIGenerator() (string) {
+	buf := make([]byte, 6)
+	_, err := rand.Read(buf)
+	if err != nil {
+		return ""
+	}
+
+	// Set the local bit
+	buf[0] |= 2
+	result := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5])
+	return result[0:16]
 }

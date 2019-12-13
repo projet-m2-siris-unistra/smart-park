@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"log"
@@ -60,10 +61,17 @@ func (s *DeviceState) UnmarshalJSON(b []byte) error {
 
 // Device represents an IoT device
 type Device struct {
-	DeviceID int         `json:"device_id"`
-	Battery  int         `json:"battery"`
-	State    DeviceState `json:"state"`
+	DeviceID  int         `json:"device_id"`
+	Battery   int         `json:"battery"`
+	State     DeviceState `json:"state"`
+	TenantID  int         `json:"tenant_id"`
+	DeviceEUI string      `json:"device_eui"`
 	Timestamps
+}
+
+// DeviceResponse returns the id of the updated / created object
+type DeviceResponse struct {
+	DeviceID int `json:"device_id"`
 }
 
 /********************************** GET **********************************/
@@ -78,11 +86,11 @@ func GetDevice(ctx context.Context, deviceID int) (Device, error) {
 	var d *string
 
 	err := pool.QueryRowContext(ctx, `
-		SELECT device_id, battery, state, created_at, updated_at
+		SELECT device_id, battery, state, tenant_id, device_eui, created_at, updated_at
 		FROM devices 
 		WHERE device_id = $1
 	`, deviceID).
-		Scan(&device.DeviceID, &device.Battery, &tmp,
+		Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
 			&device.CreatedAt, &device.UpdatedAt)
 
 	if err != nil {
@@ -116,158 +124,47 @@ func GetDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
 	var d *string
 	var tmp null.String
 
+	limite, offset = CheckArgDevice(limite, offset)
+
 	i = 0
-	if (limite != 0 && offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-		`SELECT device_id, battery, state, created_at, updated_at FROM devices
+
+	rows, err := pool.QueryContext(ctx,
+		`SELECT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
 		LIMIT $1 OFFSET $2`, limite, offset)
 
+	if err != nil {
+		return devices, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
+			&device.CreatedAt, &device.UpdatedAt)
 		if err != nil {
 			return devices, err
 		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-				&device.CreatedAt, &device.UpdatedAt)
-			if err != nil {
-				return devices, err
-			}
-			if tmp.IsZero() == true {
+		if tmp.IsZero() == true {
+			device.State = NotAssigned
+		} else {
+			d = tmp.Ptr()
+			switch *d {
+			case "free":
+				device.State = Free
+			case "occupied":
+				device.State = Occupied
+			default:
 				device.State = NotAssigned
-			} else {
-				d = tmp.Ptr()
-				switch *d {
-				case "free":
-					device.State = Free
-				case "occupied":
-					device.State = Occupied
-				default:
-					device.State = NotAssigned
-				}
 			}
-			devices = append(devices, device)
-			i = i + 1
 		}
+		devices = append(devices, device)
+		i = i + 1
+	}
 
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return devices, err
-		}
-	} else if (limite != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT device_id, battery, state, created_at, updated_at FROM devices
-			LIMIT $1`, limite)
-	
-			if err != nil {
-				return devices, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-					&device.CreatedAt, &device.UpdatedAt)
-				if err != nil {
-					return devices, err
-				}
-				if tmp.IsZero() == true {
-					device.State = NotAssigned
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "free":
-						device.State = Free
-					case "occupied":
-						device.State = Occupied
-					default:
-						device.State = NotAssigned
-					}
-				}
-				devices = append(devices, device)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return devices, err
-			}
-	} else if (offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT device_id, battery, state, created_at, updated_at FROM devices
-			OFFSET $1`, offset)
-	
-			if err != nil {
-				return devices, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-					&device.CreatedAt, &device.UpdatedAt)
-				if err != nil {
-					return devices, err
-				}
-				if tmp.IsZero() == true {
-					device.State = NotAssigned
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "free":
-						device.State = Free
-					case "occupied":
-						device.State = Occupied
-					default:
-						device.State = NotAssigned
-					}
-				}
-				devices = append(devices, device)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return devices, err
-			}
-	} else {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT device_id, battery, state, created_at, updated_at FROM devices`)
-	
-			if err != nil {
-				return devices, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-					&device.CreatedAt, &device.UpdatedAt)
-				if err != nil {
-					return devices, err
-				}
-				if tmp.IsZero() == true {
-					device.State = NotAssigned
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "free":
-						device.State = Free
-					case "occupied":
-						device.State = Occupied
-					default:
-						device.State = NotAssigned
-					}
-				}
-				devices = append(devices, device)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return devices, err
-			}
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return devices, err
 	}
 
 	return devices, nil
@@ -284,160 +181,49 @@ func GetFreeDevices(ctx context.Context, limite int, offset int) ([]Device, erro
 	var d *string
 	var tmp null.String
 
+	limite, offset = CheckArgDevice(limite, offset)
+
 	i = 0
-	if (limite != 0 && offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-		`SELECT device_id, battery, state, created_at, updated_at FROM devices
+
+	rows, err := pool.QueryContext(ctx,
+		`SELECT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
 		WHERE state='free' LIMIT $1 OFFSET $2`, limite, offset)
 
-		if err != nil {
-			return devices, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-				&device.CreatedAt, &device.UpdatedAt)
-			if err != nil {
-				return devices, err
-			}
-			if tmp.IsZero() == true {
-				device.State = NotAssigned
-			} else {
-				d = tmp.Ptr()
-				switch *d {
-				case "free":
-					device.State = Free
-				case "occupied":
-					device.State = Occupied
-				default:
-					device.State = NotAssigned
-				}
-			}
-			devices = append(devices, device)
-			i = i + 1
-		}
-
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return devices, err
-		}
-	} else if (limite != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT device_id, battery, state, created_at, updated_at FROM devices
-			WHERE state='free' LIMIT $1`, limite)
-	
-			if err != nil {
-				return devices, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-					&device.CreatedAt, &device.UpdatedAt)
-				if err != nil {
-					return devices, err
-				}
-				if tmp.IsZero() == true {
-					device.State = NotAssigned
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "free":
-						device.State = Free
-					case "occupied":
-						device.State = Occupied
-					default:
-						device.State = NotAssigned
-					}
-				}
-				devices = append(devices, device)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return devices, err
-			}
-	} else if (offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT device_id, battery, state, created_at, updated_at FROM devices
-			WHERE state='free' OFFSET $1`, offset)
-	
-			if err != nil {
-				return devices, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-					&device.CreatedAt, &device.UpdatedAt)
-				if err != nil {
-					return devices, err
-				}
-				if tmp.IsZero() == true {
-					device.State = NotAssigned
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "free":
-						device.State = Free
-					case "occupied":
-						device.State = Occupied
-					default:
-						device.State = NotAssigned
-					}
-				}
-				devices = append(devices, device)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return devices, err
-			}
-	} else {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT device_id, battery, state, created_at, updated_at FROM devices
-			WHERE state='free'`)
-	
-			if err != nil {
-				return devices, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
-					&device.CreatedAt, &device.UpdatedAt)
-				if err != nil {
-					return devices, err
-				}
-				if tmp.IsZero() == true {
-					device.State = NotAssigned
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "free":
-						device.State = Free
-					case "occupied":
-						device.State = Occupied
-					default:
-						device.State = NotAssigned
-					}
-				}
-				devices = append(devices, device)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return devices, err
-			}
+	if err != nil {
+		return devices, err
 	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
+			&device.CreatedAt, &device.UpdatedAt)
+		if err != nil {
+			return devices, err
+		}
+		if tmp.IsZero() == true {
+			device.State = NotAssigned
+		} else {
+			d = tmp.Ptr()
+			switch *d {
+			case "free":
+				device.State = Free
+			case "occupied":
+				device.State = Occupied
+			default:
+				device.State = NotAssigned
+			}
+		}
+		devices = append(devices, device)
+		i = i + 1
+	}
+
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return devices, err
+	}
+
 	return devices, nil
 }
 
@@ -446,90 +232,92 @@ func GetFreeDevices(ctx context.Context, limite int, offset int) ([]Device, erro
 /********************************** UPDATE **********************************/
 
 // UpdateDevice : update a device - need the device ID
-func UpdateDevice(ctx context.Context, deviceID int, battery int, state string) error {
+func UpdateDevice(ctx context.Context, deviceID int, battery int, state string, tenantID int,
+	deviceEUI string) (DeviceResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	if (state == "") && (battery == 0) {
-		return errors.New("invalid input fields (database/devices.go")
+	var device DeviceResponse
+
+	device.DeviceID = -1
+
+	if (state == "") && (battery == 0) && (tenantID == 0) && (deviceEUI == "") {
+		return device, errors.New("invalid input fields (database/devices.go")
 	}
 
-	// update on the battery only
-	if (state == "") && (battery != 0) {
+	if battery != 0 {
 
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE devices SET battery = $1 
-			WHERE device_id = $2
-		`, battery, deviceID)
+			WHERE device_id = $2 RETURNING device_id
+		`, battery, deviceID).Scan(&device.DeviceID)
+
+		if err == sql.ErrNoRows {
+			log.Printf("no device with id %d\n", deviceID)
+			return device, err
+		}
 
 		if err != nil {
-			return errors.New("error update device battery")
+			log.Printf("query error: %v\n", err)
+			return device, err
 		}
-
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
-		if err != nil {
-			return errors.New("error : device state - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
-		}
-
-		// update the state only
-	} else if (state != "") && (battery == 0) {
-		// have to verify if the input is correctly write
-		if ((state == "free") == false) && ((state == "occupied") == false) && ((state == "notassigned") == false) {
-			return errors.New("invalid device state")
-		}
-
-		result, err := pool.ExecContext(ctx, `
-			UPDATE devices SET state = $1 
-			WHERE device_id = $2
-		`, state, deviceID)
-
-		if err != nil {
-			return errors.New("error update device state")
-		}
-
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
-		if err != nil {
-			return errors.New("error : device state - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
-		}
-
-		// update the battery and the state
-	} else {
-
-		// have to verify if the input is correctly write
-		if ((state == "free") == false) && ((state == "occupied") == false) && ((state == "notassigned") == false) {
-			return errors.New("invalid device state")
-		}
-		result, err := pool.ExecContext(ctx, `
-			UPDATE devices SET battery = $1, state = $2
-			WHERE device_id = $3
-		`, battery, state, deviceID)
-
-		if err != nil {
-			return errors.New("error update device battery")
-		}
-
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
-		if err != nil {
-			return errors.New("error : device state - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
-		}
-
 	}
-	return nil
+
+	if state != "" {
+
+		err := pool.QueryRowContext(ctx, `
+			UPDATE devices SET state = $1 
+			WHERE device_id = $2 RETURNING device_id
+		`, state, deviceID).Scan(&device.DeviceID)
+
+		if err == sql.ErrNoRows {
+			log.Printf("no device with id %d\n", deviceID)
+			return device, err
+		}
+
+		if err != nil {
+			log.Printf("query error: %v\n", err)
+			return device, err
+		}
+	}
+
+	if tenantID != 0 {
+
+		err := pool.QueryRowContext(ctx, `
+			UPDATE devices SET tenant_id = $1 
+			WHERE device_id = $2 RETURNING device_id
+		`, tenantID, deviceID).Scan(&device.DeviceID)
+
+		if err == sql.ErrNoRows {
+			log.Printf("no device with id %d\n", deviceID)
+			return device, err
+		}
+
+		if err != nil {
+			log.Printf("query error: %v\n", err)
+			return device, err
+		}
+	}
+
+	if deviceEUI != "" {
+
+		err := pool.QueryRowContext(ctx, `
+			UPDATE devices SET device_eui = $1 
+			WHERE device_id = $2 RETURNING device_id
+		`, deviceEUI, deviceID).Scan(&device.DeviceID)
+
+		if err == sql.ErrNoRows {
+			log.Printf("no device with id %d\n", deviceID)
+			return device, err
+		}
+
+		if err != nil {
+			log.Printf("query error: %v\n", err)
+			return device, err
+		}
+	}
+
+	return device, nil
 }
 
 /********************************** UPDATE **********************************/
@@ -537,25 +325,58 @@ func UpdateDevice(ctx context.Context, deviceID int, battery int, state string) 
 /********************************** CREATE **********************************/
 
 // NewDevice : insert a new device
-func NewDevice(ctx context.Context, battery int, state string) error {
+func NewDevice(ctx context.Context, battery int, state string, tenantID int,
+	deviceEUI string) (DeviceResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	_, err := pool.ExecContext(ctx,
+	var device DeviceResponse
+
+	device.DeviceID = -1
+
+	err := pool.QueryRowContext(ctx,
 		`INSERT INTO 
 		devices (
 			battery, 
-			state
+			state,
+			tenant_id,
+			device_eui
 		) VALUES (
 			$1,
-			$2
-		)`, battery, state)
+			$2,
+			$3,
+			$4
+		) RETURNING device_id`, battery, state, tenantID, deviceEUI).Scan(&device.DeviceID)
 
-	if err != nil {
-		return errors.New("error new device")
+	if err == sql.ErrNoRows {
+		log.Printf("no device created\n")
+		return device, err
 	}
 
-	return nil
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return device, err
+	}
+
+	return device, nil
 }
 
 /********************************** CREATE **********************************/
+
+/********************************** OPTIONS **********************************/
+
+// CheckArgDevice : check limit and offset arguments
+func CheckArgDevice(limite int, offset int) (int, int) {
+
+	if limite == 0 {
+		limite = 20
+	}
+
+	if offset == 0 {
+		offset = 0
+	}
+
+	return limite, offset
+}
+
+/********************************** OPTIONS **********************************/

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 	"time"
+	"database/sql"
 
 	"gopkg.in/guregu/null.v3"
 )
@@ -17,6 +18,11 @@ type Place struct {
 	Geography null.String `json:"geo"`
 	DeviceID  int         `json:"device_id"`
 	Timestamps
+}
+
+// PlaceResponse returns the id of the updated / created object 
+type PlaceResponse struct {
+	PlaceID int `json:"place_id"`
 }
 
 /********************************** GET **********************************/
@@ -52,107 +58,34 @@ func GetPlaces(ctx context.Context, zoneID int, limite int, offset int) ([]Place
 	var place Place
 	var i int
 
+	limite, offset = CheckArgPlace(limite, offset)
+
 	i = 0
-	if (limite != 0 && offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
-			FROM places WHERE zone_id = $1 LIMIT $2 OFFSET $3`, zoneID, limite, offset)
+	
+	rows, err := pool.QueryContext(ctx,
+		`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
+		FROM places WHERE zone_id = $1 LIMIT $2 OFFSET $3`, zoneID, limite, offset)
 
+	if err != nil {
+		return places, err
+	}
+	
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&place.PlaceID, &place.ZoneID, &place.Type, &place.Geography, &place.DeviceID,
+			&place.CreatedAt, &place.UpdatedAt)
 		if err != nil {
 			return places, err
 		}
-		defer rows.Close()
+		places = append(places, place)
+		i = i + 1
+	}
 
-		for rows.Next() {
-			err = rows.Scan(&place.PlaceID, &place.ZoneID, &place.Type, &place.Geography, &place.DeviceID,
-				&place.CreatedAt, &place.UpdatedAt)
-			if err != nil {
-				return places, err
-			}
-			places = append(places, place)
-			i = i + 1
-		}
-
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return places, err
-		}
-	} else if (limite != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
-			FROM places WHERE zone_id = $1 LIMIT $2`, zoneID, limite)
-
-		if err != nil {
-			return places, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&place.PlaceID, &place.ZoneID, &place.Type, &place.Geography, &place.DeviceID,
-				&place.CreatedAt, &place.UpdatedAt)
-			if err != nil {
-				return places, err
-			}
-			places = append(places, place)
-			i = i + 1
-		}
-
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return places, err
-		}
-	} else if (offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
-			FROM places WHERE zone_id = $1 OFFSET $2`, zoneID, offset)
-
-		if err != nil {
-			return places, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&place.PlaceID, &place.ZoneID, &place.Type, &place.Geography, &place.DeviceID,
-				&place.CreatedAt, &place.UpdatedAt)
-			if err != nil {
-				return places, err
-			}
-			places = append(places, place)
-			i = i + 1
-		}
-
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return places, err
-		}
-	} else {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
-			FROM places WHERE zone_id = $1`, zoneID)
-
-		if err != nil {
-			return places, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&place.PlaceID, &place.ZoneID, &place.Type, &place.Geography, &place.DeviceID,
-				&place.CreatedAt, &place.UpdatedAt)
-			if err != nil {
-				return places, err
-			}
-			places = append(places, place)
-			i = i + 1
-		}
-
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return places, err
-		}
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return places, err
 	}
 
 	return places, nil
@@ -164,103 +97,91 @@ func GetPlaces(ctx context.Context, zoneID int, limite int, offset int) ([]Place
 
 // UpdatePlace : update a place
 func UpdatePlace(ctx context.Context, placeID int, zoneID int,
-	placetype string, geo string, deviceID int) error {
+	placetype string, geo string, deviceID int) (PlaceResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
+	var place PlaceResponse
+
+	place.PlaceID = -1
+
 	if (zoneID == 0) && (placetype == "") && (geo == "") && (deviceID == 0) {
-		return errors.New("invalid input fields (database/places.go")
+		return place, errors.New("invalid input fields (database/places.go")
 	}
 
 	// modify zoneID
 	if zoneID != 0 {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE places SET zone_id = $1 
-			WHERE place_id = $2
-		`, zoneID, placeID)
+			WHERE place_id = $2 RETURNING place_id
+		`, zoneID, placeID).Scan(&place.PlaceID)
 
-		if err != nil {
-			return errors.New("error update place zone_id")
+		if err == sql.ErrNoRows {
+			log.Printf("no place with id %d\n", deviceID)
+			return place, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : place zone_id - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return place, err
 		}
 	}
 
 	// modify type
 	if placetype != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE places SET type = $1 
-			WHERE place_id = $2
-		`, placetype, placeID)
+			WHERE place_id = $2 RETURNING place_id
+		`, placetype, placeID).Scan(&place.PlaceID)
 
-		if err != nil {
-			return errors.New("error update place type")
+		if err == sql.ErrNoRows {
+			log.Printf("no place with id %d\n", deviceID)
+			return place, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : place type - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return place, err
 		}
 	}
 
 	// modify geo
 	if geo != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE places SET geo = $1 
-			WHERE place_id = $2
-		`, geo, placeID)
+			WHERE place_id = $2 RETURNING place_id
+		`, geo, placeID).Scan(&place.PlaceID)
 
-		if err != nil {
-			return errors.New("error update place geo")
+		if err == sql.ErrNoRows {
+			log.Printf("no place with id %d\n", deviceID)
+			return place, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : place geo - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return place, err
 		}
 	}
 
 	// modify deviceID
 	if deviceID != 0 {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE places SET device_id = $1 
-			WHERE place_id = $2
-		`, deviceID, placeID)
+			WHERE place_id = $2 RETURNING place_id
+		`, deviceID, placeID).Scan(&place.PlaceID)
 
-		if err != nil {
-			return errors.New("error update place device_id")
+		if err == sql.ErrNoRows {
+			log.Printf("no place with id %d\n", deviceID)
+			return place, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : place device_id - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return place, err
 		}
 	}
 
-	return nil
+	return place, nil
 }
 
 /********************************** UPDATE **********************************/
@@ -269,11 +190,15 @@ func UpdatePlace(ctx context.Context, placeID int, zoneID int,
 
 // NewPlace : insert a new place
 func NewPlace(ctx context.Context, zoneID int, placetype string,
-	geo string, deviceID int) error {
+	geo string, deviceID int) (PlaceResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	_, err := pool.ExecContext(ctx,
+	var place PlaceResponse
+
+	place.PlaceID = -1
+
+	err := pool.QueryRowContext(ctx,
 		`INSERT INTO places
 		(
 			zone_id, 
@@ -286,13 +211,38 @@ func NewPlace(ctx context.Context, zoneID int, placetype string,
 			$2,
 			$3,
 			$4
-		)`, zoneID, placetype, geo, deviceID)
+		) RETURNING place_id`, zoneID, placetype, geo, deviceID).Scan(&place.PlaceID)
 
-	if err != nil {
-		return errors.New("error new place")
+	if err == sql.ErrNoRows {
+		log.Printf("no place created\n")
+		return place, err
 	}
 
-	return nil
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return place, err
+	}
+
+	return place, nil
 }
 
 /********************************** CREATE **********************************/
+
+
+/********************************** OPTIONS **********************************/
+
+// CheckArgPlace : check limit and offset arguments
+func CheckArgPlace(limite int, offset int) (int, int) {
+
+	if limite == 0 {
+		limite = 20
+	}
+
+	if offset == 0 {
+		offset = 0
+	}
+
+	return limite, offset
+}
+
+/********************************** OPTIONS **********************************/

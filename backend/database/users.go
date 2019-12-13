@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"database/sql"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -19,6 +20,12 @@ type User struct {
 	LastLogin null.Time `json:"last_login"`
 	Timestamps
 }
+
+// UserResponse returns the id of the updated / created object 
+type UserResponse struct {
+	UserID int `json:"user_id"`
+}
+
 
 /********************************** GET **********************************/
 
@@ -53,108 +60,34 @@ func GetUsers(ctx context.Context, limite int, offset int) ([]User, error) {
 	var user User
 	var i int
 
+	limite, offset = CheckArgUser(limite, offset)
+
 	i = 0
 
-	if (limite != 0 && offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
-			FROM users LIMIT $1 OFFSET $2`, limite, offset)
+	rows, err := pool.QueryContext(ctx,
+		`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
+		FROM users LIMIT $1 OFFSET $2`, limite, offset)
 
+	if err != nil {
+		return users, err
+	}
+	
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
+			&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
 		if err != nil {
 			return users, err
 		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
-				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
-			if err != nil {
-				return users, err
-			}
-			users = append(users, user)
-			i = i + 1
-		}
+		users = append(users, user)
+		i = i + 1
+	}
 		
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return users, err
-		}
-	} else if (limite != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
-			FROM users LIMIT $1`, limite)
-
-		if err != nil {
-			return users, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
-				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
-			if err != nil {
-				return users, err
-			}
-			users = append(users, user)
-			i = i + 1
-		}
-		
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return users, err
-		}
-	} else if (offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
-			FROM users OFFSET $1`, offset)
-
-		if err != nil {
-			return users, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
-				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
-			if err != nil {
-				return users, err
-			}
-			users = append(users, user)
-			i = i + 1
-		}
-		
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return users, err
-		}
-	} else {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
-			FROM users`)
-
-		if err != nil {
-			return users, err
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&user.UserID, &user.TenantID, &user.Username, &user.Password, &user.Email,
-				&user.CreatedAt, &user.UpdatedAt, &user.LastLogin)
-			if err != nil {
-				return users, err
-			}
-			users = append(users, user)
-			i = i + 1
-		}
-		
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return users, err
-		}
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return users, err
 	}
 
 	return users, nil
@@ -166,103 +99,110 @@ func GetUsers(ctx context.Context, limite int, offset int) ([]User, error) {
 
 // UpdateUser : update a user
 func UpdateUser(ctx context.Context, userID int, tenantID int,
-	username string, password string, email string) error {
+	username string, password string, email string) (UserResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
+	var user UserResponse
+
+	user.UserID = -1
+
 	if (tenantID == 0) && (username == "") && (password == "") && (email == "") {
-		return errors.New("invalid input fields (database/users.go")
+		return user, errors.New("invalid input fields (database/users.go")
 	}
 
 	// modify zoneID
 	if tenantID != 0 {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE users SET tenant_id = $1 
-			WHERE user_id = $2
-		`, tenantID, userID)
-
-		if err != nil {
-			return errors.New("error update user tenant_id")
+			WHERE user_id = $2 RETURNING user_id
+		`, tenantID, userID).Scan(&user.UserID)
+		
+		if err == sql.ErrNoRows {
+			log.Printf("no user with id %d\n", userID)
+			return user, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : user tenant_id - rows affected")
+			log.Printf("query error: %v\n", err)
+			return user, err
 		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
-		}
+		
 	}
 
 	// modify username
 	if username != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE users SET username = $1 
-			WHERE user_id = $2
-		`, username, userID)
+			WHERE user_id = $2 RETURNING user_id
+		`, username, userID).Scan(&user.UserID)
 
-		if err != nil {
-			return errors.New("error update users username")
+		if err == sql.ErrNoRows {
+			log.Printf("no user with id %d\n", userID)
+			return user, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : users username - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return user, err
 		}
 	}
 
 	// modify password
 	if password != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE users SET password = $1 
-			WHERE user_id = $2
-		`, password, userID)
+			WHERE user_id = $2 RETURNING user_id
+		`, password, userID).Scan(&user.UserID)
 
-		if err != nil {
-			return errors.New("error update users password")
+		if err == sql.ErrNoRows {
+			log.Printf("no user with id %d\n", userID)
+			return user, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : users password - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return user, err
 		}
 	}
 
 	// modify email
 	if email != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE users SET email = $1 
-			WHERE user_id = $2
-		`, email, userID)
+			WHERE user_id = $2 RETURNING user_id
+		`, email, userID).Scan(&user.UserID)
 
-		if err != nil {
-			return errors.New("error update user email")
+		if err == sql.ErrNoRows {
+			log.Printf("no user with id %d\n", userID)
+			return user, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : user email - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return user, err
 		}
 	}
 
-	return nil
+	return user, nil
 }
 
 /********************************** UPDATE **********************************/
+
+/********************************** OPTIONS **********************************/
+
+// CheckArgUser : check limit and offset arguments
+func CheckArgUser(limite int, offset int) (int, int) {
+
+	if limite == 0 {
+		limite = 20
+	}
+
+	if offset == 0 {
+		offset = 0
+	}
+
+	return limite, offset
+}
+
+/********************************** OPTIONS **********************************/

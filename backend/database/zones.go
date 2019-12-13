@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"database/sql"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -69,6 +70,11 @@ type Zone struct {
 	Timestamps
 }
 
+// ZoneResponse returns the id of the updated / created object 
+type ZoneResponse struct {
+	ZoneID int `json:"zone_id"`
+}
+
 /********************************** GET **********************************/
 
 // GetZone fetches the zone by its ID
@@ -120,163 +126,48 @@ func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone
 	var tmp null.String
 	var d *string
 
+	limite, offset = CheckArgZone(limite, offset)
+
 	i = 0
-	if (limite != 0 && offset != 0) {
-		rows, err := pool.QueryContext(ctx,
+
+	rows, err := pool.QueryContext(ctx,
 		`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
 		FROM zones z, tenants t
 		WHERE z.tenant_id = $1 LIMIT $2 OFFSET $3`, tenantID, limite, offset)
 
+	if err != nil {
+		return zones, err
+	}
+	
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
+			&zone.CreatedAt, &zone.UpdatedAt)
 		if err != nil {
 			return zones, err
 		}
-		defer rows.Close()
-
-		for rows.Next() {
-			err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
-				&zone.CreatedAt, &zone.UpdatedAt)
-			if err != nil {
-				return zones, err
-			}
-			if tmp.IsZero() == true {
+		if tmp.IsZero() == true {
+			zone.Type = FreeZone
+		} else {
+			d = tmp.Ptr()
+			switch *d {
+			case "paid":
+				zone.Type = Paid
+			case "blue":
+				zone.Type = Blue
+			default:
 				zone.Type = FreeZone
-			} else {
-				d = tmp.Ptr()
-				switch *d {
-				case "paid":
-					zone.Type = Paid
-				case "blue":
-					zone.Type = Blue
-				default:
-					zone.Type = FreeZone
-				}
 			}
-			zones = append(zones, zone)
-			i = i + 1
 		}
+		zones = append(zones, zone)
+		i = i + 1
+	}
 
-		// get any error encountered during iteration
-		err = rows.Err()
-		if err != nil {
-			return zones, err
-		}
-	} else if (limite != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
-			FROM zones z, tenants t
-			WHERE z.tenant_id = $1 LIMIT $2`, tenantID, limite)
-	
-			if err != nil {
-				return zones, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
-					&zone.CreatedAt, &zone.UpdatedAt)
-				if err != nil {
-					return zones, err
-				}
-				if tmp.IsZero() == true {
-					zone.Type = FreeZone
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "paid":
-						zone.Type = Paid
-					case "blue":
-						zone.Type = Blue
-					default:
-						zone.Type = FreeZone
-					}
-				}
-				zones = append(zones, zone)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return zones, err
-			}
-	} else if (offset != 0) {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
-			FROM zones z, tenants t
-			WHERE z.tenant_id = $1 OFFSET $2`, tenantID, offset)
-	
-			if err != nil {
-				return zones, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
-					&zone.CreatedAt, &zone.UpdatedAt)
-				if err != nil {
-					return zones, err
-				}
-				if tmp.IsZero() == true {
-					zone.Type = FreeZone
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "paid":
-						zone.Type = Paid
-					case "blue":
-						zone.Type = Blue
-					default:
-						zone.Type = FreeZone
-					}
-				}
-				zones = append(zones, zone)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return zones, err
-			}
-	} else {
-		rows, err := pool.QueryContext(ctx,
-			`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
-			FROM zones z, tenants t
-			WHERE z.tenant_id = $1`, tenantID)
-	
-			if err != nil {
-				return zones, err
-			}
-			defer rows.Close()
-	
-			for rows.Next() {
-				err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
-					&zone.CreatedAt, &zone.UpdatedAt)
-				if err != nil {
-					return zones, err
-				}
-				if tmp.IsZero() == true {
-					zone.Type = FreeZone
-				} else {
-					d = tmp.Ptr()
-					switch *d {
-					case "paid":
-						zone.Type = Paid
-					case "blue":
-						zone.Type = Blue
-					default:
-						zone.Type = FreeZone
-					}
-				}
-				zones = append(zones, zone)
-				i = i + 1
-			}
-	
-			// get any error encountered during iteration
-			err = rows.Err()
-			if err != nil {
-				return zones, err
-			}
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return zones, err
 	}
 
 	return zones, nil
@@ -288,125 +179,111 @@ func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone
 
 // UpdateZone : update a user
 func UpdateZone(ctx context.Context, zoneID int, tenantID int,
-	name string, zonetype string, color string, geo string) error {
+	name string, zonetype string, color string, geo string) (ZoneResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
+	var zone ZoneResponse
+
+	zone.ZoneID = -1
+
 	if (tenantID == 0) && (name == "") && (zonetype == "") && (color == "") && (geo == "") {
-		return errors.New("invalid input fields (database/zones.go")
+		return zone, errors.New("invalid input fields (database/zones.go")
 	}
 
 	// modify tenant_id
 	if tenantID != 0 {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE zones SET tenant_id = $1 
-			WHERE zone_id = $2
-		`, tenantID, zoneID)
+			WHERE zone_id = $2 RETURNING zone_id
+		`, tenantID, zoneID).Scan(&zone.ZoneID)
 
-		if err != nil {
-			return errors.New("error update zone tenant_id")
+		if err == sql.ErrNoRows {
+			log.Printf("no zone with id %d\n", zoneID)
+			return zone, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : zone tenant_id - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return zone, err
 		}
 	}
 
 	// modify name
 	if name != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE zones SET name = $1 
-			WHERE zone_id = $2
-		`, name, zoneID)
+			WHERE zone_id = $2 RETURNING zone_id
+		`, name, zoneID).Scan(&zone.ZoneID)
 
-		if err != nil {
-			return errors.New("error update zone name")
+		if err == sql.ErrNoRows {
+			log.Printf("no zone with id %d\n", zoneID)
+			return zone, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : zone name - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return zone, err
 		}
 	}
 
 	// modify type
 	if zonetype != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE zones SET type = $1 
-			WHERE zone_id = $2
-		`, zonetype, zoneID)
+			WHERE zone_id = $2 RETURNING zone_id
+		`, zonetype, zoneID).Scan(&zone.ZoneID)
 
-		if err != nil {
-			return errors.New("error update zone type")
+		if err == sql.ErrNoRows {
+			log.Printf("no zone with id %d\n", zoneID)
+			return zone, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : zone type - rows affected")
-		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
+			log.Printf("query error: %v\n", err)
+			return zone, err
 		}
 	}
 
 	// modify color
 	if color != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE zones SET color = $1 
-			WHERE zone_id = $2
-		`, color, zoneID)
-
-		if err != nil {
-			return errors.New("error update zone color")
+			WHERE zone_id = $2 RETURNING zone_id
+		`, color, zoneID).Scan(&zone.ZoneID)
+	
+		if err == sql.ErrNoRows {
+			log.Printf("no zone with id %d\n", zoneID)
+			return zone, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : zone color - rows affected")
+			log.Printf("query error: %v\n", err)
+			return zone, err
 		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
-		}
+		
 	}
 
 	// modify geo
 	if geo != "" {
-		result, err := pool.ExecContext(ctx, `
+		err := pool.QueryRowContext(ctx, `
 			UPDATE zones SET geo = $1 
-			WHERE zone_id = $2
-		`, geo, zoneID)
-
-		if err != nil {
-			return errors.New("error update zone geo")
+			WHERE zone_id = $2 RETURNING zone_id
+		`, geo, zoneID).Scan(&zone.ZoneID)
+		
+		if err == sql.ErrNoRows {
+			log.Printf("no zone with id %d\n", zoneID)
+			return zone, err
 		}
 
-		// verify if there is one ou more rows affected
-		rows, err := result.RowsAffected()
 		if err != nil {
-			return errors.New("error : zone geo - rows affected")
+			log.Printf("query error: %v\n", err)
+			return zone, err
 		}
-		// checks the number of rows affected
-		if rows < 0 {
-			log.Fatalf("expected to affect 1 row, affected %d", rows)
-		}
+	
 	}
 
-	return nil
+	return zone, nil
 }
 
 /********************************** UPDATE **********************************/
@@ -415,11 +292,15 @@ func UpdateZone(ctx context.Context, zoneID int, tenantID int,
 
 // NewZone : insert a new place
 func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
-	color string, geo string) error {
+	color string, geo string) (ZoneResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	_, err := pool.ExecContext(ctx,
+	var zone ZoneResponse
+
+	zone.ZoneID = -1
+	
+	err := pool.QueryRowContext(ctx,
 		`INSERT INTO zones
 		(
 			tenant_id, 
@@ -434,13 +315,37 @@ func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
 			$3,
 			$4,
 			$5
-		)`, tenantID, name, zonetype, color, geo)
+		) RETURNING zone_id`, tenantID, name, zonetype, color, geo).Scan(&zone.ZoneID)
 
-	if err != nil {
-		return errors.New("error new place")
-	}
+		if err == sql.ErrNoRows {
+			log.Printf("no zone created\n")
+			return zone, err
+		}
+	
+		if err != nil {
+			log.Printf("query error: %v\n", err)
+			return zone, err
+		}
 
-	return nil
+	return zone, nil
 }
 
 /********************************** CREATE **********************************/
+
+/********************************** OPTIONS **********************************/
+
+// CheckArgZone : check limit and offset arguments
+func CheckArgZone(limite int, offset int) (int, int) {
+
+	if limite == 0 {
+		limite = 20
+	}
+
+	if offset == 0 {
+		offset = 0
+	}
+
+	return limite, offset
+}
+
+/********************************** OPTIONS **********************************/

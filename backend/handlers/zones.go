@@ -53,23 +53,21 @@ func getZones(ctx context.Context, request getZonesRequest) ([]database.Zone, er
 
 /********************************** UPDATE **********************************/
 
-func updateZone(ctx context.Context, request updateZoneRequest) error {
+func updateZone(ctx context.Context, request updateZoneRequest) (database.ZoneResponse, error) {
 	log.Println("handlers: handling updateZone")
 
-	err := database.UpdateZone(ctx, request.ZoneID, request.TenantID,
+	return database.UpdateZone(ctx, request.ZoneID, request.TenantID,
 		request.Name, request.Type, request.Color, request.Geography)
-	return err
 }
 
 /********************************** UPDATE **********************************/
 
 /********************************** CREATE **********************************/
-func newZone(ctx context.Context, request newZoneRequest) error {
+func newZone(ctx context.Context, request newZoneRequest) (database.ZoneResponse, error) {
 	log.Println("handlers: handling newZone")
 
-	err := database.NewZone(ctx, request.TenantID,
+	return database.NewZone(ctx, request.TenantID,
 		request.Name, request.Type, request.Color, request.Geography)
-	return err
 }
 
 /********************************** CREATE **********************************/
