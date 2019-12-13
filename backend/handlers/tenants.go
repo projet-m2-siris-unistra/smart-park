@@ -39,11 +39,10 @@ func getTenants(ctx context.Context, request getTenantsRequest) ([]database.Tena
 
 /********************************** UPDATE **********************************/
 
-func updateTenants(ctx context.Context, request updateTenantsRequest) error {
+func updateTenants(ctx context.Context, request updateTenantsRequest) (database.TenantResponse, error) {
 	log.Println("handlers: handling updateGeoTenants")
 
-	err := database.UpdateTenants(ctx, request.TenantID, request.Name, request.Geography)
-	return err
+	return database.UpdateTenants(ctx, request.TenantID, request.Name, request.Geography)
 }
 
 /********************************** UPDATE **********************************/
