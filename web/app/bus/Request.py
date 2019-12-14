@@ -91,9 +91,13 @@ async def getDevices(tenant_id):
 
 
 # Request all NOT ASSIGNED devices
-async def getFreeDevices(tenant_id):
+async def getNotAssignedDevices(tenant_id):
     request = json.dumps({'tenant_id' : int(tenant_id)})
-    response = await nc.request("devices.get.free", bytes(request, "utf-8"), timeout=1)
+    try:
+        response = await nc.request("devices.get.free", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        return REQ_ERROR
+
     return response.data.decode("utf-8")
 
 

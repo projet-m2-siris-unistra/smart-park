@@ -71,6 +71,24 @@ class TenantManagement:
             self.devices.append(obj)
 
 
+    # This function returns the list of all not assigned devices
+    # return a list of form: ['device_id1':'eui1', 'device_id2':'eui2']
+    async def getNotAssignedDevices(self):
+        response = await Request.getNotAssignedDevices(self.id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+            
+        data = js.loads(response)
+        print("data=", data)
+
+        dict = []
+        for item in data:
+            dict[item['device_id']] = item['eui']
+        
+        print("dict=", dict)
+        return dict
+        
+
     def getTotalSpots(self):
         count = 0
         if self.zones == []:

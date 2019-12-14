@@ -4,6 +4,8 @@ from wtforms.validators import DataRequired, Length
 
 from app.forms.widgets import BXInput, BXSelect, BXSubmit
 
+from app.parkings import TenantManagement
+
 
 
 class BaseForm(SanicForm):
@@ -60,7 +62,36 @@ class ConfigurationForm(CreationForm):
     )
 
 
+# The form for creating a spot/place
 class SpotsAddingForm(SanicForm):
+
+    deviceSelect = SelectField(
+        widget=BXSelect(),
+        label='Capteur',
+        description='Choisissez le capteur qui sera associé à cette place.',
+        validators=[DataRequired()],
+        choices=[]
+    )
+
+    typeSelect = SelectField(
+        widget=BXSelect(),
+        label='Type',
+        description='Choisissez le type de véhicule pour lequel sert cette place.',
+        validators=[DataRequired()],
+        choices=[
+            ('car', 'Voiture'),
+            ('bike', 'Moto'),
+            ('truck', 'Poids Lourd')
+        ]
+    )
+
+    coordinatesInput = StringField(
+        widget=BXInput(input_type="text"),
+        label='Coordonnés',
+        description='Les coordonnés de la place remplis manuellement ou avec la carte ci-dessus.',
+        validators=[DataRequired(), Length(max=36)]
+    )
+
     submit = SubmitField(
         widget=BXSubmit(),
         label='Enregistrer'

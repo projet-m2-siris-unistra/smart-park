@@ -2,7 +2,7 @@
 var polygonClickEnabled = true;
 // adding a limit of spots to be added
 var count = 0;
-var spotsLimit = 20;
+var spotsLimit = 1;
 var currentMarker;
 var addedMarkerList = [];
 var zone_id = window.zone_id;
@@ -40,20 +40,13 @@ function validate_marker() {
     
     // adding this spot coordinates to the list
     var coordinates = currentMarker.getLngLat().wrap();
-    console.debug(coordinates);
+    var coorString = coordinates.lng + "," + coordinates.lat;
+    console.debug(coorString);
+
     addedMarkerList.push(coordinates);
 
-    // display added marker
-    var placedSpotsDiv = document.getElementById('placed-spots');
-    if (count == 0) {
-        var title = document.createElement("h5");
-        title.innerHTML = "Places créées:";
-        placedSpotsDiv.appendChild(title);
-    }
-    var spotLine = document.createElement("p");
-    spotLine.className = "placed-spot-element";
-    spotLine.innerHTML = "Coordonnées: " + coordinates;
-    placedSpotsDiv.appendChild(spotLine);
+    // push the coordinates into the input field
+    document.getElementById('coordinatesInput').value = coorString;
 
     // if not set, enable validating button
     count++;
@@ -61,8 +54,8 @@ function validate_marker() {
         polygonClickEnabled = true;
     }
     else {
-        alert("Vous avez atteinds la limite de places à ajouter. \
-            Veuillez enregistrer votre travail.");
+        //alert("Vous avez atteinds la limite de places à ajouter. \
+        //    Veuillez enregistrer votre travail.");
     }
 }
 
