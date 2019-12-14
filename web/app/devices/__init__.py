@@ -43,6 +43,19 @@ async def create(request):
 
     if form.validate_on_submit():
         print("Form validated")
+        print("eui=", form.eui.data)
+        print("name=", form.name.data)
+        res = await Request.createDevice(
+            tenant_id=1,
+            eui=form.eui.data,
+            name=form.name.data
+        )
+
+        # Checking if request worked
+        if res == Request.REQ_ERROR:
+            raise ServerError("Cannot create device", status_code=500)
+        else:
+            return response.redirect("/devices/list")
 
 
     rendered_template = await render(

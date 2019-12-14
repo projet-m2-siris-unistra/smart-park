@@ -5,6 +5,11 @@ import json
 
 from app.bus import nc
 
+# Return values for request exception handling
+REQ_ERROR = -1
+REQ_OK = 0
+
+
 
 # Request tenant infos
 async def getTenant(tenant_id):
@@ -90,3 +95,39 @@ async def getFreeDevices(tenant_id):
     request = json.dumps({'tenant_id' : int(tenant_id)})
     response = await nc.request("devices.get.free", bytes(request, "utf-8"), timeout=1)
     return response.data.decode("utf-8")
+
+
+# This variable contains the values that device.state can take
+deviceStates = {
+    'free' : 'free',
+    'occupied' : 'occupied',
+    'notassigned' : 'notassigned'
+}
+
+# Create a device from EUI
+async def createDevice(tenant_id, eui, name):
+    # Name is not used for now. Waiting for migration update
+    
+    # default values that will (hopefully) be updated from 
+    # device communication or tenant configuration
+    batteryDefault = 100
+    stateDefault = deviceStates['free']
+
+    request = json.dumps({
+        'tenant_id' : tenant_id,
+        'device_eui' : eui,
+        'battery' : batteryDefault,
+        'state' : stateDefault
+    })
+
+    print("INFO: request=", request)
+
+    try:
+        response = await nc.request("devices.new", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        return REQ_ERROR
+
+    print("INFO: reponse = ", response.data.decode("utf-8"))
+    print("INFO: device created with device_id=", 
+        json.loads(response.data.decode("utf-8"))['device_id'])
+    return REQ_OK

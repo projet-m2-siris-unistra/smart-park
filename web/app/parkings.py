@@ -14,7 +14,7 @@ class Tooling:
         return liste
 
 
-    # format #ffffff color into right format
+    # format #ffffff color into right format FFFFFF
     @staticmethod
     def formatColor(arg):
         return arg[1:].upper()
@@ -61,11 +61,10 @@ class TenantManagement:
         reponse = await Request.getDevices(self.id)
         data = js.loads(reponse)
 
-        print("setDevices DATA: ", data)
         for item in data:
             obj = DeviceManagement(item['device_id'])
             obj.staticInit(
-                eui="eb228ed2043331ce",
+                eui=item['device_eui'],
                 battery=item['battery'],
                 state=item['state']
             )
@@ -357,13 +356,13 @@ class DeviceManagement:
         response = await Request.getDevice(device_id)
         data = js.loads(response)
 
-        self.eui = "eb228ed2043331ce"
+        self.eui = data['device_eui']
         self.battery = data['battery']
         self.state = data['state']
 
 
     # Manual initialization of a device object
-    async def staticInit(self, eui, battery, state):
+    def staticInit(self, eui, battery, state):
         self.eui = eui
         self.battery = battery
         self.state = state

@@ -1,5 +1,5 @@
 from sanic_wtf import SanicForm
-from wtforms import PasswordField, StringField, SubmitField, HiddenField, SelectField
+from wtforms import StringField, SubmitField, HiddenField, SelectField
 from wtforms.validators import DataRequired, Length
 
 from app.forms.widgets import BXInput, BXSelect, BXSubmit

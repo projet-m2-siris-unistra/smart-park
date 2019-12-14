@@ -7,6 +7,7 @@ from sanic.exceptions import ServerError
 from sanic_session import Session, InMemorySessionInterface
 
 import json as js 
+from math import ceil
 
 import app.accounts
 import app.bus
@@ -75,11 +76,20 @@ async def zones(request):
     await tenantInstance.setZones()
     if tenantInstance.zones is None:
         raise ServerError("No zones in DB", status_code=500)
+    
+    limit=20
+    offset=1
+    count=120
+    pages=ceil(count/limit)
 
     rendered_template = await render(
         "tenant_zone_data_table.html", 
         request,
-        tenantInstance=tenantInstance
+        tenantInstance=tenantInstance,
+        paginationLimit=limit,
+        paginationOffset=offset,
+        paginationElements=count,
+        paginationPages=pages
     )
     return response.html(rendered_template)
 
