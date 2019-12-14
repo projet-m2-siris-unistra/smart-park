@@ -14,99 +14,121 @@
 {% endif %}
 
 
-<form class="sp-formular" method="post">
-    {{ form.csrf_token }}
+<!-- Configuration menu (tabs) -->
+<div data-tabs class="zone-config-menu bx--tabs">
 
-    <div class="zone-div">
-        <h4>Général</h4>
+    <div class="bx--tabs-trigger" tabindex="0">
+      <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path></svg>
+    </div>
 
-        <section>
+    <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
+      <li class="bx--tabs__nav-item bx--tabs__nav-item--selected " data-target=".tab-1" role="tab" aria-selected="true" >
+        <a tabindex="0" id="tab-link-1" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab" aria-controls="tab-panel-1">Places</a>
+      </li>
 
-            {{ form.name }}
+      <li class="bx--tabs__nav-item " data-target=".tab-2" role="tab" >
+        <a tabindex="0" id="tab-link-2" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab" aria-controls="tab-panel-2">Général</a>
+      </li>
+    </ul>
+</div>
 
-            {{ form.type }}
 
-            {{ form.color }}
-
-            {{ form.submit }}
-            
-            <!-- Suppression de la zone -->
-            <button class="bx--btn bx--btn--danger" type="button" data-modal-target="#modal-delete">Supprimer</button>
-                
-            <div data-modal id="modal-delete" class="bx--modal bx--modal--danger" role="dialog" aria-modal="true" aria-labelledby="modal-delete-label" aria-describedby="modal-delete-heading" tabindex="-1">
-                <div class="bx--modal-container">
-                    <div class="bx--modal-header">
-                        <p class="bx--modal-header__heading bx--type-beta" id="modal-delete-heading">Suppression de la zone</p>
-                        <button class="bx--modal-close" type="button" data-modal-close aria-label="close modal" >
-                            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--modal-close__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M12 4.7L11.3 4 8 7.3 4.7 4 4 4.7 7.3 8 4 11.3 4.7 12 8 8.7 11.3 12 12 11.3 8.7 8z"></path></svg>
-                        </button>
-                    </div>
-            
-                    <!-- Note: Modals with content that scrolls, at any viewport, requires `tabindex="0"` on the `bx--modal-content` element -->
-                    <div class="bx--modal-content" >
-                        <p>
-                            Vous êtes sur le point de supprimer la zone {{ zoneInstance.name }}. Toutes les données
-                            concernant cette zone seront effacées. Cela comprend également les places de parking 
-                            que contient cette zone.
-                        </p>
-                    </div>
-
-                    <div class="bx--modal-footer">
-                        <button class="bx--btn bx--btn--secondary" type="button" data-modal-close>Annuler</button>
+<!-- General configuration tab -->
+<div id="tab-panel-1" class="tab-1" role="tabpanel" aria-labelledby="tab-link-1" aria-hidden="false" >
+    
+        <div class="zone-div">
+        
+            <form class="sp-formular" method="post">
+    
+                <h4>Gérer les places</h4>
+                <label for="select-id" class="bx--label">Cliquer sur la zone pour ajouter des places de parking (max. 20)</label>
+        
+                <div id='map' class="spot-config-map"></div>
+    
+                <div id="placed-spots">
                     
-                        {{ form.delete }}
-                    
-                    </div>
                 </div>
-                <!-- Note: focusable span allows for focus wrap feature within Modals -->
-                <span tabindex="0"></span>
-            </div>
+                
+                <div id="validate-spots">
+                    {{ formSpots.submit }}
+                </div>
             
+            </form>
+    
+            <script type="text/javascript">
+                window.spots = {{ spotList | safe }};
+                window.polygon = {{ zoneInstance.polygon | tojson }};
+                window.tenantCoor = {{ tenantInstance.coordinates }};
+                window.color = "{{ zoneInstance.color }}";
+                window.zone_id = {{ zone_id }};
+            </script>
+            
+            <script type="text/javascript" src="/static/js/map_create_map.js"></script>
+            <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
+            <script type="text/javascript" src="/static/js/map_spot_adding.js"></script>
+            <script type="text/javascript" src="/static/js/map_polygon_draw.js"></script>
+    
+        </div>
 
-        </section>
-
-    </div>
-</form>
+</div>
 
 
-      
+<!-- Places/spots configuration tab -->
+<div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2" aria-hidden="true" hidden>
 
 
-
-
-<div class="zone-div">
-
-    <a name="spots"></a> 
-    <h4>Gérer les places</h4>
-    <label for="select-id" class="bx--label">Cliquer sur la zone pour ajouter des places de parking (max. 20)</label>
-    <br>
-    <div id='map' class="spot-config-map"></div>
-
-    <script type="text/javascript">
-        window.spots = {{ spotList | safe }};
-        window.polygon = {{ zoneInstance.polygon | tojson }};
-        window.tenantCoor = {{ tenantInstance.coordinates }};
-        window.color = "{{ zoneInstance.color }}";
-        window.zone_id = {{ zone_id }};
-    </script>
-
-    <script type="text/javascript" src="/static/js/map_create_map.js"></script>
-    <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
-    <script type="text/javascript" src="/static/js/map_spot_adding.js"></script>
-    <script type="text/javascript" src="/static/js/map_polygon_draw.js"></script>
-
-    <br>
-   
-    <div id="placed-spots">
-
-    </div>
-   
-    <br>
-   
-    <div id="validate-spots">
-        <a class="bx--btn bx--btn--primary" type="button" href="submit-spots">
-            Enregistrer
-        </a>
-    </div>
+    <form class="sp-formular" method="post">
+        {{ formGeneral.csrf_token }}
+    
+        <div class="zone-div">
+            <h4>Général</h4>
+    
+            <section>
+    
+                {{ formGeneral.name }}
+    
+                {{ formGeneral.type }}
+    
+                {{ formGeneral.color }}
+    
+                {{ formGeneral.submit }}
+                
+                <!-- Suppression de la zone -->
+                <button class="bx--btn bx--btn--danger" type="button" data-modal-target="#modal-delete">Supprimer</button>
+                    
+                <div data-modal id="modal-delete" class="bx--modal bx--modal--danger" role="dialog" aria-modal="true" aria-labelledby="modal-delete-label" aria-describedby="modal-delete-heading" tabindex="-1">
+                    <div class="bx--modal-container">
+                        <div class="bx--modal-header">
+                            <p class="bx--modal-header__heading bx--type-beta" id="modal-delete-heading">Suppression de la zone</p>
+                            <button class="bx--modal-close" type="button" data-modal-close aria-label="close modal" >
+                                <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--modal-close__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M12 4.7L11.3 4 8 7.3 4.7 4 4 4.7 7.3 8 4 11.3 4.7 12 8 8.7 11.3 12 12 11.3 8.7 8z"></path></svg>
+                            </button>
+                        </div>
+                
+                        <!-- Note: Modals with content that scrolls, at any viewport, requires `tabindex="0"` on the `bx--modal-content` element -->
+                        <div class="bx--modal-content" >
+                            <p>
+                                Vous êtes sur le point de supprimer la zone {{ zoneInstance.name }}. Toutes les données
+                                concernant cette zone seront effacées. Cela comprend également les places de parking 
+                                que contient cette zone.
+                            </p>
+                        </div>
+    
+                        <div class="bx--modal-footer">
+                            <button class="bx--btn bx--btn--secondary" type="button" data-modal-close>Annuler</button>
+                        
+                            {{ formGeneral.delete }}
+                        
+                        </div>
+                    </div>
+                    <!-- Note: focusable span allows for focus wrap feature within Modals -->
+                    <span tabindex="0"></span>
+                </div>
+    
+            </section>
+    
+        </div>
+    </form>
 
 </div>

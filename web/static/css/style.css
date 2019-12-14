@@ -172,6 +172,13 @@ h4, h3 {
     display: inline;
     margin: 0;
 }
+
+.zone-config-menu {
+    margin: auto;
+    margin-top: 20px;
+    width: 300px;
+}
+
 label {
     font-weight: bold;
 }
@@ -244,7 +251,7 @@ label {
 }
 
 .spot-config-map {
-    max-width: 1200px;
+    max-width: 800px;
     height: 500px;
 }
 

@@ -12,7 +12,7 @@ from app.parkings import TenantManagement
 
 from app.bus import Request
 
-from app.forms.zones import CreationForm, ConfigurationForm
+from app.forms.zones import CreationForm, ConfigurationForm, SpotsAddingForm
 
 bp = Blueprint("zones", url_prefix='/parking/zone')
 
@@ -122,34 +122,40 @@ async def config(request, zone_id):
     await zoneInstance.init(zone_id)
     await zoneInstance.setSpots()
     
-    form = ConfigurationForm(request, zoneInstance)
+    formGeneral = ConfigurationForm(request, zoneInstance)
+    formSpots = SpotsAddingForm(request)
 
-    print("delete data:", form.delete.data)
-    print("submit data: ", form.submit.data)
-    print("name data: ", form.name.data)
+    print("delete data:", formGeneral.delete.data)
+    print("submit data: ", formGeneral.submit.data)
+    print("name data: ", formGeneral.name.data)
 
-    if form.validate_on_submit():
+    # Handling general configuration
+    if formGeneral.validate_on_submit():
 
-        print("delete data:", form.delete.data)
-        print("submit data: ", form.submit.data)
+        print("delete data:", formGeneral.delete.data)
+        print("submit data: ", formGeneral.submit.data)
 
-        if form.delete.data:
+        if formGeneral.delete.data:
             print("Zone deletion")
 
-        elif form.submit.data:
+        elif formGeneral.submit.data:
             print("Form validated")
             changes = True
             await Request.updateZone(
                 zone_id=zone_id,
                 tenant_id=1, 
-                name=form.name.data, 
-                type=form.type.data, 
-                color=Tooling.formatColor(form.color.data),
+                name=formGeneral.name.data, 
+                type=formGeneral.type.data, 
+                color=Tooling.formatColor(formGeneral.color.data),
                 polygon=""
             )
 
         else:
             print("WARNING: Wrong button clicked")
+
+    # handling spot adding form
+    if formSpots.validate_on_submit():
+        print("spots adding form validated")
 
     rendered_template = await render(
         'parking_template.html', 
@@ -158,7 +164,8 @@ async def config(request, zone_id):
         zone_id=zone_id,
         zoneInstance=zoneInstance,
         tenantInstance=tenantInstance,
-        form=form,
+        formGeneral=formGeneral,
+        formSpots=formSpots,
         spotList=Tooling.jsonList(zoneInstance.spots),
         changesApplied=changes
     )

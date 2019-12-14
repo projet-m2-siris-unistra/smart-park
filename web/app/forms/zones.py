@@ -46,7 +46,7 @@ class CreationForm(BaseForm):
     )
 
 
-# Configuration form
+# General configuration form
 class ConfigurationForm(CreationForm):
     submit = SubmitField(
         widget=BXSubmit(),
@@ -57,4 +57,11 @@ class ConfigurationForm(CreationForm):
         widget=BXSubmit(),
         render_kw={'color': 'danger'},
         label="Supprimer"
+    )
+
+
+class SpotsAddingForm(SanicForm):
+    submit = SubmitField(
+        widget=BXSubmit(),
+        label='Enregistrer'
     )
