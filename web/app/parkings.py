@@ -103,11 +103,12 @@ class TenantManagement:
         data = js.loads(response)
         self.devicesNotAssignedCount = data['count']
 
-        dict = []
+        devList = []
         for item in data['data']:
-            dict.append({item['device_eui'], item['device_id']})
+            devList.append((item['device_id'], item['device_eui']))
         
-        return dict
+        print("devList=", devList)
+        return devList
         
 
     def getTotalSpots(self):

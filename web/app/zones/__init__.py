@@ -148,10 +148,14 @@ async def config(request, zone_id):
             changes = True
     
     print("errors: ", formSpots.deviceSelect.errors)
-    print("select data: ", formSpots.deviceSelect.data)
+    print("device data: ", formSpots.deviceSelect.data)
+    print("type data: ", formSpots.typeSelect.data)
+    print("coordinates: ", formSpots.coordinatesInput.data)
+
+    print("errors form: ", formSpots.submit.errors)
 
     # Checking if user wants to add spots
-    if formSpots.submit.data and formSpots.validate_on_submit():
+    if formSpots.validate_on_submit():
         print("Spot adding form validated")
 
         res = await Request.createSpot(

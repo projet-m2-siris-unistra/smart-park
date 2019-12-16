@@ -70,7 +70,7 @@ class SpotsAddingForm(SanicForm):
         label='Capteur',
         description='Choisissez le capteur qui sera associé à cette place.',
         validators=[DataRequired()],
-        choices=[]
+        coerce=int
     )
 
     typeSelect = SelectField(
