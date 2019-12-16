@@ -82,10 +82,13 @@ async def zones(request):
     count=120
     pages=ceil(count/limit)
 
+    zonesJson = Tooling.jsonList(tenantInstance.zones)
+
     rendered_template = await render(
         "tenant_zone_data_table.html", 
         request,
         tenantInstance=tenantInstance,
+        zonesList=zonesJson,
         paginationLimit=limit,
         paginationOffset=offset,
         paginationElements=count,

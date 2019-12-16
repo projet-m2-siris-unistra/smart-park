@@ -261,6 +261,12 @@ label {
     height: 500px;
 }
 
+.zone-element-map {
+    width: 100%;
+    max-width: 500px;
+    height: 250px;
+}
+
 
 
 /* SPOTS */

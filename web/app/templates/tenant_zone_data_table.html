@@ -2,6 +2,14 @@
 
 {% block title %}Zones de parkings{% endblock %}
 
+<!-- map inclusions -->
+{% block extra_inclusions %}
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+{% endblock %}
+
+
+
 {% block content %}
 
 <div class="bx--data-table-container" data-table>
@@ -219,8 +227,9 @@
 </div>
 
 <script type="text/javascript">
-    
+    window.zones = {{ zonesList | tojson }};
 </script>
 
+<script type="text/javascript" src="/static/js/map_zone_elements.js"></script>
 
 {% endblock %}
