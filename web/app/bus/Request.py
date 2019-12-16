@@ -14,14 +14,24 @@ REQ_OK = 0
 # Request tenant infos
 async def getTenant(tenant_id):
     request = json.dumps({'tenant_id' : int(tenant_id)})
-    response = await nc.request("tenants.get", bytes(request, "utf-8"), timeout=1)
+    try:
+        response = await nc.request("tenants.get", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> getTenant -> timeout reached")
+        return REQ_ERROR
+    
     return response.data.decode("utf-8")
 
 
 # Request zone infos
 async def getZone(zone_id):
     request = json.dumps({'zone_id' : int(zone_id)})
-    response = await nc.request("zones.get", bytes(request, "utf-8"), timeout=1)
+    try:
+        response = await nc.request("zones.get", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> getZone -> timeout reached")
+        return REQ_ERROR
+
     return response.data.decode("utf-8")
 
 
@@ -32,6 +42,8 @@ async def getZones(tenant_id):
         response = await nc.request("zones.list", bytes(request, "utf-8"), timeout=1)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getZones -> timeout reached")
+        return REQ_ERROR
+
     return response.data.decode("utf-8")
 
 
@@ -45,8 +57,14 @@ async def createZone(tenant_id, name, type, color, polygon):
         'geo' : polygon
     })
     print("createZone request = ", request)
-    response = await nc.publish("zones.new", bytes(request, "utf-8"), timeout=1)
+    
+    try:
+        response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> createZones -> timeout reached")
+        return REQ_ERROR
 
+    return REQ_OK
 
 # Update a zone
 async def updateZone(zone_id, tenant_id, name, type, color, polygon):
@@ -59,34 +77,61 @@ async def updateZone(zone_id, tenant_id, name, type, color, polygon):
         'polygon' : polygon
     })
     print("updateZone request = ", request)
-    response = await nc.publish("zones.update", bytes(request, "utf-8"))
+
+    try:
+        response = await nc.request("zones.update", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> updateZone -> timeout reached")
+        return REQ_ERROR
+    
+    return REQ_OK
 
 
 # Returns all the spots associated to zone_id
 async def getSpots(zone_id):
     request = json.dumps({'zone_id' : int(zone_id)})
-    response = await nc.request("places.list", bytes(request, "utf-8"))
+    try:
+        response = await nc.request("places.list", bytes(request, "utf-8"))
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> getSpots -> timeout reached")
+        return REQ_ERROR
+    
     return response.data.decode("utf-8")
 
 
 # Request spot infos
 async def getSpot(spot_id):
     request = json.dumps({'place_id' : int(spot_id)})
-    response = await nc.request("places.get", bytes(request, "utf-8"), timeout=1)
+    try:
+        response = await nc.request("places.get", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> getSpot -> timeout reached")
+        return REQ_ERROR
+    
     return response.data.decode("utf-8")
 
 
 # Request spot infos
 async def getDevice(device_id):
     request = json.dumps({'device_id' : int(device_id)})
-    response = await nc.request("devices.get", bytes(request, "utf-8"), timeout=1)
+    try:
+        response = await nc.request("devices.get", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> getevice -> timeout reached")
+        return REQ_ERROR
+
     return response.data.decode("utf-8")
 
 
 # Request all devices of a tenant
 async def getDevices(tenant_id):
     #request = json.dumps({'tenant_id' : int(tenant_id)})
-    response = await nc.request("devices.list", b"{}", timeout=1)
+    try:
+        response = await nc.request("devices.list", b"{}", timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> getDevices -> timeout reached")
+        return REQ_ERROR
+
     return response.data.decode("utf-8")
 
 

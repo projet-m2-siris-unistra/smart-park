@@ -35,6 +35,9 @@ class TenantManagement:
 
     async def init(self, tenant_id):
         response = await Request.getTenant(tenant_id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+
         data = js.loads(response)
         self.name = data['name']
         self.coordinates = data['geo']
@@ -42,8 +45,11 @@ class TenantManagement:
 
     # Get the list of all the zones from this tenant
     async def setZones(self):
-        reponse = await Request.getZones(self.id)
-        data = js.loads(reponse)
+        response = await Request.getZones(self.id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+
+        data = js.loads(response)
 
         for item in data:
             obj = ZoneManagement(item['zone_id'])
@@ -58,8 +64,11 @@ class TenantManagement:
 
     # Get the list of all the NOT ASSIGNED devices of this tenant
     async def setDevices(self):
-        reponse = await Request.getDevices(self.id)
-        data = js.loads(reponse)
+        response = await Request.getDevices(tenant_id=self.id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+
+        data = js.loads(response)
 
         for item in data:
             obj = DeviceManagement(item['device_id'])
@@ -132,6 +141,9 @@ class ZoneManagement:
 
     async def init(self, zone_id):
         response = await Request.getZone(zone_id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+
         data = js.loads(response)
         self.name = data['name']
         self.type = data['type']
@@ -148,7 +160,9 @@ class ZoneManagement:
             self.color,
             self.polygon
         )
-        # Checking response ?
+
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
 
 
     def toJson(self):
@@ -188,6 +202,9 @@ class ZoneManagement:
         # requesting all spots belonging to this zone
         # loop for parsing all spots
         response = await Request.getSpots(self.id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+
         data = js.loads(response)
 
         if data is not None:
@@ -273,6 +290,9 @@ class SpotManagement:
 
     async def init(self, spot_id):
         response = await Request.getSpot(spot_id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+        
         data = js.loads(response)
         self.coordinates = data['geo']
         self.type = data['type']
@@ -288,7 +308,10 @@ class SpotManagement:
 
     async def setDevice(self, device_id):
         deviceInstance = DeviceManagement(device_id)
-        await deviceInstance.init(device_id)
+        response = await deviceInstance.init(device_id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+        
         self.device = deviceInstance
 
 
@@ -372,6 +395,9 @@ class DeviceManagement:
 
     async def init(self, device_id):
         response = await Request.getDevice(device_id)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+
         data = js.loads(response)
 
         self.eui = data['device_eui']

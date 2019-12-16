@@ -149,8 +149,7 @@ def run():
     app.run(host=config.env("HOST"), port=config.env("PORT"), debug=config.env("DEBUG"))
 
 
-# Errors & Exepction handling
-
+# Errors & Exceptions handling
 @app.exception(ServerError)
 async def serverErrorHandler(request, exception):
     print(exception)

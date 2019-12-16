@@ -125,9 +125,9 @@ async def config(request, zone_id):
     formGeneral = ConfigurationForm(request, zoneInstance)
 
     # We need the not assigned devices from this tenant
-    deviceList = await tenantInstance.getNotAssignedDevices()
-    if deviceList == Request.REQ_ERROR:
-        raise ServerError("Impossible de charger les capteurs non assignés.")
+    #deviceList = await tenantInstance.getNotAssignedDevices()
+    #if deviceList == Request.REQ_ERROR:
+    #    raise ServerError("Impossible de charger les capteurs non assignés.")
 
     formSpots = SpotsAddingForm(request)
 
