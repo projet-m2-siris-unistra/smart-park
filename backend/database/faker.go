@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -20,7 +21,7 @@ var maxlongitude float64
 
 // Faker : insert fake data into the database
 func Faker(ctx context.Context, tenants int, zones int, devices int, places int, users int) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
 	gofakeit.Seed(0)
@@ -116,6 +117,7 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 			typePlace := ""
 			geoPlace, errgeo := NewGeo()
 			if errgeo != nil {
+				log.Printf("query error: %v\n", errgeo)
 				return errors.New("error new geo's place, function Faker, faker.go")
 			}
 			_, err := pool.ExecContext(ctx,
@@ -134,6 +136,7 @@ func Faker(ctx context.Context, tenants int, zones int, devices int, places int,
 				)`, zoneIDPlace, typePlace, geoPlace, deviceIDPlace)
 
 			if err != nil {
+				log.Printf("query error: %v\n", err)
 				return errors.New("error new place, function Faker, faker.go")
 			}
 		}
@@ -371,7 +374,7 @@ func RandomFloat64(min, max float64) (float64, error) {
 }
 
 // RandomEUIGenerator : generates fake EUI
-func RandomEUIGenerator() (string) {
+func RandomEUIGenerator() string {
 	buf := make([]byte, 6)
 	_, err := rand.Read(buf)
 	if err != nil {
