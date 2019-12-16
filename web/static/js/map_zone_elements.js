@@ -13,7 +13,7 @@ if (zones != null ) {
             container: 'map-' + zone.id,
             style: 'mapbox://styles/mapbox/streets-v11',
             // center the map on firt coor of zone
-            center: JSON.parse(zone.coordinates)[0],
+            center: JSON.parse(zone.coordinates)[3],
             zoom: 13.5
         });
 

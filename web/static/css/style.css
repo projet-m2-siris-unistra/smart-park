@@ -144,6 +144,13 @@ h4, h3 {
     vertical-align: top;
 }
 
+.zone-element-graphic {
+    width: 100%;
+    min-width: 200px;
+    height: 250px;
+    background-color: #cacaca;
+}
+
 .zone-div {
     margin-top: 20px;
     width: 100%;
