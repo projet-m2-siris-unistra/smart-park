@@ -196,7 +196,7 @@ func GetFreeDevices(ctx context.Context, limite int, offset int) ([]Device, erro
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp,
+		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
 			&device.CreatedAt, &device.UpdatedAt)
 		if err != nil {
 			return devices, err

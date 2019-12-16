@@ -13,7 +13,7 @@ import (
 var handlers = map[string]interface{}{
 	"ping":             ping, 				// ping database server
 	"devices.get":      getDevice, 			// get a device by its id
-	"devices.get.free": getFreeDevices, 	// get all free devices
+	"devices.get.notassigned": getFreeDevices, 	// get all free devices
 	"tenants.get":      getTenant, 			// get a tenant by its id
 	"zones.get":        getZone, 			// get a zone by its id 
 	"places.get":       getPlace, 			// get a places by its id
