@@ -21,6 +21,17 @@ class Tooling:
 
 
 
+"""
+NOTE
+Data from the backend is formated in JSON. When a list is returned:
+{
+    'count' : 10,       // the total number of existing entries
+    'data' : {...}      // the actual data
+}
+"""
+
+
+
 # Instance of a tenant
 class TenantManagement:
 
@@ -50,8 +61,9 @@ class TenantManagement:
             return Request.REQ_ERROR
 
         data = js.loads(response)
+        self.zonesCount = data['count']
 
-        for item in data:
+        for item in data['data']:
             obj = ZoneManagement(item['zone_id'])
             obj.staticInit(
                 name=item['name'],
@@ -69,8 +81,9 @@ class TenantManagement:
             return Request.REQ_ERROR
 
         data = js.loads(response)
+        self.devicesCount = data['count']
 
-        for item in data:
+        for item in data['data']:
             obj = DeviceManagement(item['device_id'])
             obj.staticInit(
                 eui=item['device_eui'],
@@ -88,13 +101,12 @@ class TenantManagement:
             return Request.REQ_ERROR
             
         data = js.loads(response)
-        print("data=", data)
+        self.devicesNotAssignedCount = data['count']
 
         dict = []
-        for item in data:
-            dict[item['device_id']] = item['eui']
+        for item in data['data']:
+            dict.append({item['device_eui'], item['device_id']})
         
-        print("dict=", dict)
         return dict
         
 
@@ -206,9 +218,10 @@ class ZoneManagement:
             return Request.REQ_ERROR
 
         data = js.loads(response)
+        self.spotsCount = data['count']
 
-        if data is not None:
-            for item in data:
+        if data['data'] is not None:
+            for item in data['data']:
                 obj = SpotManagement(item['place_id'])
                 obj.staticInit(
                     item['place_id'],
@@ -218,6 +231,12 @@ class ZoneManagement:
                 )
                 await obj.setDevice(item['device_id'])
                 self.spots.append(obj)
+
+
+    # Call this method to delete this zone from database
+    async def delete(self):
+        response = "waiting for backend..."
+
 
      # Statistics #
 

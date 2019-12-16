@@ -23,23 +23,14 @@ bp = Blueprint("zones", url_prefix='/parking/zone')
 async def create_zone(request):
     form = CreationForm(request)
 
-    name = form.name.data
-    print("Name=", name)
-    type = form.type.data
-    print("Type=", type)
-    color = form.color.data
-    print("Color=", color)
-    polygon = form.polygon.data
-    print("Polygon=", polygon)
-
     if form.validate_on_submit():
         print("Form validated")
         await Request.createZone(
-            tenant_id=1, 
-            name=name, 
-            type=type, 
-            color=Tooling.formatColor(color),
-            polygon=polygon
+            tenant_id=1,
+            name=form.name.data, 
+            type=form.type.data, 
+            color=Tooling.formatColor(form.color.data),
+            polygon=form.polygon.data
         )
         return response.redirect('/dashboard')
 
@@ -125,29 +116,26 @@ async def config(request, zone_id):
     formGeneral = ConfigurationForm(request, zoneInstance)
 
     # We need the not assigned devices from this tenant
-    #deviceList = await tenantInstance.getNotAssignedDevices()
-    #if deviceList == Request.REQ_ERROR:
-    #    raise ServerError("Impossible de charger les capteurs non assignés.")
-
+    deviceList = await tenantInstance.getNotAssignedDevices()
+    if deviceList == Request.REQ_ERROR:
+        raise ServerError("Impossible de charger les capteurs non assignés.")
+    
+    # Creating form and setting device selection
     formSpots = SpotsAddingForm(request)
-
-    print("delete data:", formGeneral.delete.data)
-    print("submit data: ", formGeneral.submit.data)
-    print("name data: ", formGeneral.name.data)
+    formSpots.deviceSelect.choices = deviceList
 
     # Handling general configuration
     if formGeneral.validate_on_submit():
 
-        print("delete data:", formGeneral.delete.data)
-        print("submit data: ", formGeneral.submit.data)
-
         if formGeneral.delete.data:
             print("Zone deletion")
+            # Call zone deletion method
+            # zoneInstance.delete()
+            return response.redirect("/dashboard")
 
         elif formGeneral.submit.data:
-            print("Form validated")
-            changes = True
-            await Request.updateZone(
+            print("General form validated")
+            res = await Request.updateZone(
                 zone_id=zone_id,
                 tenant_id=1, 
                 name=formGeneral.name.data, 
@@ -155,13 +143,26 @@ async def config(request, zone_id):
                 color=Tooling.formatColor(formGeneral.color.data),
                 polygon=""
             )
+            if res == Request.REQ_ERROR:
+                raise ServerError("impossible de mettre à jour la zone", 500)
+            changes = True
+    
+    print("errors: ", formSpots.deviceSelect.errors)
+    print("select data: ", formSpots.deviceSelect.data)
 
-        else:
-            print("WARNING: Wrong button clicked")
+    # Checking if user wants to add spots
+    if formSpots.submit.data and formSpots.validate_on_submit():
+        print("Spot adding form validated")
 
-    # handling spot adding form
-    if formSpots.validate_on_submit():
-        print("spots adding form validated")
+        res = await Request.createSpot(
+            zone_id=zone_id,
+            device_id=formSpots.deviceSelect.data,
+            type=formSpots.typeSelect.data,
+            coordinates=formSpots.coordinatesInput
+        )
+        if res == Request.REQ_ERROR:
+            raise ServerError("impossible d'ajouter une place'", 500)
+        return response.redirect("/parking/zone/"+zone_id+"/spots")
 
     rendered_template = await render(
         'parking_template.html', 

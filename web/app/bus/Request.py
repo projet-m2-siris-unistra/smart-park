@@ -11,6 +11,14 @@ REQ_OK = 0
 
 
 
+"""
+NOTE
+Warning: some attributs do not have the same naming in the front-end
+as in the backend (e.g. coordinates & geo)
+"""
+
+
+
 # Request tenant infos
 async def getTenant(tenant_id):
     request = json.dumps({'tenant_id' : int(tenant_id)})
@@ -65,6 +73,7 @@ async def createZone(tenant_id, name, type, color, polygon):
         return REQ_ERROR
 
     return REQ_OK
+
 
 # Update a zone
 async def updateZone(zone_id, tenant_id, name, type, color, polygon):
@@ -123,6 +132,26 @@ async def getDevice(device_id):
     return response.data.decode("utf-8")
 
 
+# Creatng a spot
+async def createSpot(zone_id, device_id, type, coordinates,):
+    request = json.dumps({
+        'zone_id' : int(zone_id),
+        'type' : type,
+        'device_id' : device_id,
+        'geo' : coordinates
+    })
+    print("createDevice request = ", request)
+    
+    try:
+        response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> createSpot -> timeout reached")
+        return REQ_ERROR
+
+    return REQ_OK
+
+
+
 # Request all devices of a tenant
 async def getDevices(tenant_id):
     #request = json.dumps({'tenant_id' : int(tenant_id)})
@@ -139,7 +168,7 @@ async def getDevices(tenant_id):
 async def getNotAssignedDevices(tenant_id):
     request = json.dumps({'tenant_id' : int(tenant_id)})
     try:
-        response = await nc.request("devices.get.free", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("devices.get.notassigned", bytes(request, "utf-8"), timeout=1)
     except ErrTimeout:
         return REQ_ERROR
 

@@ -79,7 +79,7 @@ async def zones(request):
     
     limit=20
     offset=1
-    count=120
+    count=tenantInstance.zonesCount
     pages=ceil(count/limit)
 
     zonesJson = Tooling.jsonList(tenantInstance.zones)
