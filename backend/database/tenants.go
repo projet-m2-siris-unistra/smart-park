@@ -61,7 +61,7 @@ func GetTenants(ctx context.Context, limite int, offset int) ([]Tenant, error) {
 	i = 0
 
 	rows, err := pool.QueryContext(ctx,
-		`SELECT tenant_id, name, geo, created_at, updated_at 
+		`SELECT DISTINCT tenant_id, name, geo, created_at, updated_at 
 		FROM tenants ORDER BY tenant_id LIMIT $1 OFFSET $2`, limite, offset)
 
 	if err != nil {

@@ -65,7 +65,7 @@ func GetUsers(ctx context.Context, limite int, offset int) ([]User, error) {
 	i = 0
 
 	rows, err := pool.QueryContext(ctx,
-		`SELECT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
+		`SELECT DISTINCT user_id, tenant_id, username, password, email, created_at, updated_at, last_login
 		FROM users LIMIT $1 OFFSET $2`, limite, offset)
 
 	if err != nil {

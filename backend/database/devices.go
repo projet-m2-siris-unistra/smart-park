@@ -129,7 +129,7 @@ func GetDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
 	i = 0
 
 	rows, err := pool.QueryContext(ctx,
-		`SELECT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
+		`SELECT DISTINCT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
 		LIMIT $1 OFFSET $2`, limite, offset)
 
 	if err != nil {
@@ -186,7 +186,7 @@ func GetFreeDevices(ctx context.Context, limite int, offset int) ([]Device, erro
 	i = 0
 
 	rows, err := pool.QueryContext(ctx,
-		`SELECT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
+		`SELECT DISTINCT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
 		WHERE state='free' LIMIT $1 OFFSET $2`, limite, offset)
 
 	if err != nil {

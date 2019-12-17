@@ -53,7 +53,7 @@ func getZones(ctx context.Context, request getZonesRequest) (resultListZone, err
 
 	var result resultListZone
 	var err error 
-	result.Count, err = database.CountZone(ctx)
+	result.Count, err = database.CountZone(ctx, request.TenantID)
 	if err != nil {
 		return result, err
 	}

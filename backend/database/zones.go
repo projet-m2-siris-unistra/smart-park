@@ -131,7 +131,7 @@ func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone
 	i = 0
 
 	rows, err := pool.QueryContext(ctx,
-		`SELECT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
+		`SELECT DISTINCT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
 		FROM zones z, tenants t
 		WHERE z.tenant_id = $1 LIMIT $2 OFFSET $3`, tenantID, limite, offset)
 
@@ -335,7 +335,7 @@ func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
 /********************************** OPTIONS **********************************/
 
 // CountZone : count number of rows
-func CountZone(ctx context.Context) (int, error) {
+func CountZone(ctx context.Context, tenantID int) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	
@@ -343,7 +343,7 @@ func CountZone(ctx context.Context) (int, error) {
 
 	count = -1
 
-	row := pool.QueryRow("SELECT COUNT(*) FROM tenants")
+	row := pool.QueryRow("SELECT COUNT(*) FROM zones WHERE tenant_id = $1", tenantID)
 	err := row.Scan(&count)
 	if err != nil {
 		return count, err

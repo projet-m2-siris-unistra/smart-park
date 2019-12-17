@@ -63,7 +63,7 @@ func GetPlaces(ctx context.Context, zoneID int, limite int, offset int) ([]Place
 	i = 0
 	
 	rows, err := pool.QueryContext(ctx,
-		`SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
+		`SELECT DISTINCT place_id, zone_id, type, geo, place_id, created_at, updated_at
 		FROM places WHERE zone_id = $1 LIMIT $2 OFFSET $3`, zoneID, limite, offset)
 
 	if err != nil {
