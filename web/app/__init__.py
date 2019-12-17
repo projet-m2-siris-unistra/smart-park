@@ -3,7 +3,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from sanic import Sanic, response
 from sanic.response import json
 from sanic.handlers import ErrorHandler
-from sanic.exceptions import ServerError
+from sanic.exceptions import ServerError 
 from sanic_session import Session, InMemorySessionInterface
 
 import json as js 
@@ -73,14 +73,33 @@ async def zones(request):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
 
-    await tenantInstance.setZones()
+    # number of total elements available in DB
+    limit = 20
+    offset = 1 
+    
+    print("req=", request.raw_args)
+    
+    # number of elements per page
+    if "pagesize" in request.raw_args:
+        limit = int(request.raw_args['pagesize'])
+        if limit not in [10, 20, 30, 40, 50]:
+            print("WARNING: pagesize is not valid")
+            raise ServerError("page size not valid")
+    
+    # current page
+    if "page" in request.raw_args:
+        offset = int(request.raw_args['page'])
+        if offset < 1: #or offset > count: ==> CAN'T TEST IT HERE !
+            print("WARNING: page number is not valid")
+            raise ServerError("page number not valid")
+
+    res = await tenantInstance.setZones(page=offset, pagesize=limit)
     if tenantInstance.zones is None:
         raise ServerError("No zones in DB", status_code=500)
     
-    limit=20
-    offset=1
-    count=tenantInstance.zonesCount
-    pages=ceil(count/limit)
+    # Number of pages available (NOTE: only the current page is loaded)
+    count = tenantInstance.zonesCount
+    pages = ceil(count/limit)
 
     zonesJson = Tooling.jsonList(tenantInstance.zones)
 

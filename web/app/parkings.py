@@ -55,13 +55,15 @@ class TenantManagement:
 
 
     # Get the list of all the zones from this tenant
-    async def setZones(self):
-        response = await Request.getZones(self.id)
+    async def setZones(self, page=1, pagesize=20):
+        response = await Request.getZones(self.id, page, pagesize)
         if response == Request.REQ_ERROR:
             return Request.REQ_ERROR
 
         data = js.loads(response)
+        #print("data", data)
         self.zonesCount = data['count']
+        self.zones.clear()
 
         for item in data['data']:
             obj = ZoneManagement(item['zone_id'])
