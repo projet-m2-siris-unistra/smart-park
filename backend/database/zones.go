@@ -332,6 +332,74 @@ func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
 
 /********************************** CREATE **********************************/
 
+/********************************** DELETE **********************************/
+
+// DeleteZone : delete a zone and their places and update all device to 'free'
+func DeleteZone(ctx context.Context, zoneID int) (ZoneResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var zone ZoneResponse
+	var placeID int
+
+	zone.ZoneID = -1
+	
+	rows, err := pool.QueryContext(ctx,
+		`SELECT DISTINCT place_id FROM places WHERE zone_id = $1`, zoneID)
+
+	if err == sql.ErrNoRows {
+		log.Printf("no zone with id %d\n", zoneID)
+		return zone, err
+	}
+
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return zone, err
+	}
+	
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&placeID)
+		if err != nil {
+			log.Printf("query error: %v\n", err)
+			return zone, err
+		}
+		_, err = DeletePlace(ctx, placeID)
+		if err != nil {
+			log.Printf("query error: %v\n", err)
+			return zone, err
+		}
+	}
+
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return zone, err
+	}
+
+	// update the device id into places
+	err = pool.QueryRowContext(ctx, `
+			DELETE FROM zones WHERE zone_id = $1 RETURNING zone_id
+		`, zoneID).Scan(&zone.ZoneID)
+
+	if err == sql.ErrNoRows {
+		log.Printf("no zone with id %d\n", zoneID)
+		return zone, err
+	}
+
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return zone, err
+	}
+
+
+	return zone, nil
+}
+
+/********************************** DELETE **********************************/
+
 /********************************** OPTIONS **********************************/
 
 // CountZone : count number of rows

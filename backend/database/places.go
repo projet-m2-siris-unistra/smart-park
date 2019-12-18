@@ -35,7 +35,7 @@ func GetPlace(ctx context.Context, placeID int) (Place, error) {
 	var place Place
 
 	err := pool.QueryRowContext(ctx, `
-		SELECT place_id, zone_id, type, geo, place_id, created_at, updated_at
+		SELECT place_id, zone_id, type, geo, device_id, created_at, updated_at
 		FROM places 
 		WHERE place_id = $1
 	`, placeID).
@@ -63,7 +63,7 @@ func GetPlaces(ctx context.Context, zoneID int, limite int, offset int) ([]Place
 	i = 0
 	
 	rows, err := pool.QueryContext(ctx,
-		`SELECT DISTINCT place_id, zone_id, type, geo, place_id, created_at, updated_at
+		`SELECT DISTINCT place_id, zone_id, type, geo, device_id, created_at, updated_at
 		FROM places WHERE zone_id = $1 LIMIT $2 OFFSET $3`, zoneID, limite, offset)
 
 	if err != nil {
@@ -227,6 +227,145 @@ func NewPlace(ctx context.Context, zoneID int, placetype string,
 }
 
 /********************************** CREATE **********************************/
+
+
+/********************************** DELETE **********************************/
+
+// DeleteDevice : update device id into places and update state into devices
+func DeleteDevice(ctx context.Context, placeID int) (PlaceResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var place PlaceResponse
+	var deviceID int
+
+	place.PlaceID = -1
+
+	// get the device id
+	err := pool.QueryRowContext(ctx, `
+		SELECT device_id
+		FROM places 
+		WHERE place_id = $1
+	`, placeID).Scan(&deviceID)
+
+	if err != nil {
+		return place, err
+	}
+
+	// update the device id into places
+	err = pool.QueryRowContext(ctx, `
+			UPDATE places SET device_id = null
+			WHERE place_id = $1 RETURNING place_id
+		`, placeID).Scan(&place.PlaceID)
+
+		if err == sql.ErrNoRows {
+			log.Printf("no place with id %d\n", placeID)
+			return place, err
+		}
+
+		if err != nil {
+			log.Printf("query error: %v\n", err)
+			return place, err
+		}
+
+	// update device state into device
+	rows, errd := pool.QueryContext(ctx, `
+		UPDATE devices SET state = 'free'
+		WHERE device_id = $1`, deviceID)
+
+	if errd == sql.ErrNoRows {
+		log.Printf("no device with id %d\n", deviceID)
+		return place, errd
+	}
+
+	if errd != nil {
+		log.Printf("query error: %v\n", errd)
+		return place, errd
+	}
+	defer rows.Close()
+
+	return place, nil
+}
+
+
+// DeletePlace : delete place and update state into devices
+func DeletePlace(ctx context.Context, placeID int) (PlaceResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var place PlaceResponse
+	var deviceID int
+	var state string
+
+	place.PlaceID = -1
+
+	err := pool.QueryRowContext(ctx, `
+		SELECT d.state
+		FROM places p, devices d
+		WHERE place_id = $1 AND p.device_id=d.device_id
+	`, placeID).Scan(&state)
+	
+	if err == sql.ErrNoRows {
+		log.Printf("no place with id %d\n", placeID)
+		return place, err
+	}
+
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return place, err
+	}
+
+	if state == "occupied" {
+		// get the device id
+		err = pool.QueryRowContext(ctx, `
+			SELECT device_id
+			FROM places 
+			WHERE place_id = $1
+		`, placeID).Scan(&deviceID)
+
+		if err != nil {
+			return place, err
+		}
+	}
+
+	// update the device id into places
+	err = pool.QueryRowContext(ctx, `
+			DELETE FROM places WHERE place_id = $1 RETURNING place_id
+		`, placeID).Scan(&place.PlaceID)
+
+	if err == sql.ErrNoRows {
+		log.Printf("no place with id %d\n", placeID)
+		return place, err
+	}
+
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return place, err
+	}
+
+	if state == "occupied" {
+		// update device state into device
+		rows, errd := pool.QueryContext(ctx, `
+			UPDATE devices SET state = 'free'
+			WHERE device_id = $1`, deviceID)
+
+		if errd == sql.ErrNoRows {
+			log.Printf("no device with id %d\n", deviceID)
+			return place, errd
+		}
+
+		if errd != nil {
+			log.Printf("query error: %v\n", errd)
+			return place, errd
+		}
+		defer rows.Close()
+	}
+
+	return place, nil
+}
+
+
+/********************************** DELETE **********************************/
 
 
 /********************************** OPTIONS **********************************/

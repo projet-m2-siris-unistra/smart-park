@@ -83,3 +83,19 @@ func newPlace(ctx context.Context, request newPlaceRequest) (database.PlaceRespo
 }
 
 /********************************** CREATE **********************************/
+
+/********************************** DELETE **********************************/
+func freePlace(ctx context.Context, request getPlaceRequest) (database.PlaceResponse, error) {
+	log.Println("handlers: handling freePlace")
+
+	return database.DeleteDevice(ctx, request.PlaceID)
+}
+
+func deletePlace(ctx context.Context, request getPlaceRequest) (database.PlaceResponse, error) {
+	log.Println("handlers: handling deletePlace")
+
+	return database.DeletePlace(ctx, request.PlaceID)
+}
+
+
+/********************************** DELETE **********************************/

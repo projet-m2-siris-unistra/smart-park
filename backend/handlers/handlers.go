@@ -31,6 +31,9 @@ var handlers = map[string]interface{}{
 	"devices.new":      newDevice, 			// create new device
 	"places.new":       newPlace, 			// create new place
 	"zones.new":        newZone, 			// create new zone
+	"places.free":		freePlace,			// free the place and update the state device to 'free'
+	"places.delete":	deletePlace,		// remove the place and update the state device to 'free'
+	"zones.delete":		deleteZone,			// remove the zone and all places and update all state device to 'free'
 	"faker.new":		createFakeData, 	// create fake data into the database (all tables)
 }
 

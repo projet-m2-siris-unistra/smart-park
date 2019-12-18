@@ -86,3 +86,12 @@ func newZone(ctx context.Context, request newZoneRequest) (database.ZoneResponse
 }
 
 /********************************** CREATE **********************************/
+
+/********************************** DELETE **********************************/
+func deleteZone(ctx context.Context, request getZoneRequest) (database.ZoneResponse, error) {
+	log.Println("handlers: handling deleteZone")
+
+	return database.DeleteZone(ctx, request.ZoneID)
+}
+
+/********************************** DELETE **********************************/
