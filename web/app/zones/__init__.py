@@ -125,7 +125,7 @@ async def config(request, zone_id):
     formSpots.deviceSelect.choices = deviceList
     
     # Informing user if no device is available
-    if deviceList is None:
+    if deviceList == []:
         formSpots.deviceSelect.description = "ATTENTION : aucun capteur disponible !"
 
     # Handling general configuration

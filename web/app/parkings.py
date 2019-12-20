@@ -83,6 +83,7 @@ class TenantManagement:
             return Request.REQ_ERROR
 
         data = js.loads(response)
+        #print("data", data)
         self.devicesCount = data['count']
         self.devices.clear() # In cas of...
 
@@ -105,10 +106,12 @@ class TenantManagement:
             
         data = js.loads(response)
         self.devicesNotAssignedCount = data['count']
+        print("data", data)
 
         devList = []
-        for item in data['data']:
-            devList.append((item['device_id'], item['device_eui']))
+        if data['data'] is not None:
+            for item in data['data']:
+                devList.append((item['device_id'], item['device_eui']))
         
         return devList
         
