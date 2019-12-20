@@ -45,22 +45,16 @@ async def getZone(zone_id):
 
 # This will return a list of zones from a tenant
 async def getZones(tenant_id, page, pagesize):
-    if page < 0:
-        print("WARNING: getZones page is below 0 !")
-        return REQ_ERROR
-
-    if pagesize not in [20, 30, 40, 50]:
-        print("WARNING: getZones illegal page size")
-        return REQ_ERROR
-
     # calculating offset
     offset = pagesize * (page-1)
-    print("offset=", offset)
+
     request = json.dumps({
         'tenant_id' : int(tenant_id),
         'limit' : pagesize,
         'offset' : offset
     })
+
+    print("Request : ", request)
 
     try:
         response = await nc.request("zones.list", bytes(request, "utf-8"), timeout=1)
@@ -172,10 +166,20 @@ async def getDevice(device_id):
 
 
 # Request all devices of a tenant
-async def getDevices(tenant_id):
-    #request = json.dumps({'tenant_id' : int(tenant_id)})
+async def getDevices(tenant_id, page, pagesize):
+    # calculating offset
+    offset = pagesize * (page-1)
+
+    request = json.dumps({
+        'tenant_id' : int(tenant_id),
+        'limit' : pagesize,
+        'offset' : offset
+    })
+
+    print("Request : ", request)
+
     try:
-        response = await nc.request("devices.list", b"{}", timeout=1)
+        response = await nc.request("devices.list", bytes(request, "utf-8"), timeout=1)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getDevices -> timeout reached")
         return REQ_ERROR

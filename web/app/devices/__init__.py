@@ -9,6 +9,7 @@ from app.templating import render
 from app.parkings import Tooling
 from app.parkings import TenantManagement
 from app.parkings import DeviceManagement
+from app.pagination import Pagination
 
 from app.bus import Request
 
@@ -23,12 +24,19 @@ bp = Blueprint("devices", url_prefix='/devices')
 async def view(request):
     tenantInstance = TenantManagement(tenant_id=1)
     await tenantInstance.init(tenant_id=1)
-    await tenantInstance.setDevices()
+
+    pagination = Pagination(request)
+    await tenantInstance.setDevices(
+        page=pagination.page_number, 
+        pagesize=pagination.page_size
+    )
+    pagination.setElementsNumber(tenantInstance.devicesCount)
 
     rendered_template = await render(
         "devices_template.html", 
         request,
-        devices = tenantInstance.devices
+        devices=tenantInstance.devices,
+        pagination=pagination
     )
     return response.html(rendered_template)
 

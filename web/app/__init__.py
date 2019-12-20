@@ -7,7 +7,6 @@ from sanic.exceptions import ServerError
 from sanic_session import Session, InMemorySessionInterface
 
 import json as js 
-from math import ceil
 
 import app.accounts
 import app.bus
@@ -20,6 +19,7 @@ from app.templating import render
 from app.parkings import TenantManagement
 from app.parkings import ZoneManagement
 from app.parkings import Tooling
+from app.pagination import Pagination
 
 app = Sanic(__name__)
 session = Session(app, interface=InMemorySessionInterface())
@@ -73,33 +73,18 @@ async def zones(request):
     tenantInstance = TenantManagement(1)
     await tenantInstance.init(1)
 
-    # number of total elements available in DB
-    limit = 20
-    offset = 1 
+    # Calculating and initialization of pagination
+    pagination = Pagination(request)
     
-    print("req=", request.raw_args)
-    
-    # number of elements per page
-    if "pagesize" in request.raw_args:
-        limit = int(request.raw_args['pagesize'])
-        if limit not in [10, 20, 30, 40, 50]:
-            print("WARNING: pagesize is not valid")
-            raise ServerError("page size not valid")
-    
-    # current page
-    if "page" in request.raw_args:
-        offset = int(request.raw_args['page'])
-        if offset < 1: #or offset > count: ==> CAN'T TEST IT HERE !
-            print("WARNING: page number is not valid")
-            raise ServerError("page number not valid")
-
-    res = await tenantInstance.setZones(page=offset, pagesize=limit)
+    # Requesting zone from database
+    res = await tenantInstance.setZones(
+        page=pagination.page_number, 
+        pagesize=pagination.page_size
+    )
     if tenantInstance.zones is None:
         raise ServerError("No zones in DB", status_code=500)
     
-    # Number of pages available (NOTE: only the current page is loaded)
-    count = tenantInstance.zonesCount
-    pages = ceil(count/limit)
+    pagination.setElementsNumber(tenantInstance.zonesCount)
 
     zonesJson = Tooling.jsonList(tenantInstance.zones)
 
@@ -108,10 +93,7 @@ async def zones(request):
         request,
         tenantInstance=tenantInstance,
         zonesList=zonesJson,
-        paginationLimit=limit,      # page size
-        paginationOffset=offset,    # current page 
-        paginationElements=count,   # total nb of elements
-        paginationPages=pages       # total nb of pages
+        pagination = pagination
     )
     return response.html(rendered_template)
 

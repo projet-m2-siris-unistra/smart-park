@@ -179,10 +179,10 @@
                     aria-label="select number of items per page"
                     tabindex="0"
                     data-items-per-page>
-                    <option class="bx--select-option" value="20" {% if paginationLimit == 20 %}selected{% endif %}>20</option>
-                    <option class="bx--select-option" value="30" {% if paginationLimit == 30 %}selected{% endif %}>30</option>
-                    <option class="bx--select-option" value="40" {% if paginationLimit == 40 %}selected{% endif %}>40</option>
-                    <option class="bx--select-option" value="50" {% if paginationLimit == 50 %}selected{% endif %}>50</option>
+                    <option class="bx--select-option" value="20" {% if pagination.page_size == 20 %}selected{% endif %}>20</option>
+                    <option class="bx--select-option" value="30" {% if pagination.page_size == 30 %}selected{% endif %}>30</option>
+                    <option class="bx--select-option" value="40" {% if pagination.page_size == 40 %}selected{% endif %}>40</option>
+                    <option class="bx--select-option" value="50" {% if pagination.page_size == 50 %}selected{% endif %}>50</option>
                     </select>
                 </form>
                 <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--select__arrow" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path></svg>
@@ -190,8 +190,8 @@
 
             <!-- Pagination informations -->
             <span class="bx--pagination__text">
-                <span data-displayed-item-range>{{ paginationLimit*(paginationOffset-1) + 1 }}-{{ (paginationLimit*paginationOffset) }}</span> de
-                <span data-total-items>{{ paginationElements }}</span> éléments
+                <span data-displayed-item-range>{{ pagination.page_size*(pagination.page_number-1) + 1 }}-{{ (pagination.page_size*pagination.page_number) }}</span> de
+                <span data-total-items>{{ pagination.elements_number }}</span> éléments
             </span>
         </div>
 
@@ -207,8 +207,8 @@
                     tabindex="0"
                     onchange="submit_offset()"
                     data-page-number-input>
-                        {% for i in range (1, paginationPages+1) %}
-                            {% if i == paginationOffset %}
+                        {% for i in range (1, pagination.max_pages+1) %}
+                            {% if i == pagination.page_number %}
                                 <option class="bx--select-option" value="{{ i }}" selected>{{ i }}</option>
                             {% else %}
                                 <option class="bx--select-option" value="{{ i }}">{{ i }}</option>
@@ -220,17 +220,17 @@
             </div>
 
             <label id="select-id-pagination-page-label" class="bx--pagination__text" for="select-id-pagination-page">
-                sur {{ paginationPages }} pages
+                sur {{ pagination.max_pages }} pages
             </label>
 
             <!-- Page navigation buttons -->
-            {% if paginationOffset > 1 %}
-                <a href="{{ url_for("zones", page=paginationOffset-1 )}}" class="bx--pagination__button bx--pagination__button--backward" tabindex="0" data-page-backward aria-label="Backward button">
+            {% if pagination.page_number > 1 %}
+                <a href="{{ url_for("zones", page=pagination.page_number-1 )}}" class="bx--pagination__button bx--pagination__button--backward" tabindex="0" data-page-backward aria-label="Backward button">
                     <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--pagination__nav-arrow" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M19 23L11 16 19 9 19 23z"></path></svg>
                 </a>
             {% endif %}
-            {% if paginationOffset < paginationPages %}
-                <a href="{{ url_for("zones", page=paginationOffset+1 )}}" class="bx--pagination__button bx--pagination__button--forward" tabindex="0" data-page-forward aria-label="Forward button">
+            {% if pagination.page_number < pagination.max_pages %}
+                <a href="{{ url_for("zones", page=pagination.page_number+1 )}}" class="bx--pagination__button bx--pagination__button--forward" tabindex="0" data-page-forward aria-label="Forward button">
                     <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--pagination__nav-arrow" width="20" height="20" viewBox="0 0 32 32" aria-hidden="true"><path d="M13 9L21 16 13 23 13 9z"></path></svg>
                 </a>
             {% endif %}

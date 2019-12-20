@@ -63,7 +63,7 @@ class TenantManagement:
         data = js.loads(response)
         #print("data", data)
         self.zonesCount = data['count']
-        self.zones.clear()
+        self.zones.clear() # In case of...
 
         for item in data['data']:
             obj = ZoneManagement(item['zone_id'])
@@ -77,13 +77,14 @@ class TenantManagement:
 
 
     # Get the list of all the NOT ASSIGNED devices of this tenant
-    async def setDevices(self):
-        response = await Request.getDevices(tenant_id=self.id)
+    async def setDevices(self, page=1, pagesize=20):
+        response = await Request.getDevices(self.id, page, pagesize)
         if response == Request.REQ_ERROR:
             return Request.REQ_ERROR
 
         data = js.loads(response)
         self.devicesCount = data['count']
+        self.devices.clear() # In cas of...
 
         for item in data['data']:
             obj = DeviceManagement(item['device_id'])
