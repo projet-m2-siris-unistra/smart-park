@@ -50,7 +50,7 @@ class CreationForm(BaseForm):
 
 # General configuration form
 class ConfigurationForm(CreationForm):
-    submit = SubmitField(
+    submitGen = SubmitField(
         widget=BXSubmit(),
         label='Enregistrer'
     )
@@ -69,7 +69,7 @@ class SpotsAddingForm(SanicForm):
         widget=BXSelect(),
         label='Capteur',
         description='Choisissez le capteur qui sera associé à cette place.',
-        validators=[DataRequired()],
+        #validators=[DataRequired()],
         coerce=int
     )
 
@@ -89,10 +89,10 @@ class SpotsAddingForm(SanicForm):
         widget=BXInput(input_type="text"),
         label='Coordonnés',
         description='Les coordonnés de la place remplis manuellement ou avec la carte ci-dessus.',
-        validators=[DataRequired(), Length(max=36)]
+        validators=[DataRequired(), Length(max=38)]
     )
 
-    submit = SubmitField(
+    submitSpots = SubmitField(
         widget=BXSubmit(),
-        label='Enregistrer'
+        label='Suivant'
     )

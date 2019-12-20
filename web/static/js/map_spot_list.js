@@ -7,6 +7,7 @@ if (spots != null) {
     // Add markers to map
     spots.forEach(function(marker) {
         marker = JSON.parse(marker);
+        console.debug("Marker: ", marker)
 
         // create a HTML element for each feature
         var el = document.createElement('div');

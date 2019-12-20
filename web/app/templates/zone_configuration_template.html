@@ -37,45 +37,40 @@
 <!-- General configuration tab -->
 <div id="tab-panel-1" class="tab-1" role="tabpanel" aria-labelledby="tab-link-1" aria-hidden="false" >
     
-        <div class="zone-div">
+    <div class="zone-div">
         
-            <form class="sp-formular" method="post">
+        <form class="sp-formular" method="post" name="formSpots">
+            {{ formSpots.csrf_token }}
+
+            <h4>Gérer les places</h4>
+            <label for="select-id" class="bx--label">Cliquer sur la zone pour ajouter une place.</label>
     
-                <h4>Gérer les places</h4>
-                <label for="select-id" class="bx--label">Cliquer sur la zone pour ajouter une place.</label>
+            <div id='map' class="spot-config-map"></div>
+
+            {{ formSpots.coordinatesInput }}
+
+            {{ formSpots.deviceSelect }}
+            
+            {{ formSpots.typeSelect }}
+
+            {{ formSpots.submitSpots }}
         
-                <div id='map' class="spot-config-map"></div>
-    
-                <!--
-                <div id="placed-spots">
-                    
-                </div>
-                -->
+        </form>
 
-                {{ formSpots.coordinatesInput }}
+        <script type="text/javascript">
+            window.spots = {{ spotList | safe }};
+            window.polygon = {{ zoneInstance.polygon | tojson }};
+            window.tenantCoor = {{ tenantInstance.coordinates }};
+            window.color = "{{ zoneInstance.color }}";
+            window.zone_id = {{ zone_id }};
+        </script>
+        
+        <script type="text/javascript" src="/static/js/map_create_map.js"></script>
+        <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
+        <script type="text/javascript" src="/static/js/map_spot_adding.js"></script>
+        <script type="text/javascript" src="/static/js/map_polygon_draw.js"></script>
 
-                {{ formSpots.deviceSelect }}
-                
-                {{ formSpots.typeSelect }}
-
-                {{ formSpots.submit }}
-            
-            </form>
-    
-            <script type="text/javascript">
-                window.spots = {{ spotList | safe }};
-                window.polygon = {{ zoneInstance.polygon | tojson }};
-                window.tenantCoor = {{ tenantInstance.coordinates }};
-                window.color = "{{ zoneInstance.color }}";
-                window.zone_id = {{ zone_id }};
-            </script>
-            
-            <script type="text/javascript" src="/static/js/map_create_map.js"></script>
-            <script type="text/javascript" src="/static/js/map_spot_list.js"></script>
-            <script type="text/javascript" src="/static/js/map_spot_adding.js"></script>
-            <script type="text/javascript" src="/static/js/map_polygon_draw.js"></script>
-    
-        </div>
+    </div>
 
 </div>
 
@@ -84,7 +79,7 @@
 <div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2" aria-hidden="true" hidden>
 
 
-    <form class="sp-formular" method="post">
+    <form class="sp-formular" method="post" name="formGeneral">
         {{ formGeneral.csrf_token }}
     
         <div class="zone-div">
@@ -98,7 +93,7 @@
     
                 {{ formGeneral.color }}
     
-                {{ formGeneral.submit }}
+                {{ formGeneral.submitGen }}
                 
                 <!-- Suppression de la zone -->
                 <button class="bx--btn bx--btn--danger" type="button" data-modal-target="#modal-delete">Supprimer</button>

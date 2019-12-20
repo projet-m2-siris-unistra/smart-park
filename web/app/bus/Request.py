@@ -137,36 +137,38 @@ async def getSpot(spot_id):
     return response.data.decode("utf-8")
 
 
+
+# Creatng a spot
+async def createSpot(zone_id, device_id, type, coordinates):
+    print("coordinates: ", coordinates)
+    request = json.dumps({
+        'zone_id' : int(zone_id),
+        'type' : type,
+        'device_id' : device_id,
+        'geo' : str(coordinates)
+    })
+    print("createSpot request = ", request)
+    
+    try:
+        response = await nc.request("places.new", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> createSpot -> timeout reached")
+        return REQ_ERROR
+
+    print("RESPONSE: ", response.data.decode("utf-8"))
+    return REQ_OK
+
+
 # Request spot infos
 async def getDevice(device_id):
     request = json.dumps({'device_id' : int(device_id)})
     try:
         response = await nc.request("devices.get", bytes(request, "utf-8"), timeout=1)
     except ErrTimeout:
-        print("WARNING: bus/Request.py -> getevice -> timeout reached")
+        print("WARNING: bus/Request.py -> getDevice -> timeout reached")
         return REQ_ERROR
 
     return response.data.decode("utf-8")
-
-
-# Creatng a spot
-async def createSpot(zone_id, device_id, type, coordinates,):
-    request = json.dumps({
-        'zone_id' : int(zone_id),
-        'type' : type,
-        'device_id' : device_id,
-        'geo' : coordinates
-    })
-    print("createDevice request = ", request)
-    
-    try:
-        response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=1)
-    except ErrTimeout:
-        print("WARNING: bus/Request.py -> createSpot -> timeout reached")
-        return REQ_ERROR
-
-    return REQ_OK
-
 
 
 # Request all devices of a tenant

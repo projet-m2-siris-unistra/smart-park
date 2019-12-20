@@ -108,10 +108,10 @@ async def zones(request):
         request,
         tenantInstance=tenantInstance,
         zonesList=zonesJson,
-        paginationLimit=limit,
-        paginationOffset=offset,
-        paginationElements=count,
-        paginationPages=pages
+        paginationLimit=limit,      # page size
+        paginationOffset=offset,    # current page 
+        paginationElements=count,   # total nb of elements
+        paginationPages=pages       # total nb of pages
     )
     return response.html(rendered_template)
 

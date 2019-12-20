@@ -113,7 +113,8 @@ async def config(request, zone_id):
     await zoneInstance.init(zone_id)
     await zoneInstance.setSpots()
     
-    formGeneral = ConfigurationForm(request, zoneInstance)
+    formGeneral = ConfigurationForm(request, zoneInstance, prefix="genForm")
+    formSpots = SpotsAddingForm(request, prefix="spotsForm")
 
     # We need the not assigned devices from this tenant
     deviceList = await tenantInstance.getNotAssignedDevices()
@@ -121,8 +122,11 @@ async def config(request, zone_id):
         raise ServerError("Impossible de charger les capteurs non assignés.")
     
     # Creating form and setting device selection
-    formSpots = SpotsAddingForm(request)
     formSpots.deviceSelect.choices = deviceList
+    
+    # Informing user if no device is available
+    if deviceList is None:
+        formSpots.deviceSelect.description = "ATTENTION : aucun capteur disponible !"
 
     # Handling general configuration
     if formGeneral.validate_on_submit():
@@ -133,7 +137,7 @@ async def config(request, zone_id):
             # zoneInstance.delete()
             return response.redirect("/dashboard")
 
-        elif formGeneral.submit.data:
+        elif formGeneral.submitGen.data:
             print("General form validated")
             res = await Request.updateZone(
                 zone_id=zone_id,
@@ -146,26 +150,21 @@ async def config(request, zone_id):
             if res == Request.REQ_ERROR:
                 raise ServerError("impossible de mettre à jour la zone", 500)
             changes = True
-    
-    print("errors: ", formSpots.deviceSelect.errors)
-    print("device data: ", formSpots.deviceSelect.data)
-    print("type data: ", formSpots.typeSelect.data)
-    print("coordinates: ", formSpots.coordinatesInput.data)
-
-    print("errors form: ", formSpots.submit.errors)
+            
 
     # Checking if user wants to add spots
     if formSpots.validate_on_submit():
         print("Spot adding form validated")
+        lnglat = formSpots.coordinatesInput.data.split(',')
 
         res = await Request.createSpot(
             zone_id=zone_id,
             device_id=formSpots.deviceSelect.data,
             type=formSpots.typeSelect.data,
-            coordinates=formSpots.coordinatesInput
+            coordinates=[float(lnglat[0]) ,float(lnglat[1])]
         )
         if res == Request.REQ_ERROR:
-            raise ServerError("impossible d'ajouter une place'", 500)
+            raise ServerError("impossible d'ajouter une place", 500)
         return response.redirect("/parking/zone/"+zone_id+"/spots")
 
     rendered_template = await render(

@@ -109,7 +109,6 @@ class TenantManagement:
         for item in data['data']:
             devList.append((item['device_id'], item['device_eui']))
         
-        print("devList=", devList)
         return devList
         
 

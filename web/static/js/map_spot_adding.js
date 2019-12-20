@@ -46,7 +46,7 @@ function validate_marker() {
     addedMarkerList.push(coordinates);
 
     // push the coordinates into the input field
-    document.getElementById('coordinatesInput').value = coorString;
+    document.getElementById('spotsForm-coordinatesInput').value = coorString;
 
     // if not set, enable validating button
     count++;
