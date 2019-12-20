@@ -120,13 +120,10 @@ func GetDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
 
 	var devices []Device
 	var device Device
-	var i int
 	var d *string
 	var tmp null.String
 
 	limite, offset = CheckArgDevice(limite, offset)
-
-	i = 0
 
 	rows, err := pool.QueryContext(ctx,
 		`SELECT DISTINCT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
@@ -158,7 +155,6 @@ func GetDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
 			}
 		}
 		devices = append(devices, device)
-		i = i + 1
 	}
 
 	// get any error encountered during iteration
@@ -170,24 +166,21 @@ func GetDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
 	return devices, nil
 }
 
-// GetFreeDevices : get all the avalaible devices
-func GetFreeDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
+// GetFreeDevices : get all the free devices
+func GetFreeDevices(ctx context.Context, limite int, offset int, tenantID int) ([]Device, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	var devices []Device
 	var device Device
-	var i int
 	var d *string
 	var tmp null.String
 
 	limite, offset = CheckArgDevice(limite, offset)
 
-	i = 0
-
 	rows, err := pool.QueryContext(ctx,
 		`SELECT DISTINCT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices
-		WHERE state='free' LIMIT $1 OFFSET $2`, limite, offset)
+		WHERE state='free' AND tenant_id = $1 LIMIT $2 OFFSET $3`, tenantID, limite, offset)
 
 	if err != nil {
 		return devices, err
@@ -215,7 +208,63 @@ func GetFreeDevices(ctx context.Context, limite int, offset int) ([]Device, erro
 			}
 		}
 		devices = append(devices, device)
-		i = i + 1
+	}
+
+	// get any error encountered during iteration
+	err = rows.Err()
+	if err != nil {
+		return devices, err
+	}
+
+	return devices, nil
+}
+
+
+// GetNotAssignedDevices : get all the not assigned devices
+func GetNotAssignedDevices(ctx context.Context, limite int, offset int, tenantID int) ([]Device, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var devices []Device
+	var device Device
+	var d *string
+	var tmp null.String
+
+	limite, offset = CheckArgDevice(limite, offset)
+
+	rows, err := pool.QueryContext(ctx,
+		`SELECT device_id, battery, state, tenant_id, device_eui, created_at, updated_at FROM devices 
+		WHERE tenant_id = $1 AND device_id NOT IN (
+			SELECT DISTINCT device_id FROM places WHERE device_id is not null
+			) 
+		LIMIT $2 OFFSET $3`, tenantID, limite, offset)
+
+	if err != nil {
+		return devices, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
+			&device.CreatedAt, &device.UpdatedAt)
+		if err != nil {
+			return devices, err
+		}
+		if tmp.IsZero() == true {
+			device.State = NotAssigned
+		} else {
+			d = tmp.Ptr()
+			switch *d {
+			case "free":
+				device.State = Free
+			case "occupied":
+				device.State = Occupied
+			default:
+				device.State = NotAssigned
+			}
+		}
+		devices = append(devices, device)
 	}
 
 	// get any error encountered during iteration
@@ -363,7 +412,88 @@ func NewDevice(ctx context.Context, battery int, state string, tenantID int,
 
 /********************************** CREATE **********************************/
 
+/********************************** DELETE **********************************/
+
+// DeleteDevice : delete a device
+func DeleteDevice(ctx context.Context, deviceID int) (DeviceResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var device DeviceResponse
+
+	device.DeviceID = -1
+
+	// verify if the device is assigned or not 
+	err := pool.QueryRowContext(ctx, `
+		SELECT DISTINCT device_id
+		FROM devices WHERE device_id = $1 AND device_id NOT IN (
+			SELECT DISTINCT device_id FROM places WHERE device_id is not null
+		) 
+	`, deviceID).Scan(&device.DeviceID)
+
+	// the device is assigned
+	if err != nil {
+		log.Printf("device_id %d is assigned, delete impossible\n", deviceID)
+		return device, err
+	}
+
+	// delete the device
+	err = pool.QueryRowContext(ctx, `
+		DELETE FROM devices WHERE device_id = $1 RETURNING device_id
+	`, deviceID).Scan(&device.DeviceID)
+
+	if err == sql.ErrNoRows {
+		log.Printf("no device with id %d\n", deviceID)
+		return device, err
+	}
+
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return device, err
+	}
+
+	return device, nil
+}
+
+/********************************** DELETE **********************************/
+
+
 /********************************** OPTIONS **********************************/
+
+// CountDeviceFree : count number of rows
+func CountDeviceFree(ctx context.Context, tenantID int) (int, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	
+	var count int
+
+	count = -1
+
+	row := pool.QueryRow("select count(*) from devices where tenant_id = $1 and state='free'", tenantID)
+	err := row.Scan(&count)
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
+// CountDeviceNotAssigned : count number of rows
+func CountDeviceNotAssigned(ctx context.Context, tenantID int) (int, error) {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	
+	var count int
+
+	count = -1
+
+	row := pool.QueryRow("select count(*) from devices where tenant_id = $1 and device_id not in (select distinct device_id from places where device_id is not null)", tenantID)
+	err := row.Scan(&count)
+	if err != nil {
+		return count, err
+	}
+	return count, nil
+}
+
 
 // CountDevice : count number of rows
 func CountDevice(ctx context.Context) (int, error) {

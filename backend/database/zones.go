@@ -122,13 +122,10 @@ func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone
 
 	var zones []Zone
 	var zone Zone
-	var i int
 	var tmp null.String
 	var d *string
 
 	limite, offset = CheckArgZone(limite, offset)
-
-	i = 0
 
 	rows, err := pool.QueryContext(ctx,
 		`SELECT DISTINCT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
@@ -161,7 +158,6 @@ func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone
 			}
 		}
 		zones = append(zones, zone)
-		i = i + 1
 	}
 
 	// get any error encountered during iteration

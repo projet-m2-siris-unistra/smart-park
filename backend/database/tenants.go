@@ -54,11 +54,8 @@ func GetTenants(ctx context.Context, limite int, offset int) ([]Tenant, error) {
 
 	var tenants []Tenant
 	var tenant Tenant
-	var i int
  
 	limite, offset = CheckArgTenant(limite, offset)
-
-	i = 0
 
 	rows, err := pool.QueryContext(ctx,
 		`SELECT DISTINCT tenant_id, name, geo, created_at, updated_at 
@@ -77,7 +74,6 @@ func GetTenants(ctx context.Context, limite int, offset int) ([]Tenant, error) {
 			return tenants, err
 		}
 		tenants = append(tenants, tenant)
-		i = i + 1
 	}
 	
 	// get any error encountered during iteration

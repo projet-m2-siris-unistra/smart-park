@@ -292,7 +292,7 @@ func NewGeoZone() (string, error) {
 
 // TypeZoneRandom : return a type zone
 func TypeZoneRandom() string {
-	n := Random(1, 4)
+	n := Random(0, 4)
 	if n == 1 {
 		return "paid"
 	} else if n == 2 {
@@ -304,7 +304,7 @@ func TypeZoneRandom() string {
 
 // StateDeviceRandom : return a type zone
 func StateDeviceRandom() string {
-	n := Random(1, 3)
+	n := Random(1, 5)
 	if n == 1 {
 		return "occupied"
 	}

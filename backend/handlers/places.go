@@ -61,6 +61,12 @@ func getPlaces(ctx context.Context, request getPlacesRequest) (resultListPlace, 
 	return result, nil
 }
 
+func getPlaceWithNoDevice(ctx context.Context) ([]database.Place, error) {
+	log.Println("handlers: handling getPlaceWithNoDevice")
+
+	return database.GetPlacesWithNoDevice(ctx)
+}
+
 /********************************** GET **********************************/
 
 /********************************** UPDATE **********************************/
@@ -85,11 +91,6 @@ func newPlace(ctx context.Context, request newPlaceRequest) (database.PlaceRespo
 /********************************** CREATE **********************************/
 
 /********************************** DELETE **********************************/
-func freePlace(ctx context.Context, request getPlaceRequest) (database.PlaceResponse, error) {
-	log.Println("handlers: handling freePlace")
-
-	return database.DeleteDevice(ctx, request.PlaceID)
-}
 
 func deletePlace(ctx context.Context, request getPlaceRequest) (database.PlaceResponse, error) {
 	log.Println("handlers: handling deletePlace")

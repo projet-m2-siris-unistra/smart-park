@@ -13,7 +13,8 @@ import (
 var handlers = map[string]interface{}{
 	"ping":             ping, 				// ping database server
 	"devices.get":      getDevice, 			// get a device by its id
-	"devices.get.notassigned": getFreeDevices, 	// get all free devices
+	"devices.get.notassigned": getNotAssignedDevices, 	// get all not assigned devices
+	"devices.get.free": getFreeDevices, 	// get all free devices
 	"tenants.get":      getTenant, 			// get a tenant by its id
 	"zones.get":        getZone, 			// get a zone by its id 
 	"places.get":       getPlace, 			// get a places by its id
@@ -31,9 +32,9 @@ var handlers = map[string]interface{}{
 	"devices.new":      newDevice, 			// create new device
 	"places.new":       newPlace, 			// create new place
 	"zones.new":        newZone, 			// create new zone
-	"places.free":		freePlace,			// free the place and update the state device to 'free'
-	"places.delete":	deletePlace,		// remove the place and update the state device to 'free'
-	"zones.delete":		deleteZone,			// remove the zone and all places and update all state device to 'free'
+	"places.delete":	deletePlace,		// remove the place 
+	"zones.delete":		deleteZone,			// remove the zone and all places
+	"devices.delete":	deleteDevice,			// remove the device
 	"faker.new":		createFakeData, 	// create fake data into the database (all tables)
 }
 

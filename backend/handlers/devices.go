@@ -14,6 +14,7 @@ type getDeviceRequest struct {
 type getDevicesRequest struct {
 	Limite int `json:"limit,omitempty"`
 	Offset int `json:"offset,omitempty"`
+	TenantID int `json:"tenant_id,omitempty"`
 }
 
 type updateDeviceRequest struct {
@@ -48,11 +49,27 @@ func getFreeDevices(ctx context.Context, request getDevicesRequest) (resultListD
 
 	var result resultListDevice
 	var err error 
-	result.Count, err = database.CountDevice(ctx)
+	result.Count, err = database.CountDeviceFree(ctx, request.TenantID)
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetFreeDevices(ctx, request.Limite, request.Offset)
+	result.Data, err = database.GetFreeDevices(ctx, request.Limite, request.Offset, request.TenantID)
+	if err != nil {
+		return result, err
+	}
+	return result, nil
+}
+
+func getNotAssignedDevices(ctx context.Context, request getDevicesRequest) (resultListDevice, error) {
+	log.Println("handlers: handling getNotAssignedDevices")
+
+	var result resultListDevice
+	var err error 
+	result.Count, err = database.CountDeviceNotAssigned(ctx, request.TenantID)
+	if err != nil {
+		return result, err
+	}
+	result.Data, err = database.GetNotAssignedDevices(ctx, request.Limite, request.Offset, request.TenantID)
 	if err != nil {
 		return result, err
 	}
@@ -96,3 +113,13 @@ func newDevice(ctx context.Context, request newDeviceRequest) (database.DeviceRe
 }
 
 /********************************** CREATE **********************************/
+
+/********************************** DELETE **********************************/
+
+func deleteDevice(ctx context.Context, request getDeviceRequest) (database.DeviceResponse, error) {
+	log.Println("handlers: handling deleteDevice")
+
+	return database.DeleteDevice(ctx, request.DeviceID)
+}
+
+/********************************** DELETE **********************************/
