@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% block extra_inclusions %}
+<script src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+{% endblock %}
+
+
 {% block content %}
 
     {% include "breadcrumbs_spot.html" %}
@@ -10,6 +16,9 @@
         {% include "spot_overview.html" %}
     {% elif active_tab_stats %}
         {% include "stats_widget.html" %}
+    {% elif active_tab_config %}
+        {% include "spot_configuration.html" %}    
     {% endif %}
+    
 
 {% endblock %}

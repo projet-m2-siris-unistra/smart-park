@@ -1,5 +1,44 @@
-<div class="spot-div">
-    <h4>Général</h4>
+<div class="sp-formular">
+    
     <br>
+
+    <h4>Général</h4>
+    
+    <br>
+
+    <div id="map-show-button-div">
+        <label for="text-input-3" class="bx--label">Coordonnées</label>
+        <div class="bx--form__helper-text">
+            À l'aide de cette carte vous pouvez modifier automatiquement les coordonnées ci-dessous.
+        </div>
+    </div>
+
+    <div id="map" class="spot-config-map"></div>
+
+    <form method="POST" name="general-form">
+        {{ form.csrf_token }}
+        
+        {{ form.coordinates }}
+
+        {{ form.device }}
+
+        {{ form.type }}
+
+        {{ form.submit }}
+    </form>
     
 </div>
+
+<script type="text/javascript">
+
+    window.tenantCoor = {{ tenantInstance.coordinates }};
+    window.zone_id = {{ zoneInstance.id }};
+    window.polygon = {{ zoneInstance.polygon | tojson }};
+    window.color = "{{ zoneInstance.color }}";
+    window.spotCoor = {{ spotInstance.coordinates }};
+
+</script>
+
+<script src="/static/js/map_create_map.js"></script>
+<script src="/static/js/map_polygon_draw.js"></script>
+<script src="/static/js/map_spot_modifying.js"></script>

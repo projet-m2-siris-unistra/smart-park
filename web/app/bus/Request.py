@@ -153,6 +153,24 @@ async def createSpot(zone_id, device_id, type, coordinates):
     return REQ_OK
 
 
+async def updateSpot(spot_id, device_id, type, coordinates):
+    request = json.dumps({
+        'place_id' : int(spot_id),
+        'device_id' : int(device_id),
+        'type' : type,
+        'geo' : str(coordinates)
+    })
+    print("updateSpot request = ", request)
+
+    try:
+        response = await nc.request("places.update", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> updateSpot -> timeout reached")
+        return REQ_ERROR
+    print("response: ", response.data.decode("utf-8"))
+    return REQ_OK
+
+
 # Request spot infos
 async def getDevice(device_id):
     request = json.dumps({'device_id' : int(device_id)})

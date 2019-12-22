@@ -69,7 +69,7 @@ class SpotsAddingForm(SanicForm):
         widget=BXSelect(),
         label='Capteur',
         description='Choisissez le capteur qui sera associé à cette place.',
-        #validators=[DataRequired()],
+        validators=[DataRequired()],
         coerce=int
     )
 

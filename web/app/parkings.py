@@ -235,7 +235,7 @@ class ZoneManagement:
                     item['type'],
                     item['device_id']
                 )
-                await obj.setDevice(item['device_id'])
+                await obj.setDevice()
                 self.spots.append(obj)
 
 
@@ -322,18 +322,19 @@ class SpotManagement:
         self.coordinates = data['geo']
         self.type = data['type']
         self.name = "PLACE-" + str(spot_id)
-        device_id = data['device_id']
+        self.device_id = data['device_id']
 
 
     def staticInit(self, spot_id, coordinates, type, device_id):
         self.coordinates = coordinates
         self.type = type
         self.name = "PLACE-" + str(spot_id)
+        self.device_id = device_id
 
 
-    async def setDevice(self, device_id):
-        deviceInstance = DeviceManagement(device_id)
-        response = await deviceInstance.init(device_id)
+    async def setDevice(self):
+        deviceInstance = DeviceManagement(self.device_id)
+        response = await deviceInstance.init(self.device_id)
         if response == Request.REQ_ERROR:
             return Request.REQ_ERROR
         

@@ -15,6 +15,9 @@ map.on('click', 'zone-polygon-' + zone_id, function(e) {
         console.debug("*Valid click*");
     
         var coordinates = e.lngLat.wrap();
+        console.debug("new marker coordinates: ", coordinates);
+        console.debug("new marker coordinates JSON: ", JSON.stringify(coordinates));
+
         currentMarker = new mapboxgl.Marker({
             draggable: true
         })

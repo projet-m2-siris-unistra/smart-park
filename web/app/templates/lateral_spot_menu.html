@@ -13,7 +13,7 @@
             <li class="bx--tabs__nav-item {% if active_tab_stats %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
                 <a class="bx--tabs__nav-link" href="{{ url_for("spots.stats", spot_id=spot_id, zone_id=zone_id) }}">Statistiques</a>
             </li>
-            <li class="bx--tabs__nav-item {% if active_tab_maintenance %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
+            <li class="bx--tabs__nav-item {% if active_tab_maintenance %}bx--tabs__nav-item--selected{% endif %}  bx--tabs__nav-item--disabled" role="presentation"  aria-disabled="true">
                 <a class="bx--tabs__nav-link" href="{{ url_for("spots.maintenance", spot_id=spot_id, zone_id=zone_id) }}">Maintenance</a>
             </li>
             <li class="bx--tabs__nav-item {% if active_tab_config %}bx--tabs__nav-item--selected{% endif %}" role="presentation">
