@@ -61,19 +61,19 @@ class TenantManagement:
             return Request.REQ_ERROR
 
         data = js.loads(response)
-        #print("data", data)
         self.zonesCount = data['count']
         self.zones.clear() # In case of...
-
-        for item in data['data']:
-            obj = ZoneManagement(item['zone_id'])
-            obj.staticInit(
-                name=item['name'],
-                type=item['type'],
-                color='#' + item['color'],
-                polygon=item['geo']
-            )
-            self.zones.append(obj)
+        
+        if data['data'] is not None:
+            for item in data['data']:
+                obj = ZoneManagement(item['zone_id'])
+                obj.staticInit(
+                    name=item['name'],
+                    type=item['type'],
+                    color='#' + item['color'],
+                    polygon=item['geo']
+                )
+                self.zones.append(obj)
 
 
     # Get the list of all the NOT ASSIGNED devices of this tenant

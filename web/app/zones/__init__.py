@@ -131,12 +131,17 @@ async def config(request, zone_id):
     # Handling general configuration
     if formGeneral.validate_on_submit():
 
+        # Deletion clicked 
         if formGeneral.delete.data:
             print("Zone deletion")
-            # Call zone deletion method
-            # zoneInstance.delete()
-            return response.redirect("/dashboard")
+            res = await Request.deleteZone(zoneInstance.id)
+            if res == Request.REQ_ERROR:
+                raise ServerError("erreur lors de la suppression de la zone")
+            else:
+                print("RES: ", res)
+                return response.redirect("/dashboard")
 
+        # General form validated
         elif formGeneral.submitGen.data:
             print("General form validated")
             res = await Request.updateZone(

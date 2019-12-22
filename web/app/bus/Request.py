@@ -62,7 +62,6 @@ async def getZones(tenant_id, page, pagesize):
         print("WARNING: bus/Request.py -> getZones -> timeout reached")
         return REQ_ERROR
 
-    print(response.data.decode("utf-8"))
     return response.data.decode("utf-8")
 
 
@@ -102,6 +101,21 @@ async def updateZone(zone_id, tenant_id, name, type, color, polygon):
         response = await nc.request("zones.update", bytes(request, "utf-8"), timeout=1)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> updateZone -> timeout reached")
+        return REQ_ERROR
+    
+    return REQ_OK
+
+
+async def deleteZone(zone_id):
+    request = json.dumps({
+        'zone_id' : int(zone_id)
+    })
+    print("deleteZone request = ", request)
+    
+    try:
+        response = await nc.request("zones.delete", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> deleteZone -> timeout reached")
         return REQ_ERROR
     
     return REQ_OK
