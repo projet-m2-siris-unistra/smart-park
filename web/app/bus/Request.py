@@ -278,3 +278,18 @@ async def createDevice(tenant_id, eui, name):
     print("INFO: device created with device_id=", 
         json.loads(response.data.decode("utf-8"))['device_id'])
     return REQ_OK
+
+
+async def deleteDevice(device_id):
+    request = json.dumps({
+        'device_id' : int(device_id)
+    })
+    print("deleteDevice request = ", request)
+    
+    try:
+        response = await nc.request("devices.delete", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> deleteDevice -> timeout reached")
+        return REQ_ERROR
+    
+    return REQ_OK

@@ -20,7 +20,7 @@ bp = Blueprint("devices", url_prefix='/devices')
 
 
 # List of devices
-@bp.route("/list")
+@bp.route("/list", methods=['GET', 'POST'])
 async def view(request):
     tenantInstance = TenantManagement(tenant_id=1)
     await tenantInstance.init(tenant_id=1)
@@ -31,6 +31,14 @@ async def view(request):
         pagesize=pagination.page_size
     )
     pagination.setElementsNumber(tenantInstance.devicesCount)
+
+    # User wants to delete the device
+    if request.method == 'POST':
+        print("Deletion of device_id : ", request.form.get('device-id'))
+        res = await Request.deleteDevice(request.form.get('device-id'))
+        if res == Request.REQ_ERROR:
+            raise ServerError("impossible de supprimer le device")
+        return response.redirect("/dashboard")
 
     rendered_template = await render(
         "devices_template.html", 

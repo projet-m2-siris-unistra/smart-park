@@ -2,6 +2,22 @@
     
 {% block content %}
 
-{% include "devices_creation_form.html" %}
+<form class="sp-formular" method="POST">
+
+    {{ form.csrf_token }}
+    
+    <h3>Ajout d'un capteur</h3>
+
+    <section>
+
+        {{ form.name }}
+
+        {{ form.eui }}
+
+        {{ form.submit }}
+    
+    </section>
+
+</form>
 
 {% endblock %}

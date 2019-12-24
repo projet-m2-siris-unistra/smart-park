@@ -26,3 +26,12 @@ class CreationForm(SanicForm):
         widget=BXSubmit(),
         label='Enregistrer'
     )
+
+
+# Devices deleting form
+class DeletionForm(SanicForm):
+    delete = SubmitField(
+        widget=BXSubmit(),
+        render_kw={'color': 'danger'},
+        label='Supprimer'
+    )

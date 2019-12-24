@@ -62,33 +62,25 @@
         <th >
               <span class="bx--table-header-label">Batterie</span>
         </th>
+        <th >
+            <span></span>
+        </th>
       </tr>
     </thead>
+
 
     <!-- data table elements -->
     {% for device in devices %}
 
-      <tbody>
-        <tr >
-          <td >
-            {{ device.id }}
-          </td>
-          <td>
-            {{ device.eui }}
-          </td>
-          <td >
-            {{ device.state }}
-          </td>
-          <td >
-            {{ device.battery }}%
-          </td>
-        </tr>
-      </tbody>
+      {% include "device_element.html" %}
     
     {% endfor %}
-        
+    
+    
   </table>
+
   
+
   <!-- Pagination -->
   <div class="bx--pagination" data-pagination>
     <div class="bx--pagination__left">

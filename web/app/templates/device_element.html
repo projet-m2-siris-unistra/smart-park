@@ -1,0 +1,73 @@
+<tbody>
+    <tr >
+      <td >
+        {{ device.id }}
+      </td>
+      <td>
+        {{ device.eui }}
+      </td>
+      <td >
+        {{ device.state }}
+      </td>
+      <td >
+        {{ device.battery }}%
+      </td>
+
+      <!-- expand icon td -->
+      <td class="bx--table-column-menu">
+        <div data-overflow-menu role="menu" tabindex="0" aria-label="Overflow menu description" class="bx--overflow-menu">
+            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--overflow-menu__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="3" r="1"></circle><circle cx="8" cy="8" r="1"></circle>
+              <circle cx="8" cy="13" r="1"></circle>
+            </svg>
+            <ul class="bx--overflow-menu-options bx--overflow-menu--flip">              
+              <li class="bx--overflow-menu-options__option bx--table-row--menu-option">
+
+                <!-- Suppression du capteur -->
+                <button class="bx--overflow-menu-options__btn" type="button" data-modal-target="#modal-delete-{{ device.id }}">
+                  <div class="bx--overflow-menu-options__option-content">
+                    <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 6H7V12H6zM9 6H10V12H9z"></path><path d="M2 3v1h1v10c0 .6.4 1 1 1h8c.6 0 1-.4 1-1V4h1V3H2zM4 14V4h8v10H4zM6 1H10V2H6z"></path></svg> 
+                    Supprimer
+                  </div>
+                </button>
+
+              </li>
+            </ul>
+
+        </div>
+      </td>
+    </tr>
+
+  </tbody>
+
+<!-- Modal pour suppression -->
+<div data-modal id="modal-delete-{{ device.id }}" class="bx--modal bx--modal--danger" role="dialog" aria-modal="true" aria-labelledby="modal-delete-label" aria-describedby="modal-delete-heading" tabindex="-1">
+    <div class="bx--modal-container">
+        <div class="bx--modal-header">
+            <p class="bx--modal-header__heading bx--type-beta" id="modal-delete-heading">Suppression du capteur</p>
+            <button class="bx--modal-close" type="button" data-modal-close aria-label="close modal" >
+                <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--modal-close__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M12 4.7L11.3 4 8 7.3 4.7 4 4 4.7 7.3 8 4 11.3 4.7 12 8 8.7 11.3 12 12 11.3 8.7 8z"></path></svg>
+            </button>
+        </div>
+
+        <!-- Note: Modals with content that scrolls, at any viewport, reqe la placeuires `tabindex="0"` on the `bx--modal-content` element -->
+        <div class="bx--modal-content" >
+            <p>
+            Vous êtes sur le point de supprimer le capteur {{ device.eui }}.
+            La suppression de ce capteur sera définitive. Si ce capteur est associé à une place,
+            la suppression sera bloquée. Veuillez d'abord assigné un nouveau capteur à la place de ce capteur.
+            </p>
+        </div>
+
+        <div class="bx--modal-footer">
+            <button class="bx--btn bx--btn--secondary" type="button" data-modal-close>Annuler</button>
+            
+            <form method="POST">
+                <input name="device-id" type="hidden" value="{{ device.id }}" />
+                <button type="submit" class="bx--btn bx--btn--danger" >Supprimer</button>
+            </form>
+        </div>
+    </div>
+    <!-- Note: focusable span allows for focus wrap feature within Modals -->
+    <span tabindex="0"></span>
+</div>
