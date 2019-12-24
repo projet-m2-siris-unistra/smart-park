@@ -145,7 +145,6 @@ async def getSpot(spot_id):
     return response.data.decode("utf-8")
 
 
-
 # Creatng a spot
 async def createSpot(zone_id, device_id, type, coordinates):
     print("coordinates: ", coordinates)
@@ -182,6 +181,21 @@ async def updateSpot(spot_id, device_id, type, coordinates):
         print("WARNING: bus/Request.py -> updateSpot -> timeout reached")
         return REQ_ERROR
     print("response: ", response.data.decode("utf-8"))
+    return REQ_OK
+
+
+async def deleteSpot(spot_id):
+    request = json.dumps({
+        'place_id' : int(spot_id)
+    })
+    print("deleteSpot request = ", request)
+    
+    try:
+        response = await nc.request("places.delete", bytes(request, "utf-8"), timeout=1)
+    except ErrTimeout:
+        print("WARNING: bus/Request.py -> deleteSpot -> timeout reached")
+        return REQ_ERROR
+    
     return REQ_OK
 
 

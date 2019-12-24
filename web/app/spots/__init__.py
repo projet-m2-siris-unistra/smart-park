@@ -128,19 +128,28 @@ async def config(request, spot_id, zone_id):
 
     # Form validation check & request
     if form.validate_on_submit():
-        print("Form validated")
-        lnglat = form.coordinates.data.split(',')
         
         # The actual update request to the queue
-        res = await Request.updateSpot(
-            spot_id=spotInstance.id,
-            device_id=form.device.data,
-            type=form.type.data,
-            coordinates=[float(lnglat[0]) ,float(lnglat[1])]
-        )
-        if res == Request.REQ_ERROR:
-            raise ServerError("Impossible de mettre à jour la place.")
-        return response.redirect("/parking/zone/"+zone_id+"/spot/"+spot_id)
+        if form.submit.data:
+            print("Submit validated")
+            lnglat = form.coordinates.data.split(',')
+            res = await Request.updateSpot(
+                spot_id=spotInstance.id,
+                device_id=form.device.data,
+                type=form.type.data,
+                coordinates=[float(lnglat[0]) ,float(lnglat[1])]
+            )
+            if res == Request.REQ_ERROR:
+                raise ServerError("Impossible de mettre à jour la place.")
+            return response.redirect("/parking/zone/"+zone_id+"/spot/"+spot_id)
+
+        # Handling place deletion
+        elif form.delete.data:
+            print("spot deletion")
+            res = await Request.deleteSpot(spotInstance.id)
+            if res == Request.REQ_ERROR:
+                raise ServerError("impossible de supprimer la place.")
+            return response.redirect("/parking/zone/"+zone_id)
 
     rendered_template = await render(
         'spot_template.html', 

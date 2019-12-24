@@ -25,12 +25,45 @@
         {{ form.type }}
 
         {{ form.submit }}
+
+        <!-- Suppression de la zone -->
+        <button class="bx--btn bx--btn--danger" type="button" data-modal-target="#modal-delete">Supprimer</button>
+    
+        <div data-modal id="modal-delete" class="bx--modal bx--modal--danger" role="dialog" aria-modal="true" aria-labelledby="modal-delete-label" aria-describedby="modal-delete-heading" tabindex="-1">
+            <div class="bx--modal-container">
+                <div class="bx--modal-header">
+                    <p class="bx--modal-header__heading bx--type-beta" id="modal-delete-heading">Suppression de la place</p>
+                    <button class="bx--modal-close" type="button" data-modal-close aria-label="close modal" >
+                        <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--modal-close__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M12 4.7L11.3 4 8 7.3 4.7 4 4 4.7 7.3 8 4 11.3 4.7 12 8 8.7 11.3 12 12 11.3 8.7 8z"></path></svg>
+                    </button>
+                </div>
+        
+                <!-- Note: Modals with content that scrolls, at any viewport, requires `tabindex="0"` on the `bx--modal-content` element -->
+                <div class="bx--modal-content" >
+                    <p>
+                        Vous êtes sur le point de supprimer la place {{ spotInstance.name }}.
+                        La suppression de la place sera définitive. Le capteur associé sera alors
+                        considéré comme "non assigné".
+                    </p>
+                </div>
+
+                <div class="bx--modal-footer">
+                    <button class="bx--btn bx--btn--secondary" type="button" data-modal-close>Annuler</button>
+                
+                    {{ form.delete }}
+                
+                </div>
+            </div>
+            <!-- Note: focusable span allows for focus wrap feature within Modals -->
+            <span tabindex="0"></span>
+        </div>
     </form>
     
 </div>
 
 <script type="text/javascript">
 
+    // map is centered over tenantCoor
     window.tenantCoor = {{ tenantInstance.coordinates }};
     window.zone_id = {{ zoneInstance.id }};
     window.polygon = {{ zoneInstance.polygon | tojson }};

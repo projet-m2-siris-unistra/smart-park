@@ -39,3 +39,9 @@ class ConfigurationForm(SanicForm):
         widget=BXSubmit(),
         label='Enregistrer'
     )
+
+    delete = SubmitField(
+        widget=BXSubmit(),
+        render_kw={'color': 'danger'},
+        label='Supprimer'
+    )
