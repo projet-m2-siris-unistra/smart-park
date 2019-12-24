@@ -39,6 +39,7 @@ class TenantManagement:
         self.id = tenant_id
         self.zones = []
         self.devices = []
+        self.notAssignedDevices = []
         # default data to see if DB requests are doing well
         self.name = "NOT UPDATED"
         self.coordinates = [7.9726, 49.0310] # Altenstadt (FR,67)
@@ -76,7 +77,7 @@ class TenantManagement:
                 self.zones.append(obj)
 
 
-    # Get the list of all the NOT ASSIGNED devices of this tenant
+    # Get the list of all devices of this tenant
     async def setDevices(self, page=1, pagesize=20):
         response = await Request.getDevices(self.id, page, pagesize)
         if response == Request.REQ_ERROR:
@@ -97,10 +98,33 @@ class TenantManagement:
             self.devices.append(obj)
 
 
+    # Get the list of all the NOT ASSIGNED devices of this tenant
+    async def setNotAssignedDevices(self, page=1, pagesize=20):
+        response = await Request.getNotAssignedDevices(self.id, page, pagesize)
+        if response == Request.REQ_ERROR:
+            return Request.REQ_ERROR
+
+        data = js.loads(response)
+        #print("data", data)
+        self.devicesNotAssignedCount = data['count']
+        self.notAssignedDevices.clear() # In cas of...
+
+        if data['data'] is not None:
+            for item in data['data']:
+                obj = DeviceManagement(item['device_id'])
+                obj.staticInit(
+                    eui=item['device_eui'],
+                    battery=item['battery'],
+                    state=item['state']
+                )
+                self.notAssignedDevices.append(obj)
+
+
     # This function returns the list of all not assigned devices
+    # It should be reduced later by using the function above
     # return a list of form: ['device_id1':'eui1', 'device_id2':'eui2']
     async def getNotAssignedDevices(self):
-        response = await Request.getNotAssignedDevices(self.id)
+        response = await Request.getNotAssignedDevices(self.id, page=1, pagesize=50)
         if response == Request.REQ_ERROR:
             return Request.REQ_ERROR
             

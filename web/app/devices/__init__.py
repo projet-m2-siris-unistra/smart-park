@@ -26,25 +26,46 @@ async def view(request):
     await tenantInstance.init(tenant_id=1)
 
     pagination = Pagination(request)
-    await tenantInstance.setDevices(
-        page=pagination.page_number, 
-        pagesize=pagination.page_size
-    )
-    pagination.setElementsNumber(tenantInstance.devicesCount)
+
+    # Handling the two existing tabs (all devices & not assigned ones)
+    tab_all = False
+    tab_notAssigned = False
+
+    # Not assigned devices data table
+    if request.raw_args != {} and request.raw_args['type'] == "notassigned":
+        tab_notAssigned = True
+        await tenantInstance.setNotAssignedDevices(
+            page=pagination.page_number, 
+            pagesize=pagination.page_size
+        )
+        devices = tenantInstance.notAssignedDevices 
+        pagination.setElementsNumber(tenantInstance.devicesNotAssignedCount)
+
+    else:
+        # All devices of the tenant
+        tab_all = True
+        await tenantInstance.setDevices(
+            page=pagination.page_number, 
+            pagesize=pagination.page_size
+        )
+        devices = tenantInstance.devices
+        pagination.setElementsNumber(tenantInstance.devicesCount)
 
     # User wants to delete the device
     if request.method == 'POST':
         print("Deletion of device_id : ", request.form.get('device-id'))
         res = await Request.deleteDevice(request.form.get('device-id'))
         if res == Request.REQ_ERROR:
-            raise ServerError("impossible de supprimer le device")
+            raise ServerError("impossible de supprimer le capteur")
         return response.redirect("/dashboard")
 
     rendered_template = await render(
         "devices_template.html", 
         request,
-        devices=tenantInstance.devices,
-        pagination=pagination
+        devices=devices,
+        pagination=pagination,
+        active_tab_all=tab_all,
+        active_tab_notassigned=tab_notAssigned
     )
     return response.html(rendered_template)
 

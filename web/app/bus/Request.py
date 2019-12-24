@@ -234,8 +234,16 @@ async def getDevices(tenant_id, page, pagesize):
 
 
 # Request all NOT ASSIGNED devices
-async def getNotAssignedDevices(tenant_id):
-    request = json.dumps({'tenant_id' : int(tenant_id)})
+async def getNotAssignedDevices(tenant_id, page, pagesize):
+    # calculating offset
+    offset = pagesize * (page-1)
+
+    request = json.dumps({
+        'tenant_id' : int(tenant_id),
+        'limit' : pagesize,
+        'offset' : offset
+    })
+    
     try:
         response = await nc.request("devices.get.notassigned", bytes(request, "utf-8"), timeout=1)
     except ErrTimeout:
