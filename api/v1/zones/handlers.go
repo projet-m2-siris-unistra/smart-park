@@ -24,12 +24,13 @@ type point struct {
 }
 
 type zone struct {
-	ZoneID    int               `json:"zone_id"`
-	TenantID  int               `json:"tenant_id"`
-	Name      string            `json:"name"`
-	Type      database.ZoneType `json:"type"`
-	Color     null.String       `json:"color"`
-	Geography []point           `json:"geo"`
+	ZoneID    int                  `json:"zone_id"`
+	TenantID  int                  `json:"tenant_id"`
+	Name      string               `json:"name"`
+	Type      database.ZoneType    `json:"type"`
+	Color     null.String          `json:"color"`
+	Geography []point              `json:"geo"`
+	Places    *database.ZonePlaces `json:"places"`
 	database.Timestamps
 }
 
@@ -59,6 +60,7 @@ func mapZone(z *database.Zone) zone {
 		Type:       z.Type,
 		Color:      z.Color,
 		Geography:  geo,
+		Places:     z.Places,
 		Timestamps: z.Timestamps,
 	}
 }
