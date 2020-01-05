@@ -1,0 +1,16 @@
+apiVersion: nats.io/v1alpha2
+kind: NatsCluster
+metadata:
+  name: nats
+spec:
+  size: 3
+  template:
+    spec:
+      securityContext:
+        runAsGroup: 65534
+        runAsUser: 65534
+  version: 2.1.2
+  pod:
+    enableMetrics: true
+    metricsImage: "synadia/prometheus-nats-exporter"
+    metricsImageTag: "0.6.0"
