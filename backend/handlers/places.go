@@ -91,7 +91,7 @@ func newPlace(ctx context.Context, request newPlaceRequest) (database.PlaceRespo
 
 /********************************** DELETE **********************************/
 
-func deletePlace(ctx context.Context, request getPlaceRequest) (database.PlaceResponse, error) {
+func deletePlace(ctx context.Context, request getPlaceRequest) (bool, error) {
 	log.Println("handlers: handling deletePlace")
 
 	return database.DeletePlace(ctx, request.PlaceID)

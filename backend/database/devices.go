@@ -374,44 +374,20 @@ func NewDevice(ctx context.Context, battery int, state string, tenantID int,
 /********************************** DELETE **********************************/
 
 // DeleteDevice : delete a device
-func DeleteDevice(ctx context.Context, deviceID int) (DeviceResponse, error) {
+func DeleteDevice(ctx context.Context, deviceID int) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	var device DeviceResponse
-
-	device.DeviceID = -1
-
-	// verify if the device is assigned or not
-	err := pool.QueryRowContext(ctx, `
-		SELECT DISTINCT device_id
-		FROM devices WHERE device_id = $1 AND device_id NOT IN (
-			SELECT DISTINCT device_id FROM places WHERE device_id is not null
-		) 
-	`, deviceID).Scan(&device.DeviceID)
-
-	// the device is assigned
-	if err != nil {
-		log.Printf("device_id %d is assigned, delete impossible\n", deviceID)
-		return device, err
-	}
-
-	// delete the device
-	err = pool.QueryRowContext(ctx, `
-		DELETE FROM devices WHERE device_id = $1 RETURNING device_id
-	`, deviceID).Scan(&device.DeviceID)
-
-	if err == sql.ErrNoRows {
-		log.Printf("no device with id %d\n", deviceID)
-		return device, err
-	}
+	result, err := pool.ExecContext(ctx, `
+		DELETE FROM devices WHERE device_id = $1
+	`, deviceID)
 
 	if err != nil {
 		log.Printf("query error: %v\n", err)
-		return device, err
+		return false, err
 	}
 
-	return device, nil
+	return checkDeletion(result)
 }
 
 /********************************** DELETE **********************************/

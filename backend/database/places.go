@@ -270,28 +270,21 @@ func NewPlace(ctx context.Context, zoneID int, placetype string,
 /********************************** DELETE **********************************/
 
 // DeletePlace : delete place
-func DeletePlace(ctx context.Context, placeID int) (PlaceResponse, error) {
+func DeletePlace(ctx context.Context, placeID int) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	var place PlaceResponse
-
 	// update the device id into places
-	err := pool.QueryRowContext(ctx, `
-			DELETE FROM places WHERE place_id = $1 RETURNING place_id
-		`, placeID).Scan(&place.PlaceID)
-
-	if err == sql.ErrNoRows {
-		log.Printf("no place with id %d\n", placeID)
-		return place, err
-	}
+	result, err := pool.ExecContext(ctx, `
+		DELETE FROM places WHERE place_id = $1
+	`, placeID)
 
 	if err != nil {
 		log.Printf("query error: %v\n", err)
-		return place, err
+		return false, err
 	}
 
-	return place, nil
+	return checkDeletion(result)
 }
 
 /********************************** DELETE **********************************/

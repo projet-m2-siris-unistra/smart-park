@@ -127,7 +127,7 @@ func newDevice(ctx context.Context, request newDeviceRequest) (database.DeviceRe
 
 /********************************** DELETE **********************************/
 
-func deleteDevice(ctx context.Context, request getDeviceRequest) (database.DeviceResponse, error) {
+func deleteDevice(ctx context.Context, request getDeviceRequest) (bool, error) {
 	log.Println("handlers: handling deleteDevice")
 
 	return database.DeleteDevice(ctx, request.DeviceID)
