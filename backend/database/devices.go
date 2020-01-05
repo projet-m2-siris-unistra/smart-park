@@ -119,14 +119,19 @@ func (DeviceFilter) New() *DeviceFilter {
 	return &DeviceFilter{}
 }
 
+// WithState sets the state field in the filter
 func (f DeviceFilter) WithState(state DeviceState) DeviceFilter {
 	f.state = &state
 	return f
 }
+
+// WithTenantID sets the tenantID field in the filter
 func (f DeviceFilter) WithTenantID(tenantID int) DeviceFilter {
 	f.tenantID = &tenantID
 	return f
 }
+
+// WithIsAttached sets the isAttached field in the filter
 func (f DeviceFilter) WithIsAttached(isAttached bool) DeviceFilter {
 	f.isAttached = &isAttached
 	return f
@@ -154,10 +159,10 @@ func (f DeviceFilter) buildQuery(offset int) (string, []interface{}) {
 	}
 
 	if len(parts) != 0 {
-		return "WHERE " + strings.Join(parts, " AND "), values
+		return strings.Join(parts, " AND "), values
 	}
 
-	return "", values
+	return "1 = 1", values
 }
 
 // DeviceResponse returns the id of the updated / created object
@@ -190,24 +195,23 @@ func GetDevice(ctx context.Context, deviceID int) (Device, error) {
 }
 
 // GetDevices : get all the device
-func GetDevices(ctx context.Context, filter DeviceFilter, limite int, offset int) ([]Device, error) {
+func GetDevices(ctx context.Context, filter DeviceFilter, paging Paging) ([]Device, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	var devices []Device
 	var device Device
 
-	limite, offset = CheckArgDevice(limite, offset)
+	paging = paging.Normalize()
 
-	where, args := filter.buildQuery(3)
-	args = append([]interface{}{limite, offset}, args...)
-	rows, err := pool.QueryContext(ctx, fmt.Sprintf(`
+	where, args := filter.buildQuery(1)
+	query := fmt.Sprintf(`
 		SELECT DISTINCT device_id, battery, state, tenant_id, device_eui, created_at, updated_at 
 		FROM devices
+		WHERE %s
 		%s
-		LIMIT $1 OFFSET $2
-	`, where), args...)
-	log.Println(where, args)
+	`, where, paging.buildQuery())
+	rows, err := pool.QueryContext(ctx, query, args...)
 
 	if err != nil {
 		return devices, err
@@ -423,7 +427,8 @@ func CountDevices(ctx context.Context, filter DeviceFilter) (int, error) {
 
 	where, args := filter.buildQuery(1)
 	var count int
-	row := pool.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM devices %s", where), args...)
+	query := fmt.Sprintf("SELECT COUNT(*) FROM devices WHERE %s", where)
+	row := pool.QueryRow(query, args...)
 	err := row.Scan(&count)
 	if err != nil {
 		return count, err

@@ -12,8 +12,7 @@ type getDeviceRequest struct {
 }
 
 type getDevicesRequest struct {
-	Limite   int `json:"limit,omitempty"`
-	Offset   int `json:"offset,omitempty"`
+	database.Paging
 	TenantID int `json:"tenant_id,omitempty"`
 }
 
@@ -57,7 +56,7 @@ func getFreeDevices(ctx context.Context, request getDevicesRequest) (resultListD
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetDevices(ctx, filter, request.Limite, request.Offset)
+	result.Data, err = database.GetDevices(ctx, filter, request.Paging)
 	if err != nil {
 		return result, err
 	}
@@ -78,7 +77,7 @@ func getNotAssignedDevices(ctx context.Context, request getDevicesRequest) (resu
 		return result, err
 	}
 
-	result.Data, err = database.GetDevices(ctx, filter, request.Limite, request.Offset)
+	result.Data, err = database.GetDevices(ctx, filter, request.Paging)
 	if err != nil {
 		return result, err
 	}
@@ -97,7 +96,7 @@ func getDevices(ctx context.Context, request getDevicesRequest) (resultListDevic
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetDevices(ctx, filter, request.Limite, request.Offset)
+	result.Data, err = database.GetDevices(ctx, filter, request.Paging)
 	if err != nil {
 		return result, err
 	}
