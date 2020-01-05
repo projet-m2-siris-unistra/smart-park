@@ -12,29 +12,29 @@ type getDeviceRequest struct {
 }
 
 type getDevicesRequest struct {
-	Limite int `json:"limit,omitempty"`
-	Offset int `json:"offset,omitempty"`
+	Limite   int `json:"limit,omitempty"`
+	Offset   int `json:"offset,omitempty"`
 	TenantID int `json:"tenant_id,omitempty"`
 }
 
 type updateDeviceRequest struct {
-	DeviceID int    `json:"device_id"`
-	Battery  int    `json:"battery,omitempty"`
-	State    string `json:"state,omitempty"`
-	TenantID int 		`json:"tenant_id,omitempty"`
-	DeviceEUI string 	`json:"device_eui,omitempty"`
+	DeviceID  int    `json:"device_id"`
+	Battery   int    `json:"battery,omitempty"`
+	State     string `json:"state,omitempty"`
+	TenantID  int    `json:"tenant_id,omitempty"`
+	DeviceEUI string `json:"device_eui,omitempty"`
 }
 
 type newDeviceRequest struct {
-	Battery int    `json:"battery"`
-	State   string `json:"state"`
-	TenantID int 		`json:"tenant_id"`
-	DeviceEUI string 	`json:"device_eui"`
+	Battery   int    `json:"battery"`
+	State     string `json:"state"`
+	TenantID  int    `json:"tenant_id"`
+	DeviceEUI string `json:"device_eui"`
 }
 
 type resultListDevice struct {
-	Count int `json:"count"`
-	Data []database.Device `json:"data"`
+	Count int               `json:"count"`
+	Data  []database.Device `json:"data"`
 }
 
 /********************************** GET **********************************/
@@ -47,13 +47,17 @@ func getDevice(ctx context.Context, request getDeviceRequest) (database.Device, 
 func getFreeDevices(ctx context.Context, request getDevicesRequest) (resultListDevice, error) {
 	log.Println("handlers: handling getFreeDevices")
 
+	filter := database.DeviceFilter{}.
+		WithTenantID(request.TenantID).
+		WithState(database.Free)
+
 	var result resultListDevice
-	var err error 
-	result.Count, err = database.CountDeviceFree(ctx, request.TenantID)
+	var err error
+	result.Count, err = database.CountDevices(ctx, filter)
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetFreeDevices(ctx, request.Limite, request.Offset, request.TenantID)
+	result.Data, err = database.GetDevices(ctx, filter, request.Limite, request.Offset)
 	if err != nil {
 		return result, err
 	}
@@ -63,13 +67,18 @@ func getFreeDevices(ctx context.Context, request getDevicesRequest) (resultListD
 func getNotAssignedDevices(ctx context.Context, request getDevicesRequest) (resultListDevice, error) {
 	log.Println("handlers: handling getNotAssignedDevices")
 
+	filter := database.DeviceFilter{}.
+		WithTenantID(request.TenantID).
+		WithIsAttached(false)
+
 	var result resultListDevice
-	var err error 
-	result.Count, err = database.CountDeviceNotAssigned(ctx, request.TenantID)
+	var err error
+	result.Count, err = database.CountDevices(ctx, filter)
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetNotAssignedDevices(ctx, request.Limite, request.Offset, request.TenantID)
+
+	result.Data, err = database.GetDevices(ctx, filter, request.Limite, request.Offset)
 	if err != nil {
 		return result, err
 	}
@@ -79,13 +88,16 @@ func getNotAssignedDevices(ctx context.Context, request getDevicesRequest) (resu
 func getDevices(ctx context.Context, request getDevicesRequest) (resultListDevice, error) {
 	log.Println("handlers: handling getDevices")
 
+	filter := database.DeviceFilter{}.
+		WithTenantID(request.TenantID)
+
 	var result resultListDevice
-	var err error 
-	result.Count, err = database.CountDevice(ctx)
+	var err error
+	result.Count, err = database.CountDevices(ctx, filter)
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetDevices(ctx, request.Limite, request.Offset)
+	result.Data, err = database.GetDevices(ctx, filter, request.Limite, request.Offset)
 	if err != nil {
 		return result, err
 	}
@@ -98,7 +110,7 @@ func getDevices(ctx context.Context, request getDevicesRequest) (resultListDevic
 func updateDevice(ctx context.Context, request updateDeviceRequest) (database.DeviceResponse, error) {
 	log.Println("handlers: handling updateDevice")
 
-	return database.UpdateDevice(ctx, request.DeviceID, request.Battery, request.State, request.TenantID, 
+	return database.UpdateDevice(ctx, request.DeviceID, request.Battery, request.State, request.TenantID,
 		request.DeviceEUI)
 }
 
@@ -108,7 +120,7 @@ func updateDevice(ctx context.Context, request updateDeviceRequest) (database.De
 func newDevice(ctx context.Context, request newDeviceRequest) (database.DeviceResponse, error) {
 	log.Println("handlers: handling newDevice")
 
-	return database.NewDevice(ctx, request.Battery, request.State, request.TenantID, 
+	return database.NewDevice(ctx, request.Battery, request.State, request.TenantID,
 		request.DeviceEUI)
 }
 
