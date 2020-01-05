@@ -154,7 +154,7 @@ func CountTenant(ctx context.Context) (int, error) {
 
 	count = -1
 
-	row := pool.QueryRow("SELECT COUNT(*) FROM tenants")
+	row := pool.QueryRowContext(ctx, "SELECT COUNT(*) FROM tenants")
 	err := row.Scan(&count)
 	if err != nil {
 		return count, err

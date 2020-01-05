@@ -426,7 +426,7 @@ func CountDevices(ctx context.Context, filter DeviceFilter) (int, error) {
 	where, args := filter.buildQuery(1)
 	var count int
 	query := fmt.Sprintf("SELECT COUNT(*) FROM devices WHERE %s", where)
-	row := pool.QueryRow(query, args...)
+	row := pool.QueryRowContext(ctx, query, args...)
 	err := row.Scan(&count)
 	if err != nil {
 		return count, err

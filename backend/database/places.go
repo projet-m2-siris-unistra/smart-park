@@ -307,7 +307,7 @@ func CountPlace(ctx context.Context) (int, error) {
 
 	count = -1
 
-	row := pool.QueryRow("SELECT COUNT(*) FROM places")
+	row := pool.QueryRowContext(ctx, "SELECT COUNT(*) FROM places")
 	err := row.Scan(&count)
 	if err != nil {
 		log.Printf("query error: %v\n", err)

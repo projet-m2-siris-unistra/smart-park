@@ -411,7 +411,7 @@ func CountZone(ctx context.Context, tenantID int) (int, error) {
 
 	count = -1
 
-	row := pool.QueryRow("SELECT COUNT(*) FROM zones WHERE tenant_id = $1", tenantID)
+	row := pool.QueryRowContext(ctx, "SELECT COUNT(*) FROM zones WHERE tenant_id = $1", tenantID)
 	err := row.Scan(&count)
 	if err != nil {
 		return count, err
