@@ -21,3 +21,8 @@ func checkDeletion(result sql.Result) (bool, error) {
 
 	return true, nil
 }
+
+// Scannable is an interface implemented for sql.Row and sql.Rows
+type Scannable interface {
+	Scan(...interface{}) error
+}

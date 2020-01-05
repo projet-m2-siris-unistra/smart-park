@@ -6,7 +6,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
@@ -95,6 +94,11 @@ func (s *ZoneType) Scan(value interface{}) error {
 	return errors.New("failed to scan ZoneType")
 }
 
+type ZonePlaces struct {
+	Total int `json:"total"`
+	Free  int `json:"free"`
+}
+
 // Zone :
 type Zone struct {
 	ZoneID    int         `json:"zone_id"`
@@ -104,6 +108,7 @@ type Zone struct {
 	Color     null.String `json:"color"`
 	Geography null.String `json:"geo"`
 	Timestamps
+	Places *ZonePlaces `json:"places"`
 }
 
 // ZoneResponse returns the id of the updated / created object
@@ -111,44 +116,81 @@ type ZoneResponse struct {
 	ZoneID int `json:"zone_id"`
 }
 
+// ZoneOptions holds options for zones queries
+type ZoneOptions struct {
+	WithPlaces bool `json:"with_places"`
+}
+
+func (opts ZoneOptions) buildQuery() string {
+	common := "zones.zone_id, zones.tenant_id, zones.name, zones.type, zones.color, zones.geo, zones.created_at, zones.updated_at"
+	if opts.WithPlaces {
+		return `
+			SELECT ` + common + `,
+				(SELECT COUNT(*) FROM places WHERE zone_id = zones.zone_id AND device_id IS NOT NULL) places_total,
+				(
+					SELECT COUNT(*) FROM places 
+					LEFT JOIN devices USING (device_id)
+					WHERE zone_id = zones.zone_id AND devices.state = 'free'
+				) places_free
+			FROM zones
+		`
+	}
+
+	return `
+		SELECT ` + common + `
+		FROM zones
+	`
+}
+
+func (opts ZoneOptions) scan(row Scannable) (*Zone, error) {
+	var zone Zone
+	var err error
+
+	if opts.WithPlaces {
+		var places ZonePlaces
+		err = row.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
+			&zone.CreatedAt, &zone.UpdatedAt, &places.Total, &places.Free)
+		zone.Places = &places
+	} else {
+		err = row.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
+			&zone.CreatedAt, &zone.UpdatedAt)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &zone, nil
+}
+
 /********************************** GET **********************************/
 
 // GetZone fetches the zone by its ID
-func GetZone(ctx context.Context, zoneID int) (Zone, error) {
+func GetZone(ctx context.Context, zoneID int, opts ZoneOptions) (Zone, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	var zone Zone
-
-	err := pool.QueryRowContext(ctx, `
-		SELECT zone_id, tenant_id, name, type, color, geo, created_at, updated_at
-		FROM zones 
-		WHERE zone_id = $1
-	`, zoneID).
-		Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
-			&zone.CreatedAt, &zone.UpdatedAt)
+	query := opts.buildQuery() + ` WHERE zones.zone_id = $1`
+	row := pool.QueryRowContext(ctx, query, zoneID)
+	zone, err := opts.scan(row)
 
 	if err != nil {
-		return zone, err
+		// TODO(sandhose): return a pointer instead
+		return Zone{}, err
 	}
 
-	return zone, nil
+	return *zone, nil
 }
 
 // GetZones : get all the zone by the tenant_id
-func GetZones(ctx context.Context, tenantID int, paging Paging) ([]Zone, error) {
+func GetZones(ctx context.Context, tenantID int, opts ZoneOptions, paging Paging) ([]Zone, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	var zones []Zone
-	var zone Zone
 
-	rows, err := pool.QueryContext(ctx, fmt.Sprintf(`
-		SELECT DISTINCT zone_id, tenant_id, name, type, color, geo, created_at, updated_at
-		FROM zones
-		WHERE tenant_id = $1
-		%s
-	`, paging.buildQuery()), tenantID)
+	query := opts.buildQuery() + ` WHERE zones.tenant_id = $1 ` + paging.buildQuery()
+	rows, err := pool.QueryContext(ctx, query, tenantID)
 
 	if err != nil {
 		return zones, err
@@ -157,12 +199,11 @@ func GetZones(ctx context.Context, tenantID int, paging Paging) ([]Zone, error) 
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
-			&zone.CreatedAt, &zone.UpdatedAt)
+		zone, err := opts.scan(rows)
 		if err != nil {
 			return zones, err
 		}
-		zones = append(zones, zone)
+		zones = append(zones, *zone)
 	}
 
 	// get any error encountered during iteration
