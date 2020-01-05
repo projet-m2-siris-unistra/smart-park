@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"log"
@@ -59,6 +60,43 @@ func (s *DeviceState) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// Value converts a DeviceState to a database/sql/driver.Value
+func (s DeviceState) Value() (driver.Value, error) {
+	switch s {
+	case Free:
+		return "free", nil
+	case Occupied:
+		return "occupied", nil
+	case NotAssigned:
+		return nil, nil
+	default:
+		return nil, errors.New("invalid ZoneType")
+	}
+}
+
+// Scan converts a database value to a DeviceState
+func (s *DeviceState) Scan(value interface{}) error {
+	if value == nil {
+		*s = NotAssigned
+		return nil
+	}
+
+	if sv, err := driver.String.ConvertValue(value); err == nil {
+		if v, ok := sv.([]byte); ok {
+			switch string(v) {
+			case "free":
+				*s = Free
+				return nil
+			case "occupied":
+				*s = Occupied
+				return nil
+			}
+		}
+	}
+
+	return errors.New("failed to scan DeviceState")
+}
+
 // Device represents an IoT device
 type Device struct {
 	DeviceID  int         `json:"device_id"`
@@ -82,34 +120,19 @@ func GetDevice(ctx context.Context, deviceID int) (Device, error) {
 	defer cancel()
 
 	var device Device
-	var tmp null.String
-	var d *string
 
 	err := pool.QueryRowContext(ctx, `
 		SELECT device_id, battery, state, tenant_id, device_eui, created_at, updated_at
 		FROM devices 
 		WHERE device_id = $1
 	`, deviceID).
-		Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
+		Scan(&device.DeviceID, &device.Battery, &device.State, &device.TenantID, &device.DeviceEUI,
 			&device.CreatedAt, &device.UpdatedAt)
 
 	if err != nil {
 		return device, err
 	}
 
-	if tmp.IsZero() == true {
-		device.State = NotAssigned
-	} else {
-		d = tmp.Ptr()
-		switch *d {
-		case "free":
-			device.State = Free
-		case "occupied":
-			device.State = Occupied
-		default:
-			device.State = NotAssigned
-		}
-	}
 	return device, nil
 }
 
@@ -120,8 +143,6 @@ func GetDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
 
 	var devices []Device
 	var device Device
-	var d *string
-	var tmp null.String
 
 	limite, offset = CheckArgDevice(limite, offset)
 
@@ -136,23 +157,10 @@ func GetDevices(ctx context.Context, limite int, offset int) ([]Device, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
+		err = rows.Scan(&device.DeviceID, &device.Battery, &device.State, &device.TenantID, &device.DeviceEUI,
 			&device.CreatedAt, &device.UpdatedAt)
 		if err != nil {
 			return devices, err
-		}
-		if tmp.IsZero() == true {
-			device.State = NotAssigned
-		} else {
-			d = tmp.Ptr()
-			switch *d {
-			case "free":
-				device.State = Free
-			case "occupied":
-				device.State = Occupied
-			default:
-				device.State = NotAssigned
-			}
 		}
 		devices = append(devices, device)
 	}
@@ -173,8 +181,6 @@ func GetFreeDevices(ctx context.Context, limite int, offset int, tenantID int) (
 
 	var devices []Device
 	var device Device
-	var d *string
-	var tmp null.String
 
 	limite, offset = CheckArgDevice(limite, offset)
 
@@ -189,23 +195,10 @@ func GetFreeDevices(ctx context.Context, limite int, offset int, tenantID int) (
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
+		err = rows.Scan(&device.DeviceID, &device.Battery, &device.State, &device.TenantID, &device.DeviceEUI,
 			&device.CreatedAt, &device.UpdatedAt)
 		if err != nil {
 			return devices, err
-		}
-		if tmp.IsZero() == true {
-			device.State = NotAssigned
-		} else {
-			d = tmp.Ptr()
-			switch *d {
-			case "free":
-				device.State = Free
-			case "occupied":
-				device.State = Occupied
-			default:
-				device.State = NotAssigned
-			}
 		}
 		devices = append(devices, device)
 	}
@@ -219,7 +212,6 @@ func GetFreeDevices(ctx context.Context, limite int, offset int, tenantID int) (
 	return devices, nil
 }
 
-
 // GetNotAssignedDevices : get all the not assigned devices
 func GetNotAssignedDevices(ctx context.Context, limite int, offset int, tenantID int) ([]Device, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -227,8 +219,6 @@ func GetNotAssignedDevices(ctx context.Context, limite int, offset int, tenantID
 
 	var devices []Device
 	var device Device
-	var d *string
-	var tmp null.String
 
 	limite, offset = CheckArgDevice(limite, offset)
 
@@ -246,23 +236,10 @@ func GetNotAssignedDevices(ctx context.Context, limite int, offset int, tenantID
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&device.DeviceID, &device.Battery, &tmp, &device.TenantID, &device.DeviceEUI,
+		err = rows.Scan(&device.DeviceID, &device.Battery, &device.State, &device.TenantID, &device.DeviceEUI,
 			&device.CreatedAt, &device.UpdatedAt)
 		if err != nil {
 			return devices, err
-		}
-		if tmp.IsZero() == true {
-			device.State = NotAssigned
-		} else {
-			d = tmp.Ptr()
-			switch *d {
-			case "free":
-				device.State = Free
-			case "occupied":
-				device.State = Occupied
-			default:
-				device.State = NotAssigned
-			}
 		}
 		devices = append(devices, device)
 	}
@@ -423,7 +400,7 @@ func DeleteDevice(ctx context.Context, deviceID int) (DeviceResponse, error) {
 
 	device.DeviceID = -1
 
-	// verify if the device is assigned or not 
+	// verify if the device is assigned or not
 	err := pool.QueryRowContext(ctx, `
 		SELECT DISTINCT device_id
 		FROM devices WHERE device_id = $1 AND device_id NOT IN (
@@ -457,14 +434,13 @@ func DeleteDevice(ctx context.Context, deviceID int) (DeviceResponse, error) {
 
 /********************************** DELETE **********************************/
 
-
 /********************************** OPTIONS **********************************/
 
 // CountDeviceFree : count number of rows
 func CountDeviceFree(ctx context.Context, tenantID int) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	
+
 	var count int
 
 	count = -1
@@ -481,7 +457,7 @@ func CountDeviceFree(ctx context.Context, tenantID int) (int, error) {
 func CountDeviceNotAssigned(ctx context.Context, tenantID int) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	
+
 	var count int
 
 	count = -1
@@ -494,12 +470,11 @@ func CountDeviceNotAssigned(ctx context.Context, tenantID int) (int, error) {
 	return count, nil
 }
 
-
 // CountDevice : count number of rows
 func CountDevice(ctx context.Context) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	
+
 	var count int
 
 	count = -1

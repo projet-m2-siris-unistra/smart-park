@@ -9,7 +9,8 @@ import (
 
 // GetZoneRequest holds the parameters of a zones.get request
 type GetZoneRequest struct {
-	ZoneID int `json:"zone_id"`
+	ZoneID         int  `json:"zone_id"`
+	WithPlacesInfo bool `json:"with_places_info"`
 }
 
 // ListZonesRequest holds the parameters of a zones.list request

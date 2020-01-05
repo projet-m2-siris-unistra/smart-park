@@ -2,10 +2,12 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
-	"database/sql"
 	"time"
 
 	"gopkg.in/guregu/null.v3"
@@ -59,6 +61,40 @@ func (s *ZoneType) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// Value converts a ZoneType to a database/sql/driver.Value
+func (s ZoneType) Value() (driver.Value, error) {
+	switch s {
+	case FreeZone:
+		return "free", nil
+	case Paid:
+		return "paid", nil
+	case Blue:
+		return "blue", nil
+	default:
+		return nil, errors.New("invalid ZoneType")
+	}
+}
+
+// Scan converts a database value to a ZoneType
+func (s *ZoneType) Scan(value interface{}) error {
+	if sv, err := driver.String.ConvertValue(value); err == nil {
+		if v, ok := sv.([]byte); ok {
+			switch string(v) {
+			case "free":
+				*s = FreeZone
+				return nil
+			case "paid":
+				*s = Paid
+				return nil
+			case "blue":
+				*s = Blue
+				return nil
+			}
+		}
+	}
+	return errors.New("failed to scan ZoneType")
+}
+
 // Zone :
 type Zone struct {
 	ZoneID    int         `json:"zone_id"`
@@ -70,7 +106,7 @@ type Zone struct {
 	Timestamps
 }
 
-// ZoneResponse returns the id of the updated / created object 
+// ZoneResponse returns the id of the updated / created object
 type ZoneResponse struct {
 	ZoneID int `json:"zone_id"`
 }
@@ -83,33 +119,17 @@ func GetZone(ctx context.Context, zoneID int) (Zone, error) {
 	defer cancel()
 
 	var zone Zone
-	var tmp null.String
-	var d *string
 
 	err := pool.QueryRowContext(ctx, `
 		SELECT zone_id, tenant_id, name, type, color, geo, created_at, updated_at
 		FROM zones 
 		WHERE zone_id = $1
 	`, zoneID).
-		Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
+		Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
 			&zone.CreatedAt, &zone.UpdatedAt)
 
 	if err != nil {
 		return zone, err
-	}
-
-	if tmp.IsZero() == true {
-		zone.Type = FreeZone
-	} else {
-		d = tmp.Ptr()
-		switch *d {
-		case "paid":
-			zone.Type = Paid
-		case "blue":
-			zone.Type = Blue
-		default:
-			zone.Type = FreeZone
-		}
 	}
 
 	return zone, nil
@@ -122,8 +142,6 @@ func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone
 
 	var zones []Zone
 	var zone Zone
-	var tmp null.String
-	var d *string
 
 	limite, offset = CheckArgZone(limite, offset)
 
@@ -135,27 +153,14 @@ func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone
 	if err != nil {
 		return zones, err
 	}
-	
+
 	defer rows.Close()
 
 	for rows.Next() {
-		err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &tmp, &zone.Color, &zone.Geography,
+		err = rows.Scan(&zone.ZoneID, &zone.TenantID, &zone.Name, &zone.Type, &zone.Color, &zone.Geography,
 			&zone.CreatedAt, &zone.UpdatedAt)
 		if err != nil {
 			return zones, err
-		}
-		if tmp.IsZero() == true {
-			zone.Type = FreeZone
-		} else {
-			d = tmp.Ptr()
-			switch *d {
-			case "paid":
-				zone.Type = Paid
-			case "blue":
-				zone.Type = Blue
-			default:
-				zone.Type = FreeZone
-			}
 		}
 		zones = append(zones, zone)
 	}
@@ -247,7 +252,7 @@ func UpdateZone(ctx context.Context, zoneID int, tenantID int,
 			UPDATE zones SET color = $1 
 			WHERE zone_id = $2 RETURNING zone_id
 		`, color, zoneID).Scan(&zone.ZoneID)
-	
+
 		if err == sql.ErrNoRows {
 			log.Printf("no zone with id %d\n", zoneID)
 			return zone, err
@@ -257,7 +262,7 @@ func UpdateZone(ctx context.Context, zoneID int, tenantID int,
 			log.Printf("query error: %v\n", err)
 			return zone, err
 		}
-		
+
 	}
 
 	// modify geo
@@ -266,7 +271,7 @@ func UpdateZone(ctx context.Context, zoneID int, tenantID int,
 			UPDATE zones SET geo = $1 
 			WHERE zone_id = $2 RETURNING zone_id
 		`, geo, zoneID).Scan(&zone.ZoneID)
-		
+
 		if err == sql.ErrNoRows {
 			log.Printf("no zone with id %d\n", zoneID)
 			return zone, err
@@ -276,7 +281,7 @@ func UpdateZone(ctx context.Context, zoneID int, tenantID int,
 			log.Printf("query error: %v\n", err)
 			return zone, err
 		}
-	
+
 	}
 
 	return zone, nil
@@ -295,7 +300,7 @@ func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
 	var zone ZoneResponse
 
 	zone.ZoneID = -1
-	
+
 	err := pool.QueryRowContext(ctx,
 		`INSERT INTO zones
 		(
@@ -313,15 +318,15 @@ func NewZone(ctx context.Context, tenantID int, name string, zonetype string,
 			$5
 		) RETURNING zone_id`, tenantID, name, zonetype, color, geo).Scan(&zone.ZoneID)
 
-		if err == sql.ErrNoRows {
-			log.Printf("no zone created\n")
-			return zone, err
-		}
-	
-		if err != nil {
-			log.Printf("query error: %v\n", err)
-			return zone, err
-		}
+	if err == sql.ErrNoRows {
+		log.Printf("no zone created\n")
+		return zone, err
+	}
+
+	if err != nil {
+		log.Printf("query error: %v\n", err)
+		return zone, err
+	}
 
 	return zone, nil
 }
@@ -339,7 +344,7 @@ func DeleteZone(ctx context.Context, zoneID int) (ZoneResponse, error) {
 	var placeID int
 
 	zone.ZoneID = -1
-	
+
 	rows, err := pool.QueryContext(ctx,
 		`SELECT DISTINCT place_id FROM places WHERE zone_id = $1`, zoneID)
 
@@ -352,7 +357,7 @@ func DeleteZone(ctx context.Context, zoneID int) (ZoneResponse, error) {
 		log.Printf("query error: %v\n", err)
 		return zone, err
 	}
-	
+
 	defer rows.Close()
 
 	for rows.Next() {
@@ -390,7 +395,6 @@ func DeleteZone(ctx context.Context, zoneID int) (ZoneResponse, error) {
 		return zone, err
 	}
 
-
 	return zone, nil
 }
 
@@ -402,7 +406,7 @@ func DeleteZone(ctx context.Context, zoneID int) (ZoneResponse, error) {
 func CountZone(ctx context.Context, tenantID int) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	
+
 	var count int
 
 	count = -1
