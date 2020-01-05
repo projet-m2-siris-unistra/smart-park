@@ -32,7 +32,7 @@ async def view(request):
     tab_notAssigned = False
 
     # Not assigned devices data table
-    if request.raw_args != {} and request.raw_args['type'] == "notassigned":
+    if request.raw_args.get('type') == "notassigned":
         tab_notAssigned = True
         await tenantInstance.setNotAssignedDevices(
             page=pagination.page_number, 
