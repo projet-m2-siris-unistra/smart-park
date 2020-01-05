@@ -14,7 +14,7 @@ type Paging struct {
 }
 
 // Normalize checks that values are in bound
-func (p Paging) Normalize() Paging {
+func (p Paging) normalize() Paging {
 	if p.Limit < 1 {
 		p.Limit = defaultLimit
 	}
@@ -28,5 +28,6 @@ func (p Paging) Normalize() Paging {
 }
 
 func (p Paging) buildQuery() string {
+	p = p.normalize()
 	return fmt.Sprintf("LIMIT %d OFFSET %d", p.Limit, p.Offset)
 }

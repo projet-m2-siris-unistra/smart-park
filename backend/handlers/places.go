@@ -12,9 +12,8 @@ type getPlaceRequest struct {
 }
 
 type getPlacesRequest struct {
+	database.Paging
 	ZoneID int `json:"zone_id"`
-	Limite int `json:"limit,omitempty"`
-	Offset int `json:"offset,omitempty"`
 }
 
 type updatePlaceRequest struct {
@@ -33,8 +32,8 @@ type newPlaceRequest struct {
 }
 
 type resultListPlace struct {
-	Count int `json:"count"`
-	Data []database.Place `json:"data"`
+	Count int              `json:"count"`
+	Data  []database.Place `json:"data"`
 }
 
 /********************************** GET **********************************/
@@ -49,12 +48,12 @@ func getPlaces(ctx context.Context, request getPlacesRequest) (resultListPlace, 
 	log.Println("handlers: handling getPlaces")
 
 	var result resultListPlace
-	var err error 
+	var err error
 	result.Count, err = database.CountPlace(ctx)
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetPlaces(ctx, request.ZoneID, request.Limite, request.Offset)
+	result.Data, err = database.GetPlaces(ctx, request.ZoneID, request.Paging)
 	if err != nil {
 		return result, err
 	}
@@ -97,6 +96,5 @@ func deletePlace(ctx context.Context, request getPlaceRequest) (database.PlaceRe
 
 	return database.DeletePlace(ctx, request.PlaceID)
 }
-
 
 /********************************** DELETE **********************************/

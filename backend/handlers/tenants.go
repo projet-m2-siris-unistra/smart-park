@@ -12,8 +12,7 @@ type getTenantRequest struct {
 }
 
 type getTenantsRequest struct {
-	Limite int `json:"limit,omitempty"`
-	Offset int `json:"offset,omitempty"`
+	database.Paging
 }
 
 type updateTenantsRequest struct {
@@ -23,8 +22,8 @@ type updateTenantsRequest struct {
 }
 
 type resultListTenant struct {
-	Count int `json:"count"`
-	Data []database.Tenant `json:"data"`
+	Count int               `json:"count"`
+	Data  []database.Tenant `json:"data"`
 }
 
 /********************************** GET **********************************/
@@ -38,12 +37,12 @@ func getTenants(ctx context.Context, request getTenantsRequest) (resultListTenan
 	log.Println("handlers: handling getTenants")
 
 	var result resultListTenant
-	var err error 
+	var err error
 	result.Count, err = database.CountTenant(ctx)
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetTenants(ctx, request.Limite, request.Offset)
+	result.Data, err = database.GetTenants(ctx, request.Paging)
 	if err != nil {
 		return result, err
 	}

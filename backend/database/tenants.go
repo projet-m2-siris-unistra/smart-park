@@ -2,10 +2,11 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"time"
-	"database/sql"
 
 	"gopkg.in/guregu/null.v3"
 )
@@ -18,7 +19,7 @@ type Tenant struct {
 	Timestamps
 }
 
-// TenantResponse returns the id of the updated / created object 
+// TenantResponse returns the id of the updated / created object
 type TenantResponse struct {
 	TenantID int `json:"tenant_id"`
 }
@@ -48,25 +49,26 @@ func GetTenant(ctx context.Context, tenantID int) (Tenant, error) {
 }
 
 // GetTenants : get all the tenant
-func GetTenants(ctx context.Context, limite int, offset int) ([]Tenant, error) {
+func GetTenants(ctx context.Context, paging Paging) ([]Tenant, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	var tenants []Tenant
 	var tenant Tenant
- 
-	limite, offset = CheckArgTenant(limite, offset)
 
-	rows, err := pool.QueryContext(ctx,
-		`SELECT DISTINCT tenant_id, name, geo, created_at, updated_at 
-		FROM tenants ORDER BY tenant_id LIMIT $1 OFFSET $2`, limite, offset)
+	rows, err := pool.QueryContext(ctx, fmt.Sprintf(`
+		SELECT DISTINCT tenant_id, name, geo, created_at, updated_at 
+		FROM tenants
+		ORDER BY tenant_id 
+		%s
+	`, paging.buildQuery()))
 
 	if err != nil {
 		return tenants, err
 	}
-	
+
 	defer rows.Close()
-		
+
 	for rows.Next() {
 		err = rows.Scan(&tenant.TenantID, &tenant.Name, &tenant.Geography,
 			&tenant.CreatedAt, &tenant.UpdatedAt)
@@ -75,7 +77,7 @@ func GetTenants(ctx context.Context, limite int, offset int) ([]Tenant, error) {
 		}
 		tenants = append(tenants, tenant)
 	}
-	
+
 	// get any error encountered during iteration
 	err = rows.Err()
 	if err != nil {
@@ -112,13 +114,13 @@ func UpdateTenants(ctx context.Context, tenantID int, name string, geo string) (
 			log.Printf("no device with id %d\n", tenantID)
 			return tenant, err
 		}
-	
+
 		if err != nil {
 			log.Printf("query error: %v\n", err)
 			return tenant, err
 		}
 	}
-	
+
 	if name != "" {
 		err := pool.QueryRowContext(ctx, `
 			UPDATE tenants SET name = $1 
@@ -129,7 +131,7 @@ func UpdateTenants(ctx context.Context, tenantID int, name string, geo string) (
 			log.Printf("no device with id %d\n", tenantID)
 			return tenant, err
 		}
-	
+
 		if err != nil {
 			log.Printf("query error: %v\n", err)
 			return tenant, err
@@ -147,7 +149,7 @@ func UpdateTenants(ctx context.Context, tenantID int, name string, geo string) (
 func CountTenant(ctx context.Context) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	
+
 	var count int
 
 	count = -1
@@ -158,20 +160,6 @@ func CountTenant(ctx context.Context) (int, error) {
 		return count, err
 	}
 	return count, nil
-}
-
-// CheckArgTenant : check limit and offset arguments
-func CheckArgTenant(limite int, offset int) (int, int) {
-
-	if limite == 0 {
-		limite = 20
-	}
-
-	if offset == 0 {
-		offset = 0
-	}
-
-	return limite, offset
 }
 
 /********************************** OPTIONS **********************************/

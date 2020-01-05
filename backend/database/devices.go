@@ -202,8 +202,6 @@ func GetDevices(ctx context.Context, filter DeviceFilter, paging Paging) ([]Devi
 	var devices []Device
 	var device Device
 
-	paging = paging.Normalize()
-
 	where, args := filter.buildQuery(1)
 	query := fmt.Sprintf(`
 		SELECT DISTINCT device_id, battery, state, tenant_id, device_eui, created_at, updated_at 
@@ -434,20 +432,6 @@ func CountDevices(ctx context.Context, filter DeviceFilter) (int, error) {
 		return count, err
 	}
 	return count, nil
-}
-
-// CheckArgDevice : check limit and offset arguments
-func CheckArgDevice(limite int, offset int) (int, int) {
-
-	if limite == 0 {
-		limite = 20
-	}
-
-	if offset == 0 {
-		offset = 0
-	}
-
-	return limite, offset
 }
 
 /********************************** OPTIONS **********************************/

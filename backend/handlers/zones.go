@@ -9,15 +9,13 @@ import (
 
 // GetZoneRequest holds the parameters of a zones.get request
 type GetZoneRequest struct {
-	ZoneID         int  `json:"zone_id"`
-	WithPlacesInfo bool `json:"with_places_info"`
+	ZoneID int `json:"zone_id"`
 }
 
 // ListZonesRequest holds the parameters of a zones.list request
 type ListZonesRequest struct {
+	database.Paging
 	TenantID int `json:"tenant_id"`
-	Limit    int `json:"limit,omitempty"`
-	Offset   int `json:"offset,omitempty"`
 }
 
 type updateZoneRequest struct {
@@ -60,7 +58,7 @@ func getZones(ctx context.Context, request ListZonesRequest) (ZoneList, error) {
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetZones(ctx, request.TenantID, request.Limit, request.Offset)
+	result.Data, err = database.GetZones(ctx, request.TenantID, request.Paging)
 	if err != nil {
 		return result, err
 	}

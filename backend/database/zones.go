@@ -6,6 +6,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -135,19 +136,19 @@ func GetZone(ctx context.Context, zoneID int) (Zone, error) {
 }
 
 // GetZones : get all the zone by the tenant_id
-func GetZones(ctx context.Context, tenantID int, limite int, offset int) ([]Zone, error) {
+func GetZones(ctx context.Context, tenantID int, paging Paging) ([]Zone, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	var zones []Zone
 	var zone Zone
 
-	limite, offset = CheckArgZone(limite, offset)
-
-	rows, err := pool.QueryContext(ctx,
-		`SELECT DISTINCT z.zone_id, z.tenant_id, z.name, z.type, z.color, z.geo, z.created_at, z.updated_at
-		FROM zones z, tenants t
-		WHERE z.tenant_id = $1 LIMIT $2 OFFSET $3`, tenantID, limite, offset)
+	rows, err := pool.QueryContext(ctx, fmt.Sprintf(`
+		SELECT DISTINCT zone_id, tenant_id, name, type, color, geo, created_at, updated_at
+		FROM zones
+		WHERE tenant_id = $1
+		%s
+	`, paging.buildQuery()), tenantID)
 
 	if err != nil {
 		return zones, err
@@ -416,20 +417,6 @@ func CountZone(ctx context.Context, tenantID int) (int, error) {
 		return count, err
 	}
 	return count, nil
-}
-
-// CheckArgZone : check limit and offset arguments
-func CheckArgZone(limite int, offset int) (int, int) {
-
-	if limite == 0 {
-		limite = 20
-	}
-
-	if offset == 0 {
-		offset = 0
-	}
-
-	return limite, offset
 }
 
 /********************************** OPTIONS **********************************/

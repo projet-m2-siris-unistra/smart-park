@@ -2,10 +2,11 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"time"
-	"database/sql"
 
 	"gopkg.in/guregu/null.v3"
 )
@@ -20,7 +21,7 @@ type Place struct {
 	Timestamps
 }
 
-// PlaceResponse returns the id of the updated / created object 
+// PlaceResponse returns the id of the updated / created object
 type PlaceResponse struct {
 	PlaceID int `json:"place_id"`
 }
@@ -50,23 +51,28 @@ func GetPlace(ctx context.Context, placeID int) (Place, error) {
 }
 
 // GetPlaces : get all the place
-func GetPlaces(ctx context.Context, zoneID int, limite int, offset int) ([]Place, error) {
+func GetPlaces(ctx context.Context, zoneID int, paging Paging) ([]Place, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	var places []Place
 	var place Place
 
-	limite, offset = CheckArgPlace(limite, offset)
-	
-	rows, err := pool.QueryContext(ctx,
-		`SELECT DISTINCT place_id, zone_id, type, geo, device_id, created_at, updated_at
-		FROM places WHERE zone_id = $1 LIMIT $2 OFFSET $3`, zoneID, limite, offset)
+	rows, err := pool.QueryContext(
+		ctx,
+		fmt.Sprintf(`
+			SELECT DISTINCT place_id, zone_id, type, geo, device_id, created_at, updated_at
+			FROM places 
+			WHERE zone_id = $1
+			%s
+		`, paging.buildQuery()),
+		zoneID,
+	)
 
 	if err != nil {
 		return places, err
 	}
-	
+
 	defer rows.Close()
 
 	for rows.Next() {
@@ -87,7 +93,6 @@ func GetPlaces(ctx context.Context, zoneID int, limite int, offset int) ([]Place
 	return places, nil
 }
 
-
 // GetPlacesWithNoDevice : get all place with a null device_id which means the place has not an assigned device
 func GetPlacesWithNoDevice(ctx context.Context) ([]Place, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -95,7 +100,7 @@ func GetPlacesWithNoDevice(ctx context.Context) ([]Place, error) {
 
 	var places []Place
 	var place Place
-	
+
 	rows, err := pool.QueryContext(ctx,
 		`SELECT DISTINCT place_id, zone_id, type, geo, created_at, updated_at
 		from places where device_id is null`)
@@ -103,7 +108,7 @@ func GetPlacesWithNoDevice(ctx context.Context) ([]Place, error) {
 	if err != nil {
 		return places, err
 	}
-	
+
 	defer rows.Close()
 
 	for rows.Next() {
@@ -124,7 +129,6 @@ func GetPlacesWithNoDevice(ctx context.Context) ([]Place, error) {
 
 	return places, nil
 }
-
 
 /********************************** GET **********************************/
 
@@ -263,8 +267,7 @@ func NewPlace(ctx context.Context, zoneID int, placetype string,
 
 /********************************** CREATE **********************************/
 
-
-/********************************** DELETE **********************************/	
+/********************************** DELETE **********************************/
 
 // DeletePlace : delete place
 func DeletePlace(ctx context.Context, placeID int) (PlaceResponse, error) {
@@ -291,9 +294,7 @@ func DeletePlace(ctx context.Context, placeID int) (PlaceResponse, error) {
 	return place, nil
 }
 
-
 /********************************** DELETE **********************************/
-
 
 /********************************** OPTIONS **********************************/
 
@@ -301,7 +302,7 @@ func DeletePlace(ctx context.Context, placeID int) (PlaceResponse, error) {
 func CountPlace(ctx context.Context) (int, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	
+
 	var count int
 
 	count = -1
@@ -313,20 +314,6 @@ func CountPlace(ctx context.Context) (int, error) {
 		return count, err
 	}
 	return count, nil
-}
-
-// CheckArgPlace : check limit and offset arguments
-func CheckArgPlace(limite int, offset int) (int, int) {
-
-	if limite == 0 {
-		limite = 20
-	}
-
-	if offset == 0 {
-		offset = 0
-	}
-
-	return limite, offset
 }
 
 /********************************** OPTIONS **********************************/
