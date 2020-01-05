@@ -7,7 +7,7 @@ import (
 	"github.com/projet-m2-siris-unistra/smart-park/backend/handlers"
 )
 
-// ListZones returns the list of zones of a handler
+// ListZones returns the list of zones of a tenant
 func ListZones(ctx context.Context, tenantID int, offset, limit int) (*handlers.ZoneList, error) {
 	req := handlers.ListZonesRequest{
 		TenantID: tenantID,

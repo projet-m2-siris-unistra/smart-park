@@ -7,11 +7,11 @@ import (
 	"github.com/projet-m2-siris-unistra/smart-park/backend/database"
 )
 
-type getTenantRequest struct {
+type GetTenantRequest struct {
 	TenantID int `json:"tenant_id"`
 }
 
-type getTenantsRequest struct {
+type ListTenantsRequest struct {
 	database.Paging
 }
 
@@ -21,22 +21,22 @@ type updateTenantsRequest struct {
 	Geography string `json:"geo,omitempty"`
 }
 
-type resultListTenant struct {
+type TenantList struct {
 	Count int               `json:"count"`
 	Data  []database.Tenant `json:"data"`
 }
 
 /********************************** GET **********************************/
-func getTenant(ctx context.Context, request getTenantRequest) (database.Tenant, error) {
+func getTenant(ctx context.Context, request GetTenantRequest) (database.Tenant, error) {
 	log.Println("handlers: handling getTenant")
 
 	return database.GetTenant(ctx, request.TenantID)
 }
 
-func getTenants(ctx context.Context, request getTenantsRequest) (resultListTenant, error) {
+func getTenants(ctx context.Context, request ListTenantsRequest) (TenantList, error) {
 	log.Println("handlers: handling getTenants")
 
-	var result resultListTenant
+	var result TenantList
 	var err error
 	result.Count, err = database.CountTenant(ctx)
 	if err != nil {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/projet-m2-siris-unistra/smart-park/api/bus"
 	"github.com/projet-m2-siris-unistra/smart-park/api/utils"
+	"github.com/projet-m2-siris-unistra/smart-park/api/v1/tenants"
 	"github.com/projet-m2-siris-unistra/smart-park/api/v1/zones"
 )
 
@@ -29,6 +30,7 @@ func main() {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api/v1").Subrouter()
 	zones.Register(api)
+	tenants.Register(api)
 	r.Use(utils.LoggingMiddleware)
 
 	log.Fatal(http.ListenAndServe(":9123", r))

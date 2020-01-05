@@ -75,6 +75,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	vars := mux.Vars(r)
+	tenantID := 1
+	if id, ok := vars["tenant_id"]; ok {
+		tenantID, _ = strconv.Atoi(id)
+	}
 	offset, limit := utils.ParseOffsetLimit(vars)
 	list, err := bus.ListZones(ctx, tenantID, offset, limit)
 	if err != nil {
@@ -107,8 +111,12 @@ func get(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
-	zone, err := bus.GetZone(ctx, tenantID, id)
+	tenantID := 1
+	if id, ok := vars["tenant_id"]; ok {
+		tenantID, _ = strconv.Atoi(id)
+	}
+	zoneID, _ := strconv.Atoi(vars["zone_id"])
+	zone, err := bus.GetZone(ctx, tenantID, zoneID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -127,8 +135,8 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 // Register adds the zones routes to the giver router
 func Register(router *mux.Router) {
-	s := router.PathPrefix("/zones").Subrouter()
-	s.Path("").
+	root := router.PathPrefix("/zones").Subrouter()
+	root.Path("").
 		Queries(
 			"offset", "{offset:[0-9]+}",
 			"limit", "{limit:[0-9]+}",
@@ -136,11 +144,11 @@ func Register(router *mux.Router) {
 		Methods("GET").
 		HandlerFunc(index)
 
-	s.Path("").
+	root.Path("").
 		Methods("GET").
 		HandlerFunc(index)
 
-	s.Path("/{id:[0-9]+}").
+	root.Path("/{zone_id:[0-9]+}").
 		Methods("GET").
 		HandlerFunc(get)
 }
