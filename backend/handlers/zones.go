@@ -7,15 +7,16 @@ import (
 	"github.com/projet-m2-siris-unistra/smart-park/backend/database"
 )
 
-type getZoneRequest struct {
+// GetZoneRequest holds the parameters of a zones.get request
+type GetZoneRequest struct {
 	ZoneID int `json:"zone_id"`
 }
 
-// get all Zone of a tenant
-type getZonesRequest struct {
+// ListZonesRequest holds the parameters of a zones.list request
+type ListZonesRequest struct {
 	TenantID int `json:"tenant_id"`
-	Limite int `json:"limit,omitempty"`
-	Offset int `json:"offset,omitempty"`
+	Limit    int `json:"limit,omitempty"`
+	Offset   int `json:"offset,omitempty"`
 }
 
 type updateZoneRequest struct {
@@ -35,29 +36,30 @@ type newZoneRequest struct {
 	Geography string `json:"geo"`
 }
 
-type resultListZone struct {
-	Count int `json:"count"`
-	Data []database.Zone `json:"data"`
+// ZoneList holds the result of a zones.list call
+type ZoneList struct {
+	Count int             `json:"count"`
+	Data  []database.Zone `json:"data"`
 }
 
 /********************************** GET **********************************/
 
-func getZone(ctx context.Context, request getZoneRequest) (database.Zone, error) {
+func getZone(ctx context.Context, request GetZoneRequest) (database.Zone, error) {
 	log.Println("handlers: handling getZone")
 
 	return database.GetZone(ctx, request.ZoneID)
 }
 
-func getZones(ctx context.Context, request getZonesRequest) (resultListZone, error) {
+func getZones(ctx context.Context, request ListZonesRequest) (ZoneList, error) {
 	log.Println("handlers: handling getZones of a tenant")
 
-	var result resultListZone
-	var err error 
+	var result ZoneList
+	var err error
 	result.Count, err = database.CountZone(ctx, request.TenantID)
 	if err != nil {
 		return result, err
 	}
-	result.Data, err = database.GetZones(ctx, request.TenantID, request.Limite, request.Offset)
+	result.Data, err = database.GetZones(ctx, request.TenantID, request.Limit, request.Offset)
 	if err != nil {
 		return result, err
 	}
@@ -88,7 +90,7 @@ func newZone(ctx context.Context, request newZoneRequest) (database.ZoneResponse
 /********************************** CREATE **********************************/
 
 /********************************** DELETE **********************************/
-func deleteZone(ctx context.Context, request getZoneRequest) (database.ZoneResponse, error) {
+func deleteZone(ctx context.Context, request GetZoneRequest) (database.ZoneResponse, error) {
 	log.Println("handlers: handling deleteZone")
 
 	return database.DeleteZone(ctx, request.ZoneID)
