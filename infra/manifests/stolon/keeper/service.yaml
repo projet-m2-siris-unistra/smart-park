@@ -1,12 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: stolon-proxy
+  name: stolon-keeper
 spec:
   ports:
-  - port: 5432
-    targetPort: 5432
-    name: pg
   - port: 8080
     targetPort: 8080
     name: metrics
+  clusterIP: None

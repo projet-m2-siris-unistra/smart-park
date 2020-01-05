@@ -6,3 +6,8 @@ commonLabels:
 
 resources:
 - statefulset.yaml
+- service.yaml
+- servicemonitor.yaml
+
+configurations:
+- ../../kustomizeconfig/servicemonitor.yaml

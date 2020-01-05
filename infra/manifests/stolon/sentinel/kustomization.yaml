@@ -6,3 +6,8 @@ commonLabels:
 
 resources:
 - deployment.yaml
+- service.yaml
+- servicemonitor.yaml
+
+configurations:
+- ../../kustomizeconfig/servicemonitor.yaml
