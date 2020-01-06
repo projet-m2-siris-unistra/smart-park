@@ -14,3 +14,8 @@ data class ZoneListResponse(
     val page: PageInfo,
     val zones: List<Zone>
 )
+
+data class TenantListResponse(
+    val page: PageInfo,
+    val tenants: List<Tenant>
+)

@@ -9,6 +9,12 @@ data class ApiResult<out T>(val status: Status, val data: T?, val message: Strin
         LOADING
     }
 
+    fun <R> map(mapper: (it: T) -> R): ApiResult<R> =
+        when(status) {
+            Status.SUCCESS -> ApiResult(Status.SUCCESS, mapper(data!!), message)
+            else -> ApiResult(status, null, message)
+        }
+
     companion object {
         fun <T> success(data: T): ApiResult<T> {
             return ApiResult(

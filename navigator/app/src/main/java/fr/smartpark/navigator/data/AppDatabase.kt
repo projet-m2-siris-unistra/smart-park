@@ -2,9 +2,11 @@ package fr.smartpark.navigator.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import fr.smartpark.navigator.data.models.Tenant
 import fr.smartpark.navigator.data.models.Zone
 
-@Database(entities = [Zone::class], version = 2, exportSchema = true)
+@Database(entities = [Tenant::class, Zone::class], version = 3, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun zonesDao(): ZoneDao
+    abstract fun zoneDao(): ZoneDao
+    abstract fun tenantDao(): TenantDao
 }

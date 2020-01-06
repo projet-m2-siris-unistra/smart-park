@@ -10,6 +10,6 @@ class ZoneRepository @Inject constructor(private val dao: ZoneDao,
     val zones = resultLiveData(
         databaseQuery = { dao.getZones() },
         networkCall = { remoteDataSource.getZones() },
-        saveCallResult = { dao.insertAll(it.zones) }
+        saveCallResult = { dao.insertAll(it) }
     )
 }

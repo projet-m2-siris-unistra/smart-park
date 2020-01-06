@@ -27,5 +27,4 @@
             android:name="parkingZone"
             app:argType="fr.smartpark.navigator.data.models.Zone" />
     </fragment>
-
 </navigation>

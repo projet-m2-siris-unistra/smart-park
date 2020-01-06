@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_tenants"
+    app:startDestination="@id/tenantList">
+
+    <fragment
+        android:id="@+id/tenantList"
+        android:name="fr.smartpark.navigator.TenantListFragment"
+        tools:layout="@layout/fragment_tenant_list"
+        android:label="TenantListFragment" >
+        <action
+            android:id="@+id/action_tenantList_to_zones"
+            app:destination="@id/zones" />
+    </fragment>
+    <activity
+        android:id="@+id/zones"
+        android:name="fr.smartpark.navigator.ZonesActivity"
+        tools:layout="@layout/activity_zones"
+        android:label="MainActivity" >
+        <argument
+            android:name="tenantId"
+            app:argType="long" />
+    </activity>
+</navigation>

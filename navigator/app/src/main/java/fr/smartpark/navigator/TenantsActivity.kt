@@ -3,13 +3,13 @@ package fr.smartpark.navigator
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import fr.smartpark.navigator.databinding.ActivityMainBinding
+import fr.smartpark.navigator.databinding.ActivityTenantsBinding
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+class TenantsActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityTenantsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_tenants)
     }
 }
