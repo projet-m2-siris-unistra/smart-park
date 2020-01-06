@@ -1,5 +1,6 @@
 package fr.smartpark.navigator.data.models
 
+import android.graphics.Color
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -17,4 +18,12 @@ data class Zone(
     val type: String,
     val color: String?
     // @Ignore val geo: List<Point>?
-) : Parcelable
+) : Parcelable {
+    fun parseColor(): Int? = color?.let {
+        when (it.length) {
+            6 -> Color.parseColor("#$it")
+            7 -> Color.parseColor("#$it")
+            else -> null
+        }
+    }
+}
