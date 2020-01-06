@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "tenants")
 data class Tenant(
-    @PrimaryKey @ColumnInfo(name = "id") @SerializedName("tenant_id") val tenantId: Long,
+    @PrimaryKey @ColumnInfo(name = "id") @SerializedName("id") val tenantId: Long,
     val name: String
 )
 

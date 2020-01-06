@@ -26,6 +26,9 @@ class ParkingZoneListFragment : DaggerFragment() {
     ): View? {
         binding = FragmentParkingZoneListBinding.inflate(inflater, container, false)
 
+        val tenantId = (requireActivity() as ZonesActivity).getTenantId()
+        viewModel.start(tenantId)
+
         val adapter = ParkingZoneAdapter()
         binding.zoneList.adapter = adapter
         viewModel.zones.observe(viewLifecycleOwner) { zones ->

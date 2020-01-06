@@ -11,6 +11,8 @@ class ZonesActivity : AppCompatActivity() {
     private lateinit var binding: ActivityZonesBinding
     private val args: ZonesActivityArgs by navArgs()
 
+    fun getTenantId() = args.tenantId
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_zones)

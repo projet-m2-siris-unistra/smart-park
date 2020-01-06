@@ -6,12 +6,12 @@ import fr.smartpark.navigator.data.ZoneRepository
 import javax.inject.Inject
 
 class ParkingZoneDetailViewModel @Inject constructor(
-    zoneRepository: ZoneRepository
+    private val zoneRepository: ZoneRepository
 ) : ViewModel() {
-    private val _zoneId = MutableLiveData<Long>()
-    val zone: LiveData<Zone> = _zoneId.switchMap { id -> zoneRepository.getZone(id) }
+    private val _params = MutableLiveData<Pair<Long, Long>>()
+    val zone: LiveData<Zone> = _params.switchMap { zoneRepository.getZone(it.first, it.second) }
 
-    fun start(zoneId: Long) {
-        _zoneId.postValue(zoneId)
+    fun start(tenantId: Long, zoneId: Long) {
+        _params.postValue(Pair(tenantId, zoneId))
     }
 }

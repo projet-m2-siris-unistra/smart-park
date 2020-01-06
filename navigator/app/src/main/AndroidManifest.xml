@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="fr.smartpark.navigator">
 
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".NavigatorApplication"
         android:allowBackup="true"
@@ -11,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity android:name=".TenantsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,9 +36,4 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="YOUR_API_KEY" />
     </application>
-
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true"/>
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
