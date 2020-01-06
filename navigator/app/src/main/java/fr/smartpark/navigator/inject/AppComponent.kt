@@ -12,7 +12,8 @@ import javax.inject.Singleton
 @Component(modules = [
     AppModule::class,
     AndroidSupportInjectionModule::class,
-    ParkingZoneDetailModule::class
+    ParkingZoneDetailModule::class,
+    ParkingZoneListModule::class
 ])
 interface AppComponent : AndroidInjector<NavigatorApplication> {
     @Component.Factory
