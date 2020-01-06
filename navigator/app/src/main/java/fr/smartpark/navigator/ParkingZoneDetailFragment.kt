@@ -7,24 +7,24 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionInflater
+import dagger.android.support.DaggerFragment
 import fr.smartpark.navigator.databinding.FragmentParkingZoneDetailBinding
 import fr.smartpark.navigator.utilities.InjectorUtils
 import fr.smartpark.navigator.viewmodels.ParkingZoneDetailViewModel
+import javax.inject.Inject
 
-class ParkingZoneDetailFragment : Fragment() {
+class ParkingZoneDetailFragment : DaggerFragment() {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel by viewModels<ParkingZoneDetailViewModel> { viewModelFactory }
+
     private lateinit var binding: FragmentParkingZoneDetailBinding
 
     private val args: ParkingZoneDetailFragmentArgs by navArgs()
-
-    private val viewModel: ParkingZoneDetailViewModel by viewModels {
-        InjectorUtils.provideParkingZoneDetailViewModelFactory(
-            requireContext(),
-            args.parkingZone.zoneId
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +37,7 @@ class ParkingZoneDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentParkingZoneDetailBinding.inflate(inflater, container, false)
+        viewModel.start(args.parkingZone.zoneId)
 
         viewModel.zone.observe(viewLifecycleOwner) { zone ->
             binding.zone = zone

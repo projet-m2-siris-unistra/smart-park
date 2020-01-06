@@ -1,13 +1,18 @@
 package fr.smartpark.navigator.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import fr.smartpark.navigator.data.ParkingZone
 import fr.smartpark.navigator.data.ParkingZoneRepository
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ParkingZoneDetailViewModel internal constructor(
-    zoneRepository: ParkingZoneRepository,
-    zoneId: String
+class ParkingZoneDetailViewModel @Inject constructor(
+    zoneRepository: ParkingZoneRepository
 ) : ViewModel() {
-    val zone: LiveData<ParkingZone> = zoneRepository.getZone(zoneId)
+    private val _zoneId = MutableLiveData<String>()
+    val zone: LiveData<ParkingZone> = _zoneId.switchMap { id -> zoneRepository.getZone(id) }
+
+    fun start(zoneId: String) {
+        _zoneId.postValue(zoneId)
+    }
 }
