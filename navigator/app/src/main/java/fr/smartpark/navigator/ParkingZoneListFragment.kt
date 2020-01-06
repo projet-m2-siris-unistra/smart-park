@@ -29,7 +29,7 @@ class ParkingZoneListFragment : DaggerFragment() {
         val adapter = ParkingZoneAdapter()
         binding.zoneList.adapter = adapter
         viewModel.zones.observe(viewLifecycleOwner) { zones ->
-            adapter.submitList(zones)
+            zones.data?.let { adapter.submitList(it) }
         }
         return binding.root
     }

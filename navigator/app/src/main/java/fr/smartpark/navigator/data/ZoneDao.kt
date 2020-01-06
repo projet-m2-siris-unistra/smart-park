@@ -4,15 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import fr.smartpark.navigator.data.models.Zone
 
 @Dao
-interface ParkingZoneDao {
+interface ZoneDao {
     @Query("SELECT * FROM zones ORDER BY id")
-    fun getZones(): LiveData<List<ParkingZone>>
+    fun getZones(): LiveData<List<Zone>>
 
     @Query("SELECT * from zones WHERE id = :id")
-    fun getZone(id: String): LiveData<ParkingZone>
+    fun getZone(id: Long): LiveData<Zone>
 
     @Insert
-    suspend fun insertAll(zones: List<ParkingZone>)
+    suspend fun insertAll(zones: List<Zone>)
 }

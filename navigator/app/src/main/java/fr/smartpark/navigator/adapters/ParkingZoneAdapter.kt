@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fr.smartpark.navigator.HomeFragmentDirections
 import fr.smartpark.navigator.R
-import fr.smartpark.navigator.data.ParkingZone
+import fr.smartpark.navigator.data.models.Zone
 import fr.smartpark.navigator.databinding.FragmentParkingZoneItemBinding
 
 class ParkingZoneAdapter :
-    ListAdapter<ParkingZone, ParkingZoneAdapter.ViewHolder>(ParkingZoneDiffCallback()) {
+    ListAdapter<Zone, ParkingZoneAdapter.ViewHolder>(ParkingZoneDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             DataBindingUtil.inflate(
@@ -36,7 +36,7 @@ class ParkingZoneAdapter :
     class ViewHolder(
         private val binding: FragmentParkingZoneItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
-        private fun navigateToZone(zone: ParkingZone, view: View) {
+        private fun navigateToZone(zone: Zone, view: View) {
             val directions = HomeFragmentDirections.actionHomeToParkingZoneDetail(zone)
 
             val extras = FragmentNavigatorExtras(
@@ -47,7 +47,7 @@ class ParkingZoneAdapter :
             view.findNavController().navigate(directions, extras)
         }
 
-        fun bind(item: ParkingZone) {
+        fun bind(item: Zone) {
             binding.apply {
                 zone = item
 
@@ -61,10 +61,10 @@ class ParkingZoneAdapter :
     }
 }
 
-private class ParkingZoneDiffCallback : DiffUtil.ItemCallback<ParkingZone>() {
-    override fun areContentsTheSame(oldItem: ParkingZone, newItem: ParkingZone) =
+private class ParkingZoneDiffCallback : DiffUtil.ItemCallback<Zone>() {
+    override fun areContentsTheSame(oldItem: Zone, newItem: Zone) =
         oldItem == newItem
 
-    override fun areItemsTheSame(oldItem: ParkingZone, newItem: ParkingZone) =
+    override fun areItemsTheSame(oldItem: Zone, newItem: Zone) =
         oldItem.zoneId == newItem.zoneId
 }

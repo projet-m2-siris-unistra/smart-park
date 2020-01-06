@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
+import fr.smartpark.navigator.api.ApiService
+import fr.smartpark.navigator.api.ZoneRemoteDataSource
 import fr.smartpark.navigator.data.AppDatabase
-import fr.smartpark.navigator.data.ParkingZoneRepository
+import fr.smartpark.navigator.data.ZoneDao
+import fr.smartpark.navigator.data.ZoneRepository
 import fr.smartpark.navigator.utilities.DATABASE_NAME
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
@@ -15,14 +18,27 @@ object AppModule {
     @JvmStatic
     @Singleton
     @Provides
-    fun provideParkingZoneRepository(database: AppDatabase) =
-        ParkingZoneRepository(database.zonesDao())
+    fun provideZoneRemoteDataSource(service: ApiService) =
+        ZoneRemoteDataSource(service)
+
+    @JvmStatic
+    @Singleton
+    @Provides
+    fun provideZoneDao(database: AppDatabase) =
+        database.zonesDao()
+
+    @JvmStatic
+    @Singleton
+    @Provides
+    fun provideZoneRepository(dao: ZoneDao, remoteDataSource: ZoneRemoteDataSource) =
+        ZoneRepository(dao, remoteDataSource)
 
     @JvmStatic
     @Singleton
     @Provides
     fun provideDatabase(context: Context) =
         Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DATABASE_NAME)
+            .fallbackToDestructiveMigration()
             .build()
 
     @JvmStatic

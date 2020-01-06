@@ -10,7 +10,7 @@
 
         <variable
             name="zone"
-            type="fr.smartpark.navigator.data.ParkingZone" />
+            type="fr.smartpark.navigator.data.models.Zone" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

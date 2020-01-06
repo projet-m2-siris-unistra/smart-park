@@ -25,7 +25,7 @@
         android:label="ParkingZoneDetail" >
         <argument
             android:name="parkingZone"
-            app:argType="fr.smartpark.navigator.data.ParkingZone" />
+            app:argType="fr.smartpark.navigator.data.models.Zone" />
     </fragment>
 
 </navigation>

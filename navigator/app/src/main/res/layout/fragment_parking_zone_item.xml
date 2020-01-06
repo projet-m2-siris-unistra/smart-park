@@ -10,7 +10,7 @@
 
         <variable
             name="zone"
-            type="fr.smartpark.navigator.data.ParkingZone" />
+            type="fr.smartpark.navigator.data.models.Zone" />
 
         <variable
             name="clickListener"
