@@ -5,9 +5,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <import type="android.graphics.Color"/>
-        <import type="androidx.databinding.adapters.Converters"/>
-
         <variable
             name="zone"
             type="fr.smartpark.navigator.data.models.Zone" />
@@ -20,13 +17,11 @@
             android:id="@+id/zone_card"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@{Converters.convertColorToDrawable(zone.parseColor())}"
             tools:background="@color/colorPrimaryDark"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:transitionName="@{@string/transition_zone_card(zone.zoneId)}">
+            app:layout_constraintTop_toTopOf="parent">
 
             <include
                 android:id="@+id/zone_card_content"

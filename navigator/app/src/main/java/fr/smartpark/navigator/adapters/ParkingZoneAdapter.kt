@@ -40,8 +40,7 @@ class ParkingZoneAdapter :
             val directions = ParkingZoneListFragmentDirections.actionZoneListToDetail(zone)
 
             val extras = FragmentNavigatorExtras(
-                binding.zoneCardContent.root to binding.zoneCardContent.root.transitionName,
-                binding.zoneCard to binding.zoneCard.transitionName
+                binding.zoneCardContent.root to binding.zoneCardContent.root.transitionName
             )
 
             view.findNavController().navigate(directions, extras)

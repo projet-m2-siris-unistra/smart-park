@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import dagger.android.support.DaggerFragment
 import fr.smartpark.navigator.adapters.ParkingZoneAdapter
+import fr.smartpark.navigator.api.ApiResult
 import fr.smartpark.navigator.databinding.FragmentParkingZoneListBinding
 import fr.smartpark.navigator.viewmodels.ParkingZoneListViewModel
 import javax.inject.Inject
@@ -32,7 +33,11 @@ class ParkingZoneListFragment : DaggerFragment() {
         val adapter = ParkingZoneAdapter()
         binding.zoneList.adapter = adapter
         viewModel.zones.observe(viewLifecycleOwner) { zones ->
-            zones.data?.let { adapter.submitList(it) }
+            if (zones.status == ApiResult.Status.SUCCESS) {
+                binding.zoneList.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
+                adapter.submitList(zones.data!!)
+            }
         }
         return binding.root
     }
