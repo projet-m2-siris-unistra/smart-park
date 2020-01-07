@@ -9,7 +9,7 @@ import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import fr.smartpark.navigator.HomeFragmentDirections
+import fr.smartpark.navigator.ParkingZoneListFragmentDirections
 import fr.smartpark.navigator.R
 import fr.smartpark.navigator.data.models.Zone
 import fr.smartpark.navigator.databinding.FragmentParkingZoneItemBinding
@@ -37,7 +37,7 @@ class ParkingZoneAdapter :
         private val binding: FragmentParkingZoneItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         private fun navigateToZone(zone: Zone, view: View) {
-            val directions = HomeFragmentDirections.actionHomeToParkingZoneDetail(zone)
+            val directions = ParkingZoneListFragmentDirections.actionZoneListToDetail(zone)
 
             val extras = FragmentNavigatorExtras(
                 binding.zoneCardContent.root to binding.zoneCardContent.root.transitionName,
