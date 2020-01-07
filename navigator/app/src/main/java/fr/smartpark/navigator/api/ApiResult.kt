@@ -5,6 +5,7 @@ data class ApiResult<out T>(val status: Status, val data: T?, val message: Strin
 
     enum class Status {
         SUCCESS,
+        CACHED,
         ERROR,
         LOADING
     }
@@ -12,10 +13,19 @@ data class ApiResult<out T>(val status: Status, val data: T?, val message: Strin
     fun <R> map(mapper: (it: T) -> R): ApiResult<R> =
         when(status) {
             Status.SUCCESS -> ApiResult(Status.SUCCESS, mapper(data!!), message)
+            Status.CACHED -> ApiResult(Status.SUCCESS, mapper(data!!), message)
             else -> ApiResult(status, null, message)
         }
 
     companion object {
+        fun <T> cached(data: T): ApiResult<T> {
+            return ApiResult(
+                Status.CACHED,
+                data,
+                null
+            )
+        }
+
         fun <T> success(data: T): ApiResult<T> {
             return ApiResult(
                 Status.SUCCESS,

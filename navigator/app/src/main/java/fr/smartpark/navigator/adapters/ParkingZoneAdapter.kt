@@ -1,5 +1,6 @@
 package fr.smartpark.navigator.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,7 +44,8 @@ class ParkingZoneAdapter :
                 binding.zoneCardContent.root to binding.zoneCardContent.root.transitionName
             )
 
-            view.findNavController().navigate(directions, extras)
+            Log.d("GRAPH", view.findNavController().graph.toString())
+            //view.findNavController().navigate(directions, extras)
         }
 
         fun bind(item: Zone) {

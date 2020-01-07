@@ -11,7 +11,7 @@ fun <T, A> resultLiveData(databaseQuery: () -> LiveData<T>,
                           saveCallResult: suspend (A) -> Unit): LiveData<ApiResult<T>> =
     liveData(Dispatchers.IO) {
         emit(ApiResult.loading())
-        val source = databaseQuery.invoke().map { ApiResult.success(it) }
+        val source = databaseQuery.invoke().map { ApiResult.cached(it) }
         emitSource(source)
 
         val responseStatus = networkCall.invoke()

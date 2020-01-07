@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ListPreference
+        android:key="night_mode"
+        android:title="Dark mode enabled"
+        android:entries="@array/night_mode"
+        app:useSimpleSummaryProvider="true"
+        android:defaultValue="@string/default_night_mode"
+        android:entryValues="@array/night_mode_values" />
+
+</PreferenceScreen>

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -33,12 +34,19 @@ class ParkingZoneListFragment : DaggerFragment() {
         val adapter = ParkingZoneAdapter()
         binding.zoneList.adapter = adapter
         viewModel.zones.observe(viewLifecycleOwner) { zones ->
-            if (zones.status == ApiResult.Status.SUCCESS) {
+            if (zones.status == ApiResult.Status.SUCCESS
+                || zones.status == ApiResult.Status.CACHED && !zones.data.isNullOrEmpty()) {
                 binding.zoneList.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
                 adapter.submitList(zones.data!!)
             }
         }
+
+        binding.root.setOnApplyWindowInsetsListener { _, insets ->
+            binding.zoneList.updatePadding(bottom = insets.systemWindowInsetBottom)
+            insets
+        }
+
         return binding.root
     }
 }

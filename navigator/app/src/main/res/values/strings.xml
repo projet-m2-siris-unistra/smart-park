@@ -5,4 +5,5 @@
     <string name="transition_zone_card_content">zone card content %s</string>
 
     <string name="parking_zone_available">%d parking spaces available</string>
+    <string name="default_night_mode">AUTO</string>
 </resources>

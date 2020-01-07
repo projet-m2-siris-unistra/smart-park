@@ -20,6 +20,8 @@
             android:scrollbars="none"
             app:layoutManager="LinearLayoutManager"
             tools:context=".ParkingZoneListFragment"
+            android:clipToPadding="false"
+            android:paddingBottom="50dp"
             android:visibility="gone"
             tools:listitem="@layout/fragment_parking_zone_item" />
     </FrameLayout>

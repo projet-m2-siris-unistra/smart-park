@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_tenantList_to_zones"
             app:destination="@id/zones" />
+        <action
+            android:id="@+id/action_tenantList_to_settings"
+            app:destination="@id/settings" />
     </fragment>
     <activity
         android:id="@+id/zones"
@@ -23,4 +26,8 @@
             android:name="tenantId"
             app:argType="long" />
     </activity>
+    <fragment
+        android:id="@+id/settings"
+        android:name="fr.smartpark.navigator.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>
