@@ -2,6 +2,7 @@ version: '3'
 
 services:
   web:
+    image: m2smartpark/web
     build: web
     ports:
     - "8080:8080"
@@ -32,6 +33,7 @@ services:
     - "./backend/database/migrations:/migrations"
 
   backend:
+    image: m2smartpark/backend
     build: backend
     depends_on:
     - database
@@ -39,3 +41,13 @@ services:
     environment:
       NATS_URL: nats://nats:4222
       DATABASE: postgres://postgres:postgres@database/postgres?sslmode=disable
+
+  api:
+    image: m2smartpark/api
+    build: api
+    depends_on:
+    - nats
+    ports:
+    - "9123:9123"
+    environment:
+      NATS_URL: nats://nats:4222
