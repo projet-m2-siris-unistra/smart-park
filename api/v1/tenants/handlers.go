@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -15,9 +16,39 @@ import (
 	"github.com/projet-m2-siris-unistra/smart-park/backend/database"
 )
 
+type point struct {
+	Lat  float64 `json:"lat"`
+	Long float64 `json:"long"`
+}
+
+type tenant struct {
+	TenantID  int    `json:"tenant_id"`
+	Name      string `json:"name"`
+	Geography *point `json:"geo"`
+	database.Timestamps
+}
+
 type tenantList struct {
-	Info    utils.PageInfo    `json:"page"`
-	Tenants []database.Tenant `json:"tenants"`
+	Info    utils.PageInfo `json:"page"`
+	Tenants []tenant       `json:"tenants"`
+}
+
+func mapTenant(t *database.Tenant) tenant {
+	var geo *point
+	if !t.Geography.IsZero() {
+		g := *t.Geography.Ptr()
+		geo = new(point)
+		re := regexp.MustCompile(`\[\s*(\d*\.\d*)\s*,\s*(\d*.\d*)\s*\]`)
+		match := re.FindStringSubmatch(g)
+		geo.Lat, _ = strconv.ParseFloat(match[1], 64)
+		geo.Long, _ = strconv.ParseFloat(match[2], 64)
+	}
+	return tenant{
+		TenantID:   t.TenantID,
+		Name:       t.Name,
+		Geography:  geo,
+		Timestamps: t.Timestamps,
+	}
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -34,11 +65,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 	respList := tenantList{
 		Info:    utils.GeneratePageInfo(list.Count, offset, limit),
-		Tenants: []database.Tenant{},
+		Tenants: []tenant{},
 	}
 
 	for _, item := range list.Data {
-		respList.Tenants = append(respList.Tenants, item)
+		respList.Tenants = append(respList.Tenants, mapTenant(&item))
 	}
 
 	resp, err := json.Marshal(respList)
@@ -64,7 +95,7 @@ func get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := json.Marshal(tenant)
+	resp, err := json.Marshal(mapTenant(tenant))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
