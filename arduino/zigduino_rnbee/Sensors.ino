@@ -18,7 +18,7 @@ boolean read_pir()
   else
     pir=0;
   debugSerial.print("pir=");
-  debugSerial.print(pir);  
+  debugSerial.println(pir);  
 }
 
 void read_light()

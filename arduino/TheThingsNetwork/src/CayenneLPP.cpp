@@ -124,6 +124,20 @@ uint8_t CayenneLPP::addPresence(uint8_t channel, uint8_t value)
   return cursor;
 }
 
+uint8_t CayenneLPP::addPercentage(uint8_t channel, uint16_t value)
+{
+  if ((cursor + LPP_PERCENTAGE_SIZE) > maxsize)
+  {
+    return 0;
+  }
+  buffer[cursor++] = channel;
+  buffer[cursor++] = LPP_PERCENTAGE;
+  buffer[cursor++] = value >> 8;
+  buffer[cursor++] = value;
+
+  return cursor;
+}
+
 uint8_t CayenneLPP::addTemperature(uint8_t channel, float celsius)
 {
   if ((cursor + LPP_TEMPERATURE_SIZE) > maxsize)

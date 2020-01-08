@@ -1,5 +1,8 @@
 #include "LIB.h"
 
+int sensorPin = A6;    // select the input pin for the potentiometer
+int sensorValue = 0;  // variable to store the value coming from the sensor
+
 void pinsInit()
 {
   pinMode(SENSOR_PIR, INPUT);
@@ -39,13 +42,23 @@ void loop()
   debugSerial.println("-- LOOP");
   
   lpp.reset();
-  lpp.addTemperature(1, 22.5);
-  lpp.addBarometricPressure(2, 1073.21);
-  lpp.addGPS(3, 52.37365, 4.88650, 2);
   lpp.addPresence(4, read_pir());
+
+
+  // read the value from the sensor:
+  sensorValue = analogRead(sensorPin);
+  Serial.println(sensorValue);
+  //float voltage = sensorValue * (5.0 / 1023.0);
+  float voltage = sensorValue / 9.8;
+  //int pour = (int) voltage;
+  Serial.println(voltage);
+  //Serial.println(pour);
+  lpp.addPercentage(5, voltage);
+
 
   // Send it off
   ttn.sendBytes(lpp.getBuffer(), lpp.getSize());
-  
-  delay(15000); 
+
+
+  delay(1000);
 }
