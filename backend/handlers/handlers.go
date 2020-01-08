@@ -11,31 +11,31 @@ import (
 )
 
 var handlers = map[string]interface{}{
-	"ping":             ping, 				// ping database server
-	"devices.get":      getDevice, 			// get a device by its id
-	"devices.get.notassigned": getNotAssignedDevices, 	// get all not assigned devices
-	"devices.get.free": getFreeDevices, 	// get all free devices
-	"tenants.get":      getTenant, 			// get a tenant by its id
-	"zones.get":        getZone, 			// get a zone by its id 
-	"places.get":       getPlace, 			// get a places by its id
-	"users.get":        getUser, 			// get a user by his/her id
-	"devices.list":     getDevices, 		// get all devices
-	"tenants.list":     getTenants, 		// get all tenants
-	"zones.list":       getZones, 			// get all zones by the tenant's id
-	"places.list":      getPlaces, 			// get all places by the zones' id
-	"users.list":       getUsers, 			// get all users
-	"devices.update":   updateDevice, 		// update devices' field
-	"tenants.update":   updateTenants, 		// update tenants' field
-	"zones.update":     updateZone, 		// update zones' field
-	"places.update":    updatePlace, 		// update places' field
-	"users.update":     updateUser, 		// update users' field
-	"devices.new":      newDevice, 			// create new device
-	"places.new":       newPlace, 			// create new place
-	"zones.new":        newZone, 			// create new zone
-	"places.delete":	deletePlace,		// remove the place 
-	"zones.delete":		deleteZone,			// remove the zone and all places
-	"devices.delete":	deleteDevice,			// remove the device
-	"faker.new":		createFakeData, 	// create fake data into the database (all tables)
+	"ping":                    ping,                  // ping database server
+	"devices.get":             getDevice,             // get a device by its id
+	"devices.get.notassigned": getNotAssignedDevices, // get all not assigned devices
+	"devices.get.free":        getFreeDevices,        // get all free devices
+	"tenants.get":             getTenant,             // get a tenant by its id
+	"zones.get":               getZone,               // get a zone by its id
+	"places.get":              getPlace,              // get a places by its id
+	"users.get":               getUser,               // get a user by his/her id
+	"devices.list":            getDevices,            // get all devices
+	"tenants.list":            getTenants,            // get all tenants
+	"zones.list":              getZones,              // get all zones by the tenant's id
+	"places.list":             getPlaces,             // get all places by the zones' id
+	"users.list":              getUsers,              // get all users
+	"devices.update":          updateDevice,          // update devices' field
+	"tenants.update":          updateTenants,         // update tenants' field
+	"zones.update":            updateZone,            // update zones' field
+	"places.update":           updatePlace,           // update places' field
+	"users.update":            updateUser,            // update users' field
+	"devices.new":             newDevice,             // create new device
+	"places.new":              newPlace,              // create new place
+	"zones.new":               newZone,               // create new zone
+	"places.delete":           deletePlace,           // remove the place
+	"zones.delete":            deleteZone,            // remove the zone and all places
+	"devices.delete":          deleteDevice,          // remove the device
+	"faker.new":               createFakeData,        // create fake data into the database (all tables)
 }
 
 // wrapHandler wraps a handler to do error handling and request/reply marshaling/unmarshaling
@@ -152,6 +152,6 @@ func Register(conn *nats.Conn) {
 	log.Println("handlers: register")
 	for name, fn := range handlers {
 		log.Printf("handlers: subscribing to %s", name)
-		conn.Subscribe(name, wrapHandler(fn))
+		conn.QueueSubscribe(name, "backend", wrapHandler(fn))
 	}
 }
