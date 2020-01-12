@@ -1,0 +1,94 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+spec:
+  serviceName: "vault-cluster"
+  replicas: 3
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: OnDelete
+  template:
+    spec:
+      serviceAccountName: vault
+      # terminationGracePeriodSeconds: 10
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 1000
+        runAsUser: 100
+        fsGroup: 1000
+      containers:
+      - name: vault
+        image: vault:1.3.1
+        command:
+        - vault
+        - server
+        - -config=/config/config.hcl
+        securityContext:
+          capabilities:
+            add: ["IPC_LOCK"]
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: VAULT_ADDR
+          value: "http://127.0.0.1:8200"
+        - name: VAULT_API_ADDR
+          value: "http://$(POD_NAME).vault-cluster.$(POD_NAMESPACE).svc:8200"
+        - name: VAULT_CLUSTER_ADDR
+          value: "http://$(POD_NAME).vault-cluster.$(POD_NAMESPACE).svc:8201"
+        - name: VAULT_RAFT_PATH
+          value: "/raft"
+        - name: VAULT_RAFT_NODE_ID
+          value: "$(POD_NAME)"
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: vault-raft
+          mountPath: /raft
+        - name: config
+          mountPath: /config
+        readinessProbe:
+          # Check status; unsealed vault servers return 0
+          # The exit code reflects the seal status:
+          #   0 - unsealed
+          #   1 - error
+          #   2 - sealed
+          exec:
+            command: ["/bin/sh", "-ec", "vault status -tls-skip-verify"]
+          failureThreshold: 2
+          initialDelaySeconds: 5
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 5
+        lifecycle:
+          # Vault container doesn't receive SIGTERM from Kubernetes
+          # and after the grace period ends, Kube sends SIGKILL.  This
+          # causes issues with graceful shutdowns such as deregistering itself
+          # from Consul (zombie services).
+          preStop:
+            exec:
+              command: ["/bin/sh","-c","kill -SIGTERM $(pidof vault)"]
+      volumes:
+      - name: config
+        configMap:
+          name: vault
+  volumeClaimTemplates:
+  - metadata:
+      name: vault-raft
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1G
