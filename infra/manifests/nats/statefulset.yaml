@@ -1,0 +1,103 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nats
+spec:
+  serviceName: "nats-mgmt"
+  replicas: 3
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-requests-cpu: "100m"
+        vault.hashicorp.com/agent-inject-secret-routes-ca.pem: "pki/issue/nats-routes"
+        vault.hashicorp.com/agent-inject-template-routes-ca.pem: |
+          {{ with secret "pki/issue/nats-routes" (env "HOSTNAME" | printf "common_name=%s.nats-mgmt.nats.svc") }}
+          {{ .Data.issuing_ca }}{{ end }}
+        vault.hashicorp.com/agent-inject-secret-routes-cert.pem: "pki/issue/nats-routes"
+        vault.hashicorp.com/agent-inject-template-routes-cert.pem: |
+          {{ with secret "pki/issue/nats-routes" (env "HOSTNAME" | printf "common_name=%s.nats-mgmt.nats.svc") }}
+          {{ .Data.certificate }}{{ end }}
+        vault.hashicorp.com/agent-inject-secret-routes-key.pem: "pki/issue/nats-routes"
+        vault.hashicorp.com/agent-inject-template-routes-key.pem: |
+          {{ with secret "pki/issue/nats-routes" (env "HOSTNAME" | printf "common_name=%s.nats-mgmt.nats.svc") }}
+          {{ .Data.private_key }}{{ end }}
+        vault.hashicorp.com/agent-inject-secret-server-ca.pem: "pki/issue/nats-server"
+        vault.hashicorp.com/agent-inject-template-server-ca.pem: |
+          {{ with secret "pki/issue/nats-server" "common_name=nats.nats.svc" }}
+          {{ .Data.issuing_ca }}{{ end }}
+        vault.hashicorp.com/agent-inject-secret-server-cert.pem: "pki/issue/nats-server"
+        vault.hashicorp.com/agent-inject-template-server-cert.pem: |
+          {{ with secret "pki/issue/nats-server" "common_name=nats.nats.svc" }}
+          {{ .Data.certificate }}{{ end }}
+        vault.hashicorp.com/agent-inject-secret-server-key.pem: "pki/issue/nats-server"
+        vault.hashicorp.com/agent-inject-template-server-key.pem: |
+          {{ with secret "pki/issue/nats-server" "common_name=nats.nats.svc" }}
+          {{ .Data.private_key }}{{ end }}
+        vault.hashicorp.com/role: nats-server
+    spec:
+      serviceAccountName: nats-server
+      containers:
+      - name: nats
+        image: nats:2.1.2-alpine
+        command:
+        - /bin/sh
+        - '-c'
+        - |
+          nats-server \
+          -c /etc/nats-config/nats.conf \
+          -P /var/run/nats/nats.pid \
+          --cluster_advertise $CLUSTER_ADVERTISE \
+          --connect_retries 10
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CLUSTER_ADVERTISE
+          value: "$(POD_NAME).nats-mgmt.$(POD_NAMESPACE).svc"
+        ports:
+        - containerPort: 6222
+          name: cluster
+          protocol: TCP
+        - containerPort: 8222
+          name: monitoring
+          protocol: TCP
+        - containerPort: 4222
+          name: client
+          protocol: TCP
+        volumeMounts:
+        - name: nats-config
+          mountPath: /etc/nats-config
+        - name: run
+          mountPath: /var/run/nats
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsUser: 65534
+          runAsGroup: 65534
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8222
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 10
+      volumes:
+      - name: nats-config
+        configMap:
+          name: nats
+      - name: run
+        emptyDir: {}
