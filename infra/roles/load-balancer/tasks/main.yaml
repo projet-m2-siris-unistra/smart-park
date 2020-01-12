@@ -1,0 +1,49 @@
+---
+- name: enable backports
+  apt_repository:
+    repo: 'deb http://ftp.fr.debian.org/debian buster-backports main'
+    update_cache: yes
+  tags: haproxy
+
+- name: install packages
+  apt:
+    pkg:
+    - keepalived
+    - ssl-cert
+    state: present
+  tags: keepalived
+
+- name: install haproxy from backports
+  apt:
+    pkg: haproxy
+    default_release: buster-backports
+    state: present
+  tags: haproxy
+
+- name: setup keepalived
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  notify: restart keepalived
+  tags: keepalived
+
+- name: setup haproxy
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify: restart haproxy
+  tags: haproxy
+
+- name: start haproxy
+  systemd:
+    name: haproxy
+    state: started
+    enabled: yes
+  tags: haproxy
+
+- name: start keepalived
+  systemd:
+    name: keepalived
+    state: started
+    enabled: yes
+  tags: keepalived

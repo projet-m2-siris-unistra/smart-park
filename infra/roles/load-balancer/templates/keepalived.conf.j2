@@ -1,0 +1,39 @@
+global_defs {
+	vrrp_version 3
+}
+
+vrrp_track_process chk_haproxy {
+	process "haproxy"
+}
+
+vrrp_sync_group MAIN {
+	group {
+		V4
+		V6
+	}
+
+	track_process {
+		chk_haproxy
+	}
+}
+
+vrrp_instance V4 {
+	interface {{ ansible_default_ipv4.interface }}
+	virtual_router_id 12
+	state BACKUP
+
+	virtual_ipaddress {
+		130.79.49.216/32
+	}
+}
+
+vrrp_instance V6 {
+	interface {{ ansible_default_ipv4.interface }}
+	virtual_router_id 12
+	state BACKUP
+
+	virtual_ipaddress {
+		fe80::cafe/64
+		2001:660:4701:2004::cafe/128
+	}
+}

@@ -1,7 +1,10 @@
 ---
 - hosts: all
-  become: true
   roles:
   - common
+
+- hosts: load-balancers
+  roles:
+    - load-balancer
 
 - import_playbook: kubespray/cluster.yml

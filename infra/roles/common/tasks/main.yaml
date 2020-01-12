@@ -19,6 +19,7 @@
     validate: 'visudo -cf %s'
   tags:
   - bootstrap
+  when: ansible_user != 'root'
 
 - name: disable ssh password auth
   lineinfile:
