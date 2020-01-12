@@ -50,6 +50,7 @@ async def view(request, zone_id):
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
+    await zoneInstance.setSpots()
 
     rendered_template = await render(
         'parking_template.html', 
@@ -69,6 +70,7 @@ async def stats(request, zone_id):
    
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
+    statistics = zoneInstance.getAllStats()
 
     rendered_template = await render(
         'parking_template.html', 
@@ -77,7 +79,7 @@ async def stats(request, zone_id):
         zone_id=zone_id,
         zoneInstance=zoneInstance,
         tenantInstance=tenantInstance,
-        statistics=zoneInstance.getAllStats()
+        statistics=statistics
     )
     return response.html(rendered_template)
 

@@ -50,23 +50,18 @@
 
         <ul class="bx--header__menu" role="menu">
           <li>
-            <a class="bx--header__menu-item" role="menuitem" href="#" tabindex="0">
+            <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("about") }}" tabindex="0">
               A propos
             </a>
           </li>
           <li>
-            <a class="bx--header__menu-item" role="menuitem" href="#" tabindex="0">
-              Carrières
+            <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("faq") }}" tabindex="0">
+              F.A.Q.
             </a>
           </li>
           <li>
-            <a class="bx--header__menu-item" role="menuitem" href="#" tabindex="0">
-              Contact
-            </a>
-          </li>
-          <li>
-            <a class="bx--header__menu-item" role="menuitem" href="#" tabindex="0">
-              Problèmes
+            <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("issue") }}" tabindex="0">
+              Signaler un problème
             </a>
           </li>
         </ul>
@@ -76,17 +71,23 @@
 
   <div class="bx--header__global">
     <ul class="bx--header__menu-bar" role="menubar">
+    
+    <!--      
       <li>
         <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("accounts.signup") }}">
           Inscription
         </a>
       </li>
+    -->
 
+    <!--
       <li>
         <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("accounts.login") }}">
           Connexion
         </a>
       </li>
+    -->
+      
     </ul>
   </div>
 </header>

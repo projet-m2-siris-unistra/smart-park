@@ -21,6 +21,7 @@ from app.parkings import TenantManagement
 from app.parkings import ZoneManagement
 from app.parkings import Tooling
 from app.pagination import Pagination
+from app.parkings import Request
 
 app = Sanic(__name__)
 session = Session(app, interface=InMemorySessionInterface())
@@ -58,8 +59,11 @@ async def dashboard(request):
     await tenantInstance.setZones()
     if tenantInstance.zones is None:
         raise ServerError("No zones in DB", status_code=500)
-
-    zonesJson = Tooling.jsonList(tenantInstance.zones)
+    
+    for zone in tenantInstance.zones:
+        res = await zone.setSpots()
+        if res == Request.REQ_ERROR:
+            raise ServerError("Spots not init", status_code=500)
 
     rendered_template = await render(
         "dashboard_template.html",
@@ -140,6 +144,20 @@ async def statistics(request):
         knights="En cours de construction..."
     )
     return response.html(rendered_template)
+
+
+# "plus" tab (nav bar)
+@app.route('/about')
+async def about(request):
+    return response.text("ok")
+
+@app.route('/faq')
+async def faq(request):
+    return response.text("ok")
+
+@app.route('/issue')
+async def issue(request):
+    return response.text("ok")
 
 
 @app.route("/ping")

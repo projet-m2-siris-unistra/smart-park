@@ -1,11 +1,11 @@
 <div class="bx--tile summary-widget">
     
-    <h4 class="widget-title">Tous les parkings</h4>
+    <h4 class="widget-title">Tous les parkings de {{ tenantInstance.name }}</h4>
     <br>
     <p class="widget-text">{{ tenantInstance.zones.length }} zones configurées</p>
     <p class="widget-text">{{ tenantInstance.getTakenSpots() }}/{{ tenantInstance.getTotalSpots() }} places occupées</p>
     <p class="widget-text">??? usagers aujourd'hui</p>
-    <p class="widget-text">??? utilisateurs enregistrés</p>
+    <!--<p class="widget-text">??? utilisateurs enregistrés</p>-->
 
     <a class="bx--btn bx--btn--secondary" href="{{ url_for("zones.create_zone") }}">
         Créer

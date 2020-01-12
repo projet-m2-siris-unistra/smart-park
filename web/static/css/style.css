@@ -24,6 +24,15 @@
     margin-top: 80px;
 }
 
+.no-underline-link {
+    text-decoration: none;
+}
+
+.no-underline-link:hover {
+    opacity: 80%;
+    text-decoration: underline;
+}
+
 .home-div {
     position: absolute;
     margin: 0;
@@ -60,6 +69,7 @@ h4, h3 {
     min-width: 285px;
     width: 65%;
     margin-top: 20px;
+    padding: 0;
 }
 
 .summary-widget {
@@ -307,4 +317,10 @@ label {
     margin-right: auto;
     text-align: center;
     margin-bottom: 20px;
+}
+
+
+/* GRAPHICS */
+#sp-graphic-zone-pie {
+    margin: 10px;
 }

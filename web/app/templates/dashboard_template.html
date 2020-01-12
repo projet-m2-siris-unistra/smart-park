@@ -21,11 +21,17 @@
 <div class="dashboard-widgets">
 
     <h3>Tableau de bord</h3>
-    
+
+    <script type="text/javascript">
+        window.usageRatio = {{ tenantInstance.getUsageRatio() }};
+    </script>
+
     <!-- Graphic -->
     {% include "graphic_widget.html" %}
+
     <!-- Summary Widgets -->
     {% include "tenant_summary_widget.html" %}
+    
     <!-- Parking widgets -->
     <br>
 

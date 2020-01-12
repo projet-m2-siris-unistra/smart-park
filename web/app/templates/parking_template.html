@@ -7,6 +7,10 @@
     {% include "lateral_zone_menu.html" %}
 
     {% if active_tab_view %}
+        <script type="text/javascript">
+            // for the graphics (Carbon charts)
+            window.usageRatio = {{ zoneInstance.getUsageRatio() }};
+        </script>
         <div class="dashboard-widgets">
             {% include "graphic_widget.html" %}
             {% include "zone_summary_widget.html" %}

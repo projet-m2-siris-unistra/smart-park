@@ -33,7 +33,10 @@ async def getTenant(tenant_id):
 
 # Request zone infos
 async def getZone(zone_id):
-    request = json.dumps({'zone_id' : int(zone_id)})
+    request = json.dumps({
+        'zone_id' : int(zone_id),
+        'with_places' : True
+    })
     try:
         response = await nc.request("zones.get", bytes(request, "utf-8"), timeout=1)
     except ErrTimeout:
@@ -44,14 +47,15 @@ async def getZone(zone_id):
 
 
 # This will return a list of zones from a tenant
-async def getZones(tenant_id, page, pagesize):
+async def getZones(tenant_id, page, pagesize, with_places=False):
     # calculating offset
     offset = pagesize * (page-1)
 
     request = json.dumps({
         'tenant_id' : int(tenant_id),
         'limit' : pagesize,
-        'offset' : offset
+        'offset' : offset,
+        'with_places' : with_places
     })
 
     print("Request : ", request)

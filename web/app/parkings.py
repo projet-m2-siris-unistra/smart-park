@@ -1,5 +1,6 @@
 import json as js
 import datetime
+from math import floor
 
 from app.bus import Request
 
@@ -10,7 +11,8 @@ class Tooling:
     def jsonList(arg):
         liste = []
         for item in arg:
-            liste.append(js.dumps(item.toJson()))
+            tmp = js.dumps(item.toJson())
+            liste.append(tmp)
         return liste
 
 
@@ -43,6 +45,7 @@ class TenantManagement:
         # default data to see if DB requests are doing well
         self.name = "NOT UPDATED"
         self.coordinates = [7.9726, 49.0310] # Altenstadt (FR,67)
+        self.zonesCount = 0
 
 
     async def init(self, tenant_id):
@@ -57,11 +60,12 @@ class TenantManagement:
 
     # Get the list of all the zones from this tenant
     async def setZones(self, page=1, pagesize=20):
-        response = await Request.getZones(self.id, page, pagesize)
+        response = await Request.getZones(self.id, page, pagesize, True)
         if response == Request.REQ_ERROR:
             return Request.REQ_ERROR
 
         data = js.loads(response)
+        print("setZones: ", data)
         self.zonesCount = data['count']
         self.zones.clear() # In case of...
         
@@ -72,7 +76,9 @@ class TenantManagement:
                     name=item['name'],
                     type=item['type'],
                     color='#' + item['color'],
-                    polygon=item['geo']
+                    polygon=item['geo'],
+                    spotsCount=item['places']['total'],
+                    spotsFree=item['places']['free']
                 )
                 self.zones.append(obj)
 
@@ -146,7 +152,7 @@ class TenantManagement:
             print("WARNING: tenant.zones empty")
             return -1
         for zone in self.zones:
-            count += zone.getNbTotalSpots()
+            count += zone.spotsCount
         return count
 
 
@@ -160,6 +166,13 @@ class TenantManagement:
         return count
 
 
+    def getUsageRatio(self):
+        total = self.getTotalSpots()
+        taken = self.getTakenSpots()
+        if total == 0:
+            return 0
+        return floor((taken/total)*100)
+
 
 # Instance of a zone
 class ZoneManagement:
@@ -172,13 +185,17 @@ class ZoneManagement:
         # some default data to reveal further failed init
         self.desc = "Parking description"
         self.spots = []
+        self.spotsCount = 0
+        self.spotsFree = 0
 
 
-    def staticInit(self, name, type, color, polygon):
+    def staticInit(self, name, type, color, polygon, spotsCount, spotsFree):
         self.name = name
         self.type = type
         self.color = color
         self.polygon = polygon
+        self.spotsCount = spotsCount
+        self.spotsFree = spotsFree
 
 
     async def init(self, zone_id):
@@ -191,6 +208,8 @@ class ZoneManagement:
         self.type = data['type']
         self.color = '#' + data['color']
         self.polygon = data['geo']
+        self.spotsCount = data['places']['total']
+        self.spotsFree = data['places']['free']
 
 
     async def create(self, tenant_id):
@@ -213,7 +232,7 @@ class ZoneManagement:
         return {
             "id" : self.id,
             "name" : self.name,
-            "nb_total_spots" : self.getNbTotalSpots(),
+            "nb_total_spots" : self.spotsCount,
             "nb_taken_spots" : self.getNbTakenSpots(),
             "desc" : self.desc,
             "type" : self.type,
@@ -228,16 +247,16 @@ class ZoneManagement:
             listJson.append(spot.toJson())
         return listJson
 
-    # Getter / Setter #
-
-    def getNbTotalSpots(self):
-        # calculation from DB
-        return 321
-
 
     def getNbTakenSpots(self):
-        # calculation from DB
-        return 123
+        return (self.spotsCount - self.spotsFree)
+
+
+    # Compute usage ratio (taken spots divided by total spots, in %)
+    def getUsageRatio(self):
+        if self.spotsCount == 0:
+            return 0
+        return floor((1-(self.spotsFree/self.spotsCount))*100)
 
 
     async def setSpots(self):
@@ -248,7 +267,6 @@ class ZoneManagement:
             return Request.REQ_ERROR
 
         data = js.loads(response)
-        self.spotsCount = data['count']
 
         if data['data'] is not None:
             for item in data['data']:
