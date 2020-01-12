@@ -4,6 +4,7 @@ and command line arguments
 """
 
 import os
+import ssl
 
 import click
 from envparse import Env
@@ -15,6 +16,9 @@ env = Env(
     PORT=dict(cast=int, default=8080),
     DEBUG=dict(cast=bool, default=False),
     NATS_URL=dict(cast=str, default="nats://localhost:4222"),
+    NATS_CERT=dict(cast=str, default=""),
+    NATS_KEY=dict(cast=str, default=""),
+    NATS_CA=dict(cast=str, default=""),
 )
 
 
@@ -22,10 +26,25 @@ def load(app: Sanic, *_):
     """Load the config from the environment"""
     env.read_envfile()
     app.config.NATS_URL = env("NATS_URL")
+    app.config.NATS_CERT = env("NATS_CERT")
+    app.config.NATS_KEY = env("NATS_KEY")
+    app.config.NATS_CA = env("NATS_CA")
     app.config.SERVER_NAME = env("SERVER_NAME")
     app.config.HOST = env("HOST")
     app.config.PORT = env("PORT")
     app.config.DEBUG = env("DEBUG")
+
+    if (
+        app.config.NATS_CERT and
+        app.config.NATS_KEY and
+        app.config.NATS_CA
+    ):
+        app.config.SSL_CTX = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
+        app.config.SSL_CTX.load_verify_locations(app.config.NATS_CA)
+        app.config.SSL_CTX.load_cert_chain(certfile=app.config.NATS_CERT,
+                                           keyfile=app.config.NATS_KEY)
+    else:
+        app.config.SSL_CTX = None
 
 
 def run_params(f):

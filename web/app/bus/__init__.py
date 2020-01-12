@@ -8,11 +8,15 @@ nc = NATS()
 
 
 async def error_cb(err):
-    logger.error("error while connecting to NATS: " + str(err))
+    logger.exception("error while connecting to NATS: " + repr(err))
 
 
 async def init(app, loop):
-    await nc.connect(app.config.NATS_URL, loop=loop, error_cb=error_cb)
+    options = {}
+    if app.config.SSL_CTX:
+        options['tls'] = app.config.SSL_CTX
+
+    await nc.connect(servers=[app.config.NATS_URL], error_cb=error_cb, loop=loop, **options)
     app.nc = nc
 
 

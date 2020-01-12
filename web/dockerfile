@@ -1,9 +1,10 @@
-FROM python:3.7-alpine
+FROM python:3.8-alpine
 LABEL maintainer="Lionel Jung <lionel.jung@etu.unistra.fr>"
 
 WORKDIR /app
 
 # Install requirements
+ENV SANIC_NO_UVLOOP=true
 ADD requirements.txt ./
 RUN apk add --no-cache -t .build gcc autoconf python3-dev musl-dev make openssl-dev && \
     pip install -r requirements.txt && \

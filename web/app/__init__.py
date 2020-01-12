@@ -1,4 +1,5 @@
 import click
+import asyncio
 from jinja2 import Environment, PackageLoader, select_autoescape
 from sanic import Sanic, response
 from sanic.response import json
@@ -150,7 +151,13 @@ async def ping(request):
 @click.command()
 @config.run_params
 def run():
-    app.run(host=config.env("HOST"), port=config.env("PORT"), debug=config.env("DEBUG"))
+    server = app.create_server(host=config.env("HOST"), port=config.env("PORT"), debug=config.env("DEBUG"), return_asyncio_server=True)
+    # NATS with TLS does not work properly with uvloop for some reason
+    # Sanic changes the default event loop by default if uvloop is installed
+    asyncio.set_event_loop_policy(None)
+    loop = asyncio.get_event_loop()
+    task = asyncio.ensure_future(server)
+    loop.run_forever()
 
 
 # Errors & Exceptions handling
