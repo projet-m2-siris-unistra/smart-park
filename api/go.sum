@@ -16,6 +16,7 @@ github.com/nats-io/nkeys v0.1.0/go.mod h1:xpnFELMwJABBLVhffcfd1MZx6VsNRFpEugbxzi
 github.com/nats-io/nuid v1.0.1 h1:5iA8DT8V7q8WK2EScv2padNa/rTESc1KdnPw4TC2paw=
 github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OSON2c=
 github.com/projet-m2-siris-unistra/smart-park v0.0.0-20191224143719-86d60215529d h1:1DVw36Df7qGuiWIzPqUEgvMXV1wjWDxa6TrQwfz+Upo=
+github.com/projet-m2-siris-unistra/smart-park/api v0.0.0-20200108143200-0fef8c7b0ae7/go.mod h1:o+yniLMb+YDl5kjBqqLqxpYCcEjvITcscSDnSXhdDq8=
 github.com/projet-m2-siris-unistra/smart-park/backend v0.0.0-20191224143719-86d60215529d h1:/qp8sVmGkdb6hM/imjwPvU9aYGcQ616n0docdB6Qw9c=
 github.com/projet-m2-siris-unistra/smart-park/backend v0.0.0-20191224143719-86d60215529d/go.mod h1:9RxysyCmDNyfBkRS4eU+8rjCFcbVVnGqLhFSlY+Fcgo=
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
