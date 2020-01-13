@@ -3,6 +3,13 @@
 int sensorPin = A6;    // select the input pin for the potentiometer
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
+// test presentation
+int pirState = LOW;
+int inputPin = 2;
+int val = 0;                    // variable for reading the pin status
+
+//
+
 void pinsInit()
 {
   pinMode(SENSOR_PIR, INPUT);
@@ -12,6 +19,8 @@ void pinsInit()
 void setup() 
 {       
   pinsInit();  
+
+  pinMode(inputPin, INPUT);
   
   loraSerial.begin(57600);
   debugSerial.begin(9600);
@@ -21,15 +30,12 @@ void setup()
     ;
 
   debugSerial.println("-- STATUS");
-  debugSerial.println("-- JPP");
 
   ttn.showStatus();
-  debugSerial.println("-- JPP1");
 
   debugSerial.println("-- JOIN");
   ttn.sendMacSet(1,devEui_);
 
-  debugSerial.println("-- JPP2");
   
   ttn.sendMacSet(2, appEui_);
   ttn.sendMacSet(5, appKey_);
@@ -48,12 +54,17 @@ void loop()
   debugSerial.println("-- LOOP");
   
   lpp.reset();
-  lpp.addPresence(4, read_pir());
-
+  val = digitalRead(inputPin);  // read input value
+  Serial.println(val);
+//  lpp.addPresence(4, read_pir());
+  lpp.addPresence(4, val);
+  //  lpp.addLuminosity(4, val);
 
   // read the value from the sensor:
   sensorValue = analogRead(sensorPin);
   Serial.println(sensorValue);
+  
+  
   //float voltage = sensorValue * (5.0 / 1023.0);
   float voltage = sensorValue / 9.8;
   //int pour = (int) voltage;
