@@ -62,16 +62,6 @@ h4, h3 {
     max-width: 1200px;
 }
 
-.graphic-widget {
-    min-height: 233px;
-    display: inline-block;
-    margin-right: 20px;
-    min-width: 285px;
-    width: 65%;
-    margin-top: 20px;
-    padding: 0;
-}
-
 .summary-widget {
     min-width: 285px;
     width: 30%;
@@ -130,7 +120,7 @@ h4, h3 {
 /* ZONES */
 .stats-widget {
     min-width: 1200px;
-    min-height: 233px;
+    min-height: 263px;
     display: inline-block;
     margin-left: auto;
     margin-right: 20px;
@@ -140,6 +130,7 @@ h4, h3 {
 .stats-inner-col {
     display: inline-block;
     min-width: 300px;
+    width: 45%;
     padding-right: 20px;
     margin-right: 50px;
     vertical-align: top;
@@ -152,13 +143,6 @@ h4, h3 {
     margin-right: auto;
     padding-right: 20px;
     vertical-align: top;
-}
-
-.zone-element-graphic {
-    width: 100%;
-    min-width: 200px;
-    height: 250px;
-    background-color: #cacaca;
 }
 
 .zone-div {
@@ -215,15 +199,32 @@ label {
     padding: 30px;
 }
 
+.sp-spots-menu {
+    max-width: 310px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
 .bx--btn--orange {
-    background-color: orange;
+    background-color:#f1c21b;
     color: black;
     min-width: 251px;
     padding: 7px;
     padding-left: 15px;
 }
 .bx--btn--orange:hover {
-    background-color: #cf8626;
+    background-color: #cf8600;
+}
+
+.sp-btn-grey {
+    background-color: #a8a8a8;
+    color: black;
+}
+.sp-btn-grey:hover {
+    background-color: #6f6f6f;
+    color: white;
 }
 
 
@@ -321,6 +322,48 @@ label {
 
 
 /* GRAPHICS */
-#sp-graphic-zone-pie {
-    margin: 10px;
+
+.sp-graphic-ratio-donut-style {
+    margin: 1px;
+    min-width: 233px;
+}
+
+.sp-graphic-zone-pie-style {
+    display: inline-block;
+    margin: 2px;
+    margin-left: 10px;
+    width: 30%;
+}
+
+.sp-graphic-line-daily-style {
+    /*display: block;*/
+    float: right;
+    min-width: 350px;
+    width: 65%;
+    margin-top: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.sp-graphic-line-widget-style {
+    display: inline-block;
+    width: 70%;
+    max-width: 800px;
+    min-width: 480px;
+    margin-top: 20px;
+}
+
+.sp-graphic-zone-data-table {
+    margin: auto;
+    margin-top: 20px;
+}
+
+.graphic-widget {
+    min-height: 233px;
+    display: inline-block;
+    margin-right: 20px;
+    min-width: 285px;
+    width: 65%;
+    margin-top: 20px;
+    padding: 0;
 }

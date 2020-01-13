@@ -9,6 +9,7 @@ from app.templating import render
 from app.parkings import Tooling
 from app.parkings import ZoneManagement
 from app.parkings import TenantManagement
+from app.pagination import Pagination
 
 from app.bus import Request
 
@@ -192,12 +193,30 @@ async def config(request, zone_id):
 # Handling Parking Spots
 @bp.route('/<zone_id>/spots')
 async def spots(request, zone_id):
+        
     tenantInstance = TenantManagement(tenant_id=1)
     await tenantInstance.init(tenant_id=1)
 
+    # Calculating and initialization of pagination
+    pagination = Pagination(request)
+
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
-    await zoneInstance.setSpots()
+    await zoneInstance.setSpots(
+        page=pagination.page_number, 
+        pagesize=pagination.page_size
+    )
+
+    # Handling request and tab
+    tab_map = True
+
+    if request.raw_args.get('type') == "table":
+        tab_map = False
+        for spot in zoneInstance.spots:
+            await spot.setDevice()
+
+    pagination.setElementsNumber(zoneInstance.spotsCount)
+
     spotsJson = Tooling.jsonList(zoneInstance.spots)
 
     rendered_template = await render(
@@ -207,7 +226,9 @@ async def spots(request, zone_id):
         zone_id=zone_id,
         zoneInstance=zoneInstance,
         tenantInstance=tenantInstance,
-        spotList=spotsJson
+        spotList=spotsJson,
+        pagination = pagination,
+        tab_map=tab_map
     )
     return response.html(rendered_template)
 

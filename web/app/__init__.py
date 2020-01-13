@@ -65,10 +65,13 @@ async def dashboard(request):
         if res == Request.REQ_ERROR:
             raise ServerError("Spots not init", status_code=500)
 
+    zonesJson = Tooling.jsonList(tenantInstance.zones)
+
     rendered_template = await render(
         "dashboard_template.html",
         request, 
-        tenantInstance=tenantInstance
+        tenantInstance=tenantInstance,
+        zonesJson=zonesJson
     )
     return response.html(rendered_template)
 

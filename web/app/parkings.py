@@ -259,10 +259,10 @@ class ZoneManagement:
         return floor((1-(self.spotsFree/self.spotsCount))*100)
 
 
-    async def setSpots(self):
+    async def setSpots(self, page=1, pagesize=20):
         # requesting all spots belonging to this zone
         # loop for parsing all spots
-        response = await Request.getSpots(self.id)
+        response = await Request.getSpots(self.id, page, pagesize)
         if response == Request.REQ_ERROR:
             return Request.REQ_ERROR
 
@@ -396,7 +396,7 @@ class SpotManagement:
 
     def getDailyStats(self):
         stats = {
-            'stats_type':'Daily',
+            'stats_type':'Quotidienne',
             'total_users':123,
             'rate':18,
             'is_charge':True,
@@ -408,7 +408,7 @@ class SpotManagement:
 
     def getWeeklyStats(self):
         stats = {
-            'stats_type':'Weekly',
+            'stats_type':'Hebdomadaire',
             'total_users':123,
             'rate':18,
             'is_charge':True,
@@ -420,7 +420,7 @@ class SpotManagement:
 
     def getMonthlyStats(self):
         stats = {
-            'stats_type':'Monthly',
+            'stats_type':'Mensuelle',
             'total_users':123,
             'rate':18,
             'is_charge':True,
@@ -432,7 +432,7 @@ class SpotManagement:
 
     def getAnnualStats(self):
         stats = {
-            'stats_type':'Annual',
+            'stats_type':'Annuelle',
             'total_users':123,
             'rate':18,
             'is_charge':True,

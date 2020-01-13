@@ -2,15 +2,15 @@
     <h4>État des places</h4>
     <br>
     <a class="bx--btn bx--btn--danger bx--btn--sm" href="#", zone_id=zone_id ) }}">
-        <p>? capteurs déconnectés</p>
+        <p>0 capteurs déconnectés</p>
     </a>
     <br>
     <a class="bx--btn bx--btn--orange bx--btn--sm" href="#", zone_id=zone_id ) }}">
-        <p>? batteries à changer</p>
+        <p>0 batteries à changer</p>
     </a>
     <br>
-    <a class="bx--btn bx--btn--secondary bx--btn--sm" href="{{ url_for("zones.spots", zone_id=zone_id ) }}">
-        <p>? places sans capteurs associés</p>
+    <a class="bx--btn bx--btn--sm sp-btn-grey" href="{{ url_for("zones.spots", zone_id=zone_id ) }}">
+        <p>0 places sans capteurs associés</p>
     </a>
     <br>
     <br>

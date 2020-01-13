@@ -9,7 +9,8 @@
     {% if active_tab_view %}
         <script type="text/javascript">
             // for the graphics (Carbon charts)
-            window.usageRatio = {{ zoneInstance.getUsageRatio() }};
+            window.spotsTaken = {{ zoneInstance.spotsCount - zoneInstance.spotsFree }};
+            window.spotsCount = {{ zoneInstance.spotsCount }};
         </script>
         <div class="dashboard-widgets">
             {% include "graphic_widget.html" %}

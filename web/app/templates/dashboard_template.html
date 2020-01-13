@@ -24,10 +24,14 @@
 
     <script type="text/javascript">
         window.usageRatio = {{ tenantInstance.getUsageRatio() }};
+        window.spotsCount = {{ tenantInstance.getTotalSpots() }};
+        window.spotsTaken = {{ tenantInstance.getTakenSpots() }};
+        window.zones = {{ zonesJson | tojson }};
     </script>
 
     <!-- Graphic -->
     {% include "graphic_widget.html" %}
+    
 
     <!-- Summary Widgets -->
     {% include "tenant_summary_widget.html" %}
@@ -35,10 +39,12 @@
     <!-- Parking widgets -->
     <br>
 
-    {% for zoneItem in tenantInstance.zones %}
+    {% for item in tenantInstance.zones %}
         {% include "parking_widget.html" %}
     {% endfor %}
     
 </div>
+
+<script type="text/javascript" src="/static/js/charts_ratio_donut.js"></script>
 
 {% endblock %}

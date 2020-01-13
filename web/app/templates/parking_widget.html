@@ -1,19 +1,23 @@
 <div class="bx--tile parking-widget">
-    <a class="no-underline-link" href="{{ url_for("zones.view", zone_id=zoneItem.id) }}">
-        <h4 id="widget-title">Parking {{ zoneItem.name }} <b>></b></h4>
+    <a class="no-underline-link" href="{{ url_for("zones.view", zone_id=item.id) }}">
+        <h4 id="widget-title">Parking {{ item.name }} <b>></b></h4>
     </a>
-
+    <!--
     <div data-loading class="bx--loading--small">
         <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
             <circle class="bx--loading__background" cx="0" cy="0" r="37.5" />
             <circle class="bx--loading__stroke" cx="0" cy="0" r="37.5" />
         </svg>
+    </div>-->
+    <div class="sp-graphic-ratio-donut-style" id="sp-graphic-ratio-donut-{{ item.id }}">
+
     </div>
-    <p class="widget-text">{{ zoneItem.getNbTakenSpots() }}/{{ zoneItem.spotsCount }} places occupées</p>
+    <!--
+    <p class="widget-text">{{ item.getNbTakenSpots() }}/{{ item.spotsCount }} places occupées</p>
 
     <p class="widget-text">??? usagers aujourd'hui</p>
-
-    <a class="parking-widget-status-btn bx--btn bx--btn--danger bx--btn--sm" href="{{ url_for("zones.config", zone_id=zoneItem.id) }}">
-        <p>? capteurs déconnectés</p>
+    -->
+    <a class="parking-widget-status-btn bx--btn bx--btn--danger bx--btn--sm" href="{{ url_for("zones.config", zone_id=item.id) }}">
+        <p>0 capteurs déconnectés</p>
     </a>
 </div>

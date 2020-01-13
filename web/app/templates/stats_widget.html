@@ -13,8 +13,13 @@
             </div>
             <div class="stats-inner-col">
                 <h4>Graphiques</h4>
-                <p>Bientôt...</p>
+                <div id="sp-graphic-line-{{ item.stats_type }}" class="sp-graphic-line-widget-style">
+                    
+                </div>
             </div>
         </div>
     {% endfor %}
 </div>
+
+<script src="https://unpkg.com/@carbon/charts/bundle.js"></script>
+<script type="text/javascript" src="/static/js/charts_line_all.js"></script>

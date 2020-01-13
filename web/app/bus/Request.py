@@ -9,6 +9,8 @@ from app.bus import nc
 REQ_ERROR = -1
 REQ_OK = 0
 
+# Tolerated delay (in seconds) when making request to the bus
+globalTimeout = 1
 
 
 """
@@ -23,7 +25,7 @@ as in the backend (e.g. coordinates & geo)
 async def getTenant(tenant_id):
     request = json.dumps({'tenant_id' : int(tenant_id)})
     try:
-        response = await nc.request("tenants.get", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("tenants.get", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getTenant -> timeout reached")
         return REQ_ERROR
@@ -38,7 +40,7 @@ async def getZone(zone_id):
         'with_places' : True
     })
     try:
-        response = await nc.request("zones.get", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("zones.get", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getZone -> timeout reached")
         return REQ_ERROR
@@ -61,7 +63,7 @@ async def getZones(tenant_id, page, pagesize, with_places=False):
     print("Request : ", request)
 
     try:
-        response = await nc.request("zones.list", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("zones.list", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getZones -> timeout reached")
         return REQ_ERROR
@@ -81,7 +83,7 @@ async def createZone(tenant_id, name, type, color, polygon):
     print("createZone request = ", request)
     
     try:
-        response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("zones.new", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> createZones -> timeout reached")
         return REQ_ERROR
@@ -102,7 +104,7 @@ async def updateZone(zone_id, tenant_id, name, type, color, polygon):
     print("updateZone request = ", request)
 
     try:
-        response = await nc.request("zones.update", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("zones.update", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> updateZone -> timeout reached")
         return REQ_ERROR
@@ -117,7 +119,7 @@ async def deleteZone(zone_id):
     print("deleteZone request = ", request)
     
     try:
-        response = await nc.request("zones.delete", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("zones.delete", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> deleteZone -> timeout reached")
         return REQ_ERROR
@@ -126,8 +128,15 @@ async def deleteZone(zone_id):
 
 
 # Returns all the spots associated to zone_id
-async def getSpots(zone_id):
-    request = json.dumps({'zone_id' : int(zone_id)})
+async def getSpots(zone_id, page, pagesize):
+    offset = pagesize * (page-1)
+    
+    request = json.dumps({
+        'zone_id' : int(zone_id),
+        'limit' : pagesize,
+        'offset' : offset
+    })
+
     try:
         response = await nc.request("places.list", bytes(request, "utf-8"))
     except ErrTimeout:
@@ -141,7 +150,7 @@ async def getSpots(zone_id):
 async def getSpot(spot_id):
     request = json.dumps({'place_id' : int(spot_id)})
     try:
-        response = await nc.request("places.get", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("places.get", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getSpot -> timeout reached")
         return REQ_ERROR
@@ -161,7 +170,7 @@ async def createSpot(zone_id, device_id, type, coordinates):
     print("createSpot request = ", request)
     
     try:
-        response = await nc.request("places.new", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("places.new", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> createSpot -> timeout reached")
         return REQ_ERROR
@@ -180,7 +189,7 @@ async def updateSpot(spot_id, device_id, type, coordinates):
     print("updateSpot request = ", request)
 
     try:
-        response = await nc.request("places.update", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("places.update", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> updateSpot -> timeout reached")
         return REQ_ERROR
@@ -195,7 +204,7 @@ async def deleteSpot(spot_id):
     print("deleteSpot request = ", request)
     
     try:
-        response = await nc.request("places.delete", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("places.delete", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> deleteSpot -> timeout reached")
         return REQ_ERROR
@@ -207,7 +216,7 @@ async def deleteSpot(spot_id):
 async def getDevice(device_id):
     request = json.dumps({'device_id' : int(device_id)})
     try:
-        response = await nc.request("devices.get", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("devices.get", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getDevice -> timeout reached")
         return REQ_ERROR
@@ -229,7 +238,7 @@ async def getDevices(tenant_id, page, pagesize):
     print("Request : ", request)
 
     try:
-        response = await nc.request("devices.list", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("devices.list", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> getDevices -> timeout reached")
         return REQ_ERROR
@@ -249,7 +258,7 @@ async def getNotAssignedDevices(tenant_id, page, pagesize):
     })
     
     try:
-        response = await nc.request("devices.get.notassigned", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("devices.get.notassigned", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         return REQ_ERROR
 
@@ -282,7 +291,7 @@ async def createDevice(tenant_id, eui, name):
     print("INFO: request=", request)
 
     try:
-        response = await nc.request("devices.new", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("devices.new", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         return REQ_ERROR
 
@@ -299,7 +308,7 @@ async def deleteDevice(device_id):
     print("deleteDevice request = ", request)
     
     try:
-        response = await nc.request("devices.delete", bytes(request, "utf-8"), timeout=1)
+        response = await nc.request("devices.delete", bytes(request, "utf-8"), timeout=globalTimeout)
     except ErrTimeout:
         print("WARNING: bus/Request.py -> deleteDevice -> timeout reached")
         return REQ_ERROR
