@@ -11,7 +11,7 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-requests-cpu: "100m"
+        vault.hashicorp.com/agent-requests-cpu: "40m"
         vault.hashicorp.com/agent-inject-secret-routes-ca.pem: "pki/issue/nats-routes"
         vault.hashicorp.com/agent-inject-template-routes-ca.pem: |
           {{ with secret "pki/issue/nats-routes" (env "HOSTNAME" | printf "common_name=%s.nats-mgmt.nats.svc") }}
