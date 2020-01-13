@@ -119,6 +119,7 @@ var providers map[string]*provider
 type authorizationRequest struct {
 	Config      string `json:"config"`
 	RedirectURI string `json:"redirect_uri"`
+	State       string `json:"state"`
 }
 
 type authorizationResponse struct {
@@ -157,7 +158,7 @@ type exchangeResponse struct {
 
 func authorizationHandler(subject, reply string, req *authorizationRequest) {
 	if p, ok := providers[req.Config]; ok {
-		url := p.Config.AuthCodeURL("", oauth2.SetAuthURLParam("redirect_uri", req.RedirectURI))
+		url := p.Config.AuthCodeURL(req.State, oauth2.SetAuthURLParam("redirect_uri", req.RedirectURI))
 		resp := authorizationResponse{URL: url}
 		err := jsonConn.Publish(reply, &resp)
 		if err != nil {
