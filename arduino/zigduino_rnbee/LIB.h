@@ -6,7 +6,7 @@ long randNumber;
 // Set your AppEUI and AppKey
 const char *appEui_ = "3d8f545b53302abe";
 const char *appKey_ = "08e78f1ef55044e77df23763fe81aadc";
-const char *devEui_ = "be2a30535b548f3d";
+const char *devEui_ = "f6ccfe129cdf5e97";
 
 #define loraSerial Serial1
 #define debugSerial Serial

@@ -21,10 +21,16 @@ void setup()
     ;
 
   debugSerial.println("-- STATUS");
+  debugSerial.println("-- JPP");
+
   ttn.showStatus();
+  debugSerial.println("-- JPP1");
 
   debugSerial.println("-- JOIN");
   ttn.sendMacSet(1,devEui_);
+
+  debugSerial.println("-- JPP2");
+  
   ttn.sendMacSet(2, appEui_);
   ttn.sendMacSet(5, appKey_);
   
@@ -53,12 +59,12 @@ void loop()
   //int pour = (int) voltage;
   Serial.println(voltage);
   //Serial.println(pour);
-  lpp.addPercentage(5, voltage);
+  lpp.addTemperature(5, voltage);
 
 
   // Send it off
   ttn.sendBytes(lpp.getBuffer(), lpp.getSize());
 
 
-  delay(1000);
+  delay(15000);
 }
