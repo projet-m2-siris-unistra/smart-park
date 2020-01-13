@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: vault-issuer
+spec:
+  vault:
+    path: pki/sign/ingress-nginx
+    server: http://vault.vault.svc:8200
+    auth:
+      kubernetes:
+        role: cert-manager-issuer
+        mountPath: /v1/auth/kubernetes
+        secretRef:
+          name: cert-manager-issuer-token-btftk
+          key: token

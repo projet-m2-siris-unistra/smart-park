@@ -10,6 +10,7 @@
     pkg:
     - keepalived
     - ssl-cert
+    - certbot
     state: present
   tags: keepalived
 
@@ -27,10 +28,18 @@
   notify: restart keepalived
   tags: keepalived
 
+- name: copy ca
+  copy:
+    src: ca.pem
+    dest: /etc/ssl/certs/smartpark-ca.pem
+  notify: restart haproxy
+  tags: haproxy
+
 - name: setup haproxy
   template:
     src: haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
+    validate: /usr/sbin/haproxy -f %s -c
   notify: restart haproxy
   tags: haproxy
 

@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: ingress
+spec:
+  secretName: ingress-tls
+  duration: 4h
+  renewBefore: 1h
+  dnsNames:
+  - smart-park-sydney.u-strasbg.fr
+  - smart-park-darwin.u-strasbg.fr
+  - smart-park-melbourne.u-strasbg.fr
+  usages:
+  - server auth
+  keySize: 2048
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  issuerRef:
+    name: vault-issuer
+    kind: Issuer
+    group: cert-manager.io

@@ -33,23 +33,36 @@ defaults
 
 frontend frontend_http
 	mode	http
-	bind	:::443	v4v6 ssl crt /etc/haproxy/cert.pem alpn h2,http/1.1
+	bind	:::443	v4v6 ssl crt /etc/ssl/private/smart-park.pem alpn h2,http/1.1
 	bind	:::80	v4v6
-	redirect scheme https code 301 if !{ ssl_fc }
+
+	acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+	use_backend letsencrypt-backend if letsencrypt-acl
+
+	option	http-use-htx
+	option	forwardfor
+	http-request set-header X-Forwarded-Proto https
 	default_backend cluster
+
+backend letsencrypt-backend
+	server letsencrypt 127.0.0.1:8888
 
 backend cluster
 	balance	roundrobin
+	option	http-use-htx
+	http-reuse always
+	redirect scheme https code 301 if !{ ssl_fc }
 	mode	http
-	server	melbourne	smart-park-melbourne.u-strasbg.fr:80	check
-	server	sydney	smart-park-sydney.u-strasbg.fr:80	check
-	server	darwin	smart-park-darwin.u-strasbg.fr:80	check
+	default-server ssl verify required ca-file /etc/ssl/certs/smartpark-ca.pem alpn h2
+	server	melbourne	smart-park-melbourne.u-strasbg.fr:443 check
+	server	sydney	smart-park-sydney.u-strasbg.fr:443 check
+	server	darwin	smart-park-darwin.u-strasbg.fr:443 check
 
 frontend stats
-        mode http
-        bind :::8080
-        stats enable
-        stats hide-version
-        stats refresh 30s
-        stats show-node
-        stats uri /stats
+	mode http
+	bind :::8080
+	stats enable
+	stats hide-version
+	stats refresh 30s
+	stats show-node
+	stats uri /stats
