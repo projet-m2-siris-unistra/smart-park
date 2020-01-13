@@ -7,7 +7,7 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-requests-cpu: "100m"
+        vault.hashicorp.com/agent-requests-cpu: "40m"
         vault.hashicorp.com/agent-inject-secret-nats-ca.pem: "pki/issue/nats-client-web"
         vault.hashicorp.com/agent-inject-template-nats-ca.pem: |
           {{ with secret "pki/issue/nats-client-web" "common_name=web" }}
@@ -52,3 +52,10 @@ spec:
         ports:
         - name: http
           containerPort: 4444
+        resources:
+          requests:
+            cpu: 50m
+            memory: 10Mi
+          limits:
+            cpu: 100m
+            memory: 200Mi

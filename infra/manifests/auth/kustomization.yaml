@@ -7,3 +7,4 @@ commonLabels:
 resources:
 - serviceaccount.yaml
 - deployment.yaml
+- hpa.yaml

@@ -7,7 +7,7 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-requests-cpu: "100m"
+        vault.hashicorp.com/agent-requests-cpu: "40m"
         vault.hashicorp.com/agent-inject-secret-nats-ca.pem: "pki/issue/nats-client-auth"
         vault.hashicorp.com/agent-inject-template-nats-ca.pem: |
           {{ with secret "pki/issue/nats-client-auth" "common_name=auth" }}
@@ -59,3 +59,10 @@ spec:
           value: "/vault/secrets/nats-ca.pem"
         - name: PROVIDERS_CONFIG
           value: "/vault/secrets/providers.json"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 50Mi
