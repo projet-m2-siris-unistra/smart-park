@@ -22,8 +22,8 @@ bp = Blueprint("devices", url_prefix='/devices')
 # List of devices
 @bp.route("/list", methods=['GET', 'POST'])
 async def view(request):
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     pagination = Pagination(request)
 
@@ -75,15 +75,15 @@ async def view(request):
 async def create(request):
     form = CreationForm(request)
 
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     if form.validate_on_submit():
         print("Form validated")
         print("eui=", form.eui.data)
         print("name=", form.name.data)
         res = await Request.createDevice(
-            tenant_id=1,
+            tenant_id=request.ctx.tenant_id,
             eui=form.eui.data,
             name=form.name.data
         )

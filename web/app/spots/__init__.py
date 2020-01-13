@@ -17,8 +17,8 @@ bp = Blueprint("spots", url_prefix='/parking/zone/<zone_id>/spot')
 @bp.route('/<spot_id>')
 @bp.route('/<spot_id>/overview')
 async def overview(request, spot_id, zone_id):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -42,7 +42,7 @@ async def overview(request, spot_id, zone_id):
 @bp.route('/<spot_id>/statistics')
 async def stats(request, spot_id, zone_id):
     tenantInstance = TenantManagement(123)
-    await tenantInstance.init(1)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -66,8 +66,8 @@ async def stats(request, spot_id, zone_id):
 
 @bp.route('/<spot_id>/maintenance')
 async def maintenance(request, spot_id, zone_id):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -90,8 +90,8 @@ async def maintenance(request, spot_id, zone_id):
 
 @bp.route('/<spot_id>/configuration', methods=['GET', 'POST'])
 async def config(request, spot_id, zone_id):
-    tenantInstance = TenantManagement(1)
-    res = await tenantInstance.init(1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    res = await tenantInstance.init(request.ctx.tenant_id)
     if res == Request.REQ_ERROR:
         raise ServerError("impossible de récupérer le tenant", status_code=500)
 

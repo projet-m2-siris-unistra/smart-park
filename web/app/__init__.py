@@ -55,8 +55,8 @@ async def home(request):
 
 @app.route("/dashboard")
 async def dashboard(request):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     await tenantInstance.setZones()
     if tenantInstance.zones is None:
@@ -80,8 +80,8 @@ async def dashboard(request):
 
 @app.route("/zones")
 async def zones(request):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     # Calculating and initialization of pagination
     pagination = Pagination(request)
@@ -110,8 +110,8 @@ async def zones(request):
 
 @app.route("/map")
 async def map(request):
-    tenantInstance = TenantManagement(1)
-    await tenantInstance.init(1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     await tenantInstance.setZones()
     if tenantInstance.zones is None:

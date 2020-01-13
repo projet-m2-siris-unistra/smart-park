@@ -33,7 +33,7 @@ async def create_zone(request):
     if form.validate_on_submit():
         print("Form validated")
         await Request.createZone(
-            tenant_id=1,
+            tenant_id=request.ctx.tenant_id,
             name=form.name.data, 
             type=form.type.data, 
             color=Tooling.formatColor(form.color.data),
@@ -52,8 +52,8 @@ async def create_zone(request):
 @bp.route('/<zone_id>')
 @bp.route('/<zone_id>/overview')
 async def view(request, zone_id):
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -72,8 +72,8 @@ async def view(request, zone_id):
 
 @bp.route('/<zone_id>/statistics')
 async def stats(request, zone_id):
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
    
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -93,8 +93,8 @@ async def stats(request, zone_id):
 
 @bp.route('/<zone_id>/maintenance')
 async def maintenance(request, zone_id):
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -115,8 +115,8 @@ async def maintenance(request, zone_id):
 async def config(request, zone_id):
     changes = False
     
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -155,7 +155,7 @@ async def config(request, zone_id):
             print("General form validated")
             res = await Request.updateZone(
                 zone_id=zone_id,
-                tenant_id=1, 
+                tenant_id=request.ctx.tenant_id, 
                 name=formGeneral.name.data, 
                 type=formGeneral.type.data, 
                 color=Tooling.formatColor(formGeneral.color.data),
@@ -200,8 +200,8 @@ async def config(request, zone_id):
 @bp.route('/<zone_id>/spots')
 async def spots(request, zone_id):
         
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     # Calculating and initialization of pagination
     pagination = Pagination(request)
@@ -242,8 +242,8 @@ async def spots(request, zone_id):
 # Interface for deleting a zone
 @bp.route('/<zone_id>/remove')
 async def remove(request, zone_id):
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     zoneInstance = ZoneManagement(zone_id)
     await zoneInstance.init(zone_id)
@@ -264,8 +264,8 @@ async def remove_check(request, zone_id):
     # removing the spots if needed
 
     # temporary redirection to dashboard of tenant
-    tenantInstance = TenantManagement(tenant_id=1)
-    await tenantInstance.init(tenant_id=1)
+    tenantInstance = TenantManagement(request.ctx.tenant_id)
+    await tenantInstance.init(request.ctx.tenant_id)
 
     await tenantInstance.setZones()
     if tenantInstance.zones is None:
