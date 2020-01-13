@@ -56,12 +56,13 @@ func GetTenants(ctx context.Context, paging Paging) ([]Tenant, error) {
 	var tenants []Tenant
 	var tenant Tenant
 
+	order := setOrderBy("tenant_id")
 	rows, err := pool.QueryContext(ctx, fmt.Sprintf(`
 		SELECT DISTINCT tenant_id, name, geo, created_at, updated_at 
 		FROM tenants
-		ORDER BY tenant_id 
+		%s 
 		%s
-	`, paging.buildQuery()))
+	`, order, paging.buildQuery()))
 
 	if err != nil {
 		return tenants, err

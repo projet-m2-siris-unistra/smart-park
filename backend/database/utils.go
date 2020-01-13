@@ -6,6 +6,12 @@ import (
 	"fmt"
 )
 
+
+func setOrderBy(id string) (string) {
+	result := " ORDER BY " + id + " ASC "
+	return result
+}
+
 func checkDeletion(result sql.Result) (bool, error) {
 	rows, err := result.RowsAffected()
 

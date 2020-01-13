@@ -94,6 +94,7 @@ func (s *ZoneType) Scan(value interface{}) error {
 	return errors.New("failed to scan ZoneType")
 }
 
+// ZonePlaces
 type ZonePlaces struct {
 	Total int `json:"total"`
 	Free  int `json:"free"`
@@ -189,7 +190,8 @@ func GetZones(ctx context.Context, tenantID int, opts ZoneOptions, paging Paging
 
 	var zones []Zone
 
-	query := opts.buildQuery() + ` WHERE zones.tenant_id = $1 ` + paging.buildQuery()
+	order := setOrderBy("zone_id")
+	query := opts.buildQuery() + ` WHERE zones.tenant_id = $1 ` + order + paging.buildQuery()
 	rows, err := pool.QueryContext(ctx, query, tenantID)
 
 	if err != nil {

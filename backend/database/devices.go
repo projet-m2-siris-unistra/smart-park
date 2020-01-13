@@ -203,12 +203,14 @@ func GetDevices(ctx context.Context, filter DeviceFilter, paging Paging) ([]Devi
 	var device Device
 
 	where, args := filter.buildQuery(1)
+	order := setOrderBy("device_id")
+	//fmt.Printf("order : %s \n", order)
 	query := fmt.Sprintf(`
 		SELECT DISTINCT device_id, battery, state, tenant_id, device_eui, created_at, updated_at 
-		FROM devices
-		WHERE %s
-		%s
-	`, where, paging.buildQuery())
+		FROM devices 
+		WHERE %s 
+		%s %s
+	`, where, order, paging.buildQuery())
 	rows, err := pool.QueryContext(ctx, query, args...)
 
 	if err != nil {

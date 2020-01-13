@@ -58,6 +58,8 @@ func GetPlaces(ctx context.Context, zoneID int, paging Paging) ([]Place, error) 
 	var places []Place
 	var place Place
 
+	order := setOrderBy("place_id")
+
 	rows, err := pool.QueryContext(
 		ctx,
 		fmt.Sprintf(`
@@ -65,7 +67,8 @@ func GetPlaces(ctx context.Context, zoneID int, paging Paging) ([]Place, error) 
 			FROM places 
 			WHERE zone_id = $1
 			%s
-		`, paging.buildQuery()),
+			%s
+		`, order, paging.buildQuery()),
 		zoneID,
 	)
 
