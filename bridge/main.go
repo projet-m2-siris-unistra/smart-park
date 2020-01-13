@@ -52,9 +52,9 @@ func loadTLS(prefix string) (*tls.Config, error) {
 }
 
 type deviceInfos struct {
-	DeviceName     string `json:"deviceName"`
-	DevEUI         string `json:"devEUI"`
-	PresenceSensor int    `json:"presenceSensor"`
+	DeviceName string                        `json:"deviceName"`
+	DevEUI     string                        `json:"devEUI"`
+	Object     map[string]map[string]float64 `json:"object"`
 }
 
 type outputInfos struct {
@@ -91,10 +91,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var out outputInfos
 
 	out.DeviceEUI = u.DevEUI
-	if u.PresenceSensor == 1 {
-		out.State = "occupied"
-	} else {
-		out.State = "free"
+	if p, ok := u.Object["presenceSensor"]; ok {
+		for _, v := range p {
+			if v > 0.9 {
+				out.State = "occupied"
+			} else {
+				out.State = "free"
+			}
+			break
+		}
 	}
 	out.Battery = 43
 

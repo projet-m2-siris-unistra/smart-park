@@ -17,11 +17,11 @@ type getDevicesRequest struct {
 }
 
 type updateDeviceRequest struct {
-	DeviceID  int    `json:"device_id"`
-	Battery   int    `json:"battery,omitempty"`
-	State     string `json:"state,omitempty"`
-	TenantID  int    `json:"tenant_id,omitempty"`
-	DeviceEUI string `json:"device_eui,omitempty"`
+	DeviceID  *int    `json:"device_id,omitempty"`
+	Battery   *int    `json:"battery,omitempty"`
+	State     *string `json:"state,omitempty"`
+	TenantID  *int    `json:"tenant_id,omitempty"`
+	DeviceEUI *string `json:"device_eui,omitempty"`
 }
 
 type newDeviceRequest struct {
@@ -106,11 +106,14 @@ func getDevices(ctx context.Context, request getDevicesRequest) (resultListDevic
 /********************************** GET **********************************/
 
 /********************************** UPDATE **********************************/
-func updateDevice(ctx context.Context, request updateDeviceRequest) (database.DeviceResponse, error) {
+func updateDevice(ctx context.Context, request updateDeviceRequest) (bool, error) {
 	log.Println("handlers: handling updateDevice")
 
-	return database.UpdateDevice(ctx, request.DeviceID, request.Battery, request.State, request.TenantID,
-		request.DeviceEUI)
+	err := database.UpdateDevice(ctx, request.DeviceID, request.Battery, request.State, request.TenantID, request.DeviceEUI)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 /********************************** UPDATE **********************************/

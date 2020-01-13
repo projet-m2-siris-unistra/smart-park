@@ -52,6 +52,16 @@ services:
     environment:
       NATS_URL: nats://nats:4222
 
+  bridge:
+    image: m2smartpark/bridge
+    build: bridge
+    depends_on:
+    - nats
+    ports:
+    - "3000:3000"
+    environment:
+      NATS_URL: nats://nats:4222
+
   auth:
     image: m2smartpark/auth
     build: auth

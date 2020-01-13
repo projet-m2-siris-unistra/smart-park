@@ -240,92 +240,80 @@ func GetDevices(ctx context.Context, filter DeviceFilter, paging Paging) ([]Devi
 /********************************** UPDATE **********************************/
 
 // UpdateDevice : update a device - need the device ID
-func UpdateDevice(ctx context.Context, deviceID int, battery int, state string, tenantID int,
-	deviceEUI string) (DeviceResponse, error) {
+func UpdateDevice(ctx context.Context, deviceID *int, battery *int, state *string, tenantID *int,
+	deviceEUI *string) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	var device DeviceResponse
-
-	device.DeviceID = -1
-
-	if (state == "") && (battery == 0) && (tenantID == 0) && (deviceEUI == "") {
-		return device, errors.New("invalid input fields (database/devices.go")
+	offset := 1
+	params := []interface{}{}
+	where := ""
+	if deviceID == nil && deviceEUI == nil {
+		return errors.New("must specify either deviceID or deviceEUI")
+	} else if deviceID == nil {
+		where = fmt.Sprintf("device_eui = $%d", offset)
+		offset++
+		params = append(params, *deviceEUI)
+	} else {
+		where = fmt.Sprintf("device_id = $%d", offset)
+		offset++
+		params = append(params, *deviceID)
 	}
 
-	if battery != 0 {
+	update := []string{}
 
-		err := pool.QueryRowContext(ctx, `
-			UPDATE devices SET battery = $1 
-			WHERE device_id = $2 RETURNING device_id
-		`, battery, deviceID).Scan(&device.DeviceID)
-
-		if err == sql.ErrNoRows {
-			log.Printf("no device with id %d\n", deviceID)
-			return device, err
-		}
-
-		if err != nil {
-			log.Printf("query error: %v\n", err)
-			return device, err
-		}
+	if battery != nil {
+		update = append(update, fmt.Sprintf("battery = $%d", offset))
+		offset++
+		params = append(params, *battery)
 	}
 
-	if state != "" {
-
-		err := pool.QueryRowContext(ctx, `
-			UPDATE devices SET state = $1 
-			WHERE device_id = $2 RETURNING device_id
-		`, state, deviceID).Scan(&device.DeviceID)
-
-		if err == sql.ErrNoRows {
-			log.Printf("no device with id %d\n", deviceID)
-			return device, err
-		}
-
-		if err != nil {
-			log.Printf("query error: %v\n", err)
-			return device, err
-		}
+	if state != nil {
+		update = append(update, fmt.Sprintf("state = $%d", offset))
+		offset++
+		params = append(params, *state)
 	}
 
-	if tenantID != 0 {
-
-		err := pool.QueryRowContext(ctx, `
-			UPDATE devices SET tenant_id = $1 
-			WHERE device_id = $2 RETURNING device_id
-		`, tenantID, deviceID).Scan(&device.DeviceID)
-
-		if err == sql.ErrNoRows {
-			log.Printf("no device with id %d\n", deviceID)
-			return device, err
-		}
-
-		if err != nil {
-			log.Printf("query error: %v\n", err)
-			return device, err
-		}
+	if tenantID != nil {
+		update = append(update, fmt.Sprintf("tenant_id = $%d", offset))
+		offset++
+		params = append(params, *tenantID)
 	}
 
-	if deviceEUI != "" {
-
-		err := pool.QueryRowContext(ctx, `
-			UPDATE devices SET device_eui = $1 
-			WHERE device_id = $2 RETURNING device_id
-		`, deviceEUI, deviceID).Scan(&device.DeviceID)
-
-		if err == sql.ErrNoRows {
-			log.Printf("no device with id %d\n", deviceID)
-			return device, err
-		}
-
-		if err != nil {
-			log.Printf("query error: %v\n", err)
-			return device, err
-		}
+	if deviceID != nil && deviceEUI != nil {
+		update = append(update, fmt.Sprintf("device_eui = $%d", offset))
+		offset++
+		params = append(params, *deviceEUI)
 	}
 
-	return device, nil
+	if len(update) == 0 {
+		return errors.New("devices: nothing to update")
+	}
+
+	request := fmt.Sprintf(`
+		UPDATE devices
+		SET %s
+		WHERE %s
+	`, strings.Join(update, ", "), where)
+	result, err := pool.ExecContext(ctx, request, params...)
+
+	if err != nil {
+		log.Printf("query error: %v", err)
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("result error: %v", err)
+		return err
+	}
+	if rows != 1 {
+		err := fmt.Errorf("expected single row affected, got %d rows affected", rows)
+		log.Print(err)
+		return err
+	}
+
+	return nil
 }
 
 /********************************** UPDATE **********************************/
