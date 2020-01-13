@@ -22,6 +22,7 @@ from app.parkings import ZoneManagement
 from app.parkings import Tooling
 from app.pagination import Pagination
 from app.parkings import Request
+from app.forms.issue import IssueForm
 
 app = Sanic(__name__)
 session = Session(app, interface=InMemorySessionInterface())
@@ -152,15 +153,29 @@ async def statistics(request):
 # "plus" tab (nav bar)
 @app.route('/about')
 async def about(request):
-    return response.text("ok")
+    rendered_template = await render(
+        "about.html", 
+        request
+    )
+    return response.html(rendered_template)
 
 @app.route('/faq')
 async def faq(request):
-    return response.text("ok")
+    rendered_template = await render(
+        "faq.html", 
+        request
+    )
+    return response.html(rendered_template)
 
-@app.route('/issue')
+@app.route('/issue', methods=["GET", "POST"])
 async def issue(request):
-    return response.text("ok")
+    form = IssueForm(request)
+    rendered_template = await render(
+        "issue.html", 
+        request,
+        form=form
+    )
+    return response.html(rendered_template)
 
 
 @app.route("/ping")

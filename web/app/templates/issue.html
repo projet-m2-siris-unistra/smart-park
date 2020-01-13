@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Smart Park{% endblock %}
+{% block content %}
+
+<div class="zone-div">
+    <h4>
+        Signalez un problème
+    </h4>
+</div>
+<div class="zone-div">
+        
+    <form class="sp-formular" method="post">
+        {{ form.csrf_token }}
+
+        {{ form.type}}
+
+        {{ form.report }}
+
+        {{ form.submit }}
+    
+    </form>
+</div>
+
+{% endblock %}
