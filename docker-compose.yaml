@@ -51,3 +51,14 @@ services:
     - "9123:9123"
     environment:
       NATS_URL: nats://nats:4222
+
+  auth:
+    image: m2smartpark/auth
+    build: auth
+    depends_on:
+    - nats
+    volumes:
+    - "./auth/providers.json:/providers.json"
+    environment:
+      NATS_URL: nats://nats:4222
+      PROVIDERS_CONFIG: "/providers.json"
