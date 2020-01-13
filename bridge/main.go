@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,6 +13,44 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
+func loadTLS(prefix string) (*tls.Config, error) {
+	certFile, ok := os.LookupEnv(prefix + "_CERT")
+	if !ok {
+		return nil, nil
+	}
+	keyFile, ok := os.LookupEnv(prefix + "_KEY")
+	if !ok {
+		return nil, nil
+	}
+	caFile, ok := os.LookupEnv(prefix + "_CA")
+	if !ok {
+		return nil, nil
+	}
+
+	// Load client certificate
+	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	if err != nil {
+		return nil, err
+	}
+
+	// Load CA
+	pool := x509.NewCertPool()
+	rootPEM, err := ioutil.ReadFile(caFile)
+	if err != nil || rootPEM == nil {
+		return nil, fmt.Errorf("error loading or parsing rootCA file: %v", err)
+	}
+	ok = pool.AppendCertsFromPEM(rootPEM)
+	if !ok {
+		return nil, fmt.Errorf("failed to parse root certificate from %q", caFile)
+	}
+
+	return &tls.Config{
+		MinVersion:   tls.VersionTLS12,
+		RootCAs:      pool,
+		Certificates: []tls.Certificate{cert},
+	}, nil
+}
+
 type deviceInfos struct {
 	DeviceName      string `json:"deviceName"`
 	DevEUI          string `json:"devEUI"`
@@ -17,9 +58,9 @@ type deviceInfos struct {
 }
 
 type outputInfos struct {
-	Device_EUI		string `json:"device_EUI"`
-	State			string `json:"state"`
-	Battery			int    `json:"battery"`
+	DeviceEUI string `json:"device_eui"`
+	State     string `json:"state"`
+	Battery   int    `json:"battery"`
 }
 
 type listRequest struct{}
@@ -49,7 +90,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	var out outputInfos
 
-	out.Device_EUI = u.DevEUI
+	out.DeviceEUI = u.DevEUI
 	out.State = "occupied"
 	out.Battery = 43
 
@@ -67,7 +108,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	//w.Write([]byte("DeviceName : %s, DevEUI : %s, Battery : %s\n",u.deviceName, u.devEUI, u.applicationName))
 
-
 	w.Write([]byte("ok"))
 }
 
@@ -79,7 +119,17 @@ func main() {
 		natsURL = nats.DefaultURL
 	}
 
-	nc, err = nats.Connect(natsURL)
+	options := []nats.Option{}
+	tlsConfig, err := loadTLS("NATS")
+	if err != nil {
+		log.Fatalf("unable to load certificates: %v", err)
+	}
+
+	if tlsConfig != nil {
+		options = append(options, nats.Secure(tlsConfig))
+	}
+
+	nc, err = nats.Connect(natsURL, options...)
 	defer nc.Close()
 	if err != nil {
 		log.Fatalf("unable to connect to bus: %v", err)
