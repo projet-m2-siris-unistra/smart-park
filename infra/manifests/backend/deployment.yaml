@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-requests-cpu: "40m"
+        vault.hashicorp.com/agent-inject-secret-nats-ca.pem: "pki/issue/nats-client-backend"
+        vault.hashicorp.com/agent-inject-template-nats-ca.pem: |
+          {{ with secret "pki/issue/nats-client-backend" "common_name=backend" }}
+          {{ .Data.issuing_ca }}{{ end }}
+        vault.hashicorp.com/agent-inject-secret-nats-cert.pem: "pki/issue/nats-client-backend"
+        vault.hashicorp.com/agent-inject-template-nats-cert.pem: |
+          {{ with secret "pki/issue/nats-client-backend" "common_name=backend" }}
+          {{ .Data.certificate }}{{ end }}
+        vault.hashicorp.com/agent-inject-secret-nats-key.pem: "pki/issue/nats-client-backend"
+        vault.hashicorp.com/agent-inject-template-nats-key.pem: |
+          {{ with secret "pki/issue/nats-client-backend" "common_name=backend" }}
+          {{ .Data.private_key }}{{ end }}
+        vault.hashicorp.com/role: backend
+    spec:
+      serviceAccountName: backend
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchLabels: {}
+              topologyKey: kubernetes.io/hostname
+      securityContext:
+        runAsUser: 65534
+        runAsGroup: 65534
+      containers:
+      - name: backend
+        image: m2smartpark/backend:latest
+        imagePullPolicy: Always
+        securityContext:
+          readOnlyRootFilesystem: true
+        env:
+        - name: NATS_URL
+          value: "nats://nats.nats.svc:4222"
+        - name: NATS_CERT
+          value: "/vault/secrets/nats-cert.pem"
+        - name: NATS_KEY
+          value: "/vault/secrets/nats-key.pem"
+        - name: NATS_CA
+          value: "/vault/secrets/nats-ca.pem"
+        - name: DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: backend
+              key: database
+        resources:
+          requests:
+            cpu: 50m
+            memory: 20Mi
+          limits:
+            cpu: 100m
+            memory: 50Mi
