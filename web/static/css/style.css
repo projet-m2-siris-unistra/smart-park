@@ -227,6 +227,14 @@ label {
     color: white;
 }
 
+.sp-nav-user-name {
+    color: white;
+    font-size: 14px;
+    vertical-align: middle;
+    margin-top: 8px;
+    margin-right: 10px;
+}
+
 
 /* CARTES */
 .tenant-global-map {

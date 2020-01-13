@@ -18,6 +18,12 @@ from app.forms.zones import CreationForm, ConfigurationForm, SpotsAddingForm
 bp = Blueprint("zones", url_prefix='/parking/zone')
 
 
+# Checking if the user is allowed to display the ressource
+@bp.middleware('request')
+async def check_session(request):
+    print("Session checking...")
+    session_cookie = request.cookies.get('session')
+
 
 # Handling Parkings zones
 @bp.route('/create_zone', methods=['POST', 'GET'])

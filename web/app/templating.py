@@ -19,5 +19,6 @@ async def render(name, request, **context):
         request=request,
         url_for=request.app.url_for,
         app=request.app,
+        ctx=request.ctx,
         **context,
     )

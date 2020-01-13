@@ -5,6 +5,9 @@
 
   <nav class="bx--header__nav" data-header-nav>
     <ul class="bx--header__menu-bar" role="menubar">
+      
+      {% if ctx.tenant_id %}
+      
       <li>
         <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("dashboard") }}" tabindex="0">
           Tableau de bord
@@ -41,13 +44,40 @@
         </a>
       </li>
 
-      <li class="bx--header__submenu" data-header-submenu>
-        <a aria-expanded="false" aria-haspopup="true" class="bx--header__menu-item bx--header__menu-title" role="menuitem" tabindex="0">
-          Plus
-          <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true" class="bx--header__menu-arrow" style="will-change: transform;"><path d="M5 6L0 1 .7.3 5 4.6 9.3.3l.7.7z"></path></svg>
-        </a>
+      {% endif %}
 
-        <ul class="bx--header__menu" role="menu">
+ 
+
+          {% if ctx.tenant_id %}
+
+          <li class="bx--header__submenu" data-header-submenu>
+            <a aria-expanded="false" aria-haspopup="true" class="bx--header__menu-item bx--header__menu-title" role="menuitem" tabindex="0">
+              Plus
+              <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true" class="bx--header__menu-arrow" style="will-change: transform;"><path d="M5 6L0 1 .7.3 5 4.6 9.3.3l.7.7z"></path></svg>
+            </a>
+    
+            <ul class="bx--header__menu" role="menu">
+              <li>
+                <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("about") }}" tabindex="0">
+                  A propos
+                </a>
+                </li>
+                <li>
+                  <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("faq") }}" tabindex="0">
+                    F.A.Q.
+                  </a>
+                </li>
+
+                <li>
+                  <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("issue") }}" tabindex="0">
+                    Signaler un problème
+                  </a>
+                </li>
+              </ul>
+            </li>
+
+          {% else %}
+
           <li>
             <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("about") }}" tabindex="0">
               A propos
@@ -58,35 +88,45 @@
               F.A.Q.
             </a>
           </li>
-          <li>
-            <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("issue") }}" tabindex="0">
-              Signaler un problème
-            </a>
-          </li>
-        </ul>
-      </li>
+
+          {% endif %}        
+     
     </ul>
   </nav>
 
   <div class="bx--header__global">
     <ul class="bx--header__menu-bar" role="menubar">
     
-    <!--      
+    {% if ctx.tenant_id %}
+
       <li>
-        <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("accounts.signup") }}">
-          Inscription
+        <p class="bx--header__menu-item sp-nav-user-name" role="menuitem" tabindex="0">
+          {{ ctx.user['name'] }}
+        </p>
+      </li>
+
+      <li>
+        <p class="bx--header__menu-item" role="menuitem" tabindex="0">
+          <img src="{{ ctx.user['picture'] }}" style="height: 47px;" />
+        </p>
+      </li>
+
+      <li>
+        <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("accounts.logout") }}">
+          Deconnexion
         </a>
       </li>
-    -->
-
-    <!--
+    
+    {% else %}
+    
       <li>
         <a class="bx--header__menu-item" role="menuitem" href="{{ url_for("accounts.login") }}">
           Connexion
         </a>
       </li>
-    -->
-      
+    
+    {% endif %}
+
     </ul>
   </div>
 </header>

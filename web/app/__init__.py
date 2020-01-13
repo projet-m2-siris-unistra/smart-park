@@ -44,6 +44,7 @@ app.blueprint(devices.bp)
 @app.route("/")
 @app.route("/home")
 async def home(request):
+    print(request.ctx)
     rendered_template = await render(
         "base_template.html", 
         request, 
