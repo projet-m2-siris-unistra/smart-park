@@ -58,7 +58,7 @@ async def session_authorization(request):
         # Redirecting to SSO
         print("Redirection to SSO...")
         url = request.url_for("accounts.session_exchange")
-        res = await Auth.authorization(url)
+        res = await Auth.authorization(request.host, url)
         data = js.loads(res)
         resp = response.redirect(data['url'])
         del resp.cookies["session"]
@@ -73,7 +73,7 @@ async def session_exchange(request):
 
         # Check the code to get session token
         url = request.url_for("accounts.session_exchange")
-        res = await Auth.exchange(code, url)
+        res = await Auth.exchange(request.host, code, url)
         if res == REQ_ERROR:
             return response.text("IMPOSSIBLE DE SE CONNECTER")
 

@@ -33,6 +33,7 @@ def load(app: Sanic, *_):
     app.config.HOST = env("HOST")
     app.config.PORT = env("PORT")
     app.config.DEBUG = env("DEBUG")
+    app.config.PROXIES_COUNT = 1
 
     if (
         app.config.NATS_CERT and

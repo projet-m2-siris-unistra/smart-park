@@ -8,9 +8,9 @@ from app.bus.Request import REQ_ERROR, REQ_OK
 
 
 
-async def authorization(url):
+async def authorization(config, url):
     request = json.dumps({
-        "config" : "foo", 
+        "config" : config, 
         "redirect_uri" : url
     })
     
@@ -22,9 +22,9 @@ async def authorization(url):
     return res.data.decode("utf-8")
 
 
-async def exchange(code, url):
+async def exchange(config, code, url):
     request = json.dumps({
-        "config" : "foo", 
+        "config" : config, 
         "code" : code, 
         "redirect_uri" : url
     })
