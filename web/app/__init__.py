@@ -185,6 +185,11 @@ async def ping(request):
     return response.json({"data": ret})
 
 
+@app.route("/health")
+async def health(request):
+    return response.text("ok")
+
+
 @click.command()
 @config.run_params
 def run():

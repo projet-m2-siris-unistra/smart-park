@@ -17,7 +17,7 @@ type Place struct {
 	ZoneID    int         `json:"zone_id"`
 	Type      string      `json:"type"`
 	Geography null.String `json:"geo"`
-	DeviceID  int         `json:"device_id"`
+	DeviceID  null.Int    `json:"device_id"`
 	Timestamps
 }
 
@@ -117,7 +117,7 @@ func GetPlacesWithNoDevice(ctx context.Context) ([]Place, error) {
 		if err != nil {
 			return places, err
 		}
-		place.DeviceID = 0
+		place.DeviceID = null.IntFromPtr(nil)
 		places = append(places, place)
 	}
 
@@ -156,7 +156,7 @@ func UpdatePlace(ctx context.Context, placeID int, zoneID int,
 		`, zoneID, placeID).Scan(&place.PlaceID)
 
 		if err == sql.ErrNoRows {
-			log.Printf("no place with id %d\n", deviceID)
+			log.Printf("no place with id %d\n", placeID)
 			return place, err
 		}
 
@@ -174,7 +174,7 @@ func UpdatePlace(ctx context.Context, placeID int, zoneID int,
 		`, placetype, placeID).Scan(&place.PlaceID)
 
 		if err == sql.ErrNoRows {
-			log.Printf("no place with id %d\n", deviceID)
+			log.Printf("no place with id %d\n", placeID)
 			return place, err
 		}
 
@@ -192,7 +192,7 @@ func UpdatePlace(ctx context.Context, placeID int, zoneID int,
 		`, geo, placeID).Scan(&place.PlaceID)
 
 		if err == sql.ErrNoRows {
-			log.Printf("no place with id %d\n", deviceID)
+			log.Printf("no place with id %d\n", placeID)
 			return place, err
 		}
 
@@ -210,7 +210,7 @@ func UpdatePlace(ctx context.Context, placeID int, zoneID int,
 		`, deviceID, placeID).Scan(&place.PlaceID)
 
 		if err == sql.ErrNoRows {
-			log.Printf("no place with id %d\n", deviceID)
+			log.Printf("no place with id %d\n", placeID)
 			return place, err
 		}
 

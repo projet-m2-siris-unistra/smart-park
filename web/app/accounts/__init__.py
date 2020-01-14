@@ -38,7 +38,8 @@ offlinePaths = [
     "/home",
     "/about",
     "/faq",
-    "/logout"
+    "/logout",
+    "/health"
 ]
 
 

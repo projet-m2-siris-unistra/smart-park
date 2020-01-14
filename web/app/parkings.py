@@ -375,6 +375,9 @@ class SpotManagement:
 
 
     async def setDevice(self):
+        if self.device_id is None:
+            self.device = None
+            return
         deviceInstance = DeviceManagement(self.device_id)
         response = await deviceInstance.init(self.device_id)
         if response == Request.REQ_ERROR:
@@ -389,7 +392,7 @@ class SpotManagement:
             "name" : self.name,
             "type" : self.type,
             "coordinates" : self.coordinates,
-            "device" : self.device.toJson()
+            "device" : self.device.toJson() if self.device is not None else None
         }
 
     # Statistics #
