@@ -6,8 +6,4 @@ resources:
 - vault
 - stolon
 - monitoring
-- api
-- web
-- backend
-- auth
-- bridge
+- services

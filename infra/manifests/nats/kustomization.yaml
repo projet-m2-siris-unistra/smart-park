@@ -7,6 +7,7 @@ commonLabels:
 namespace: nats
 
 resources:
+- namespace.yaml
 - serviceaccount.yaml
 - service.yaml
 - statefulset.yaml

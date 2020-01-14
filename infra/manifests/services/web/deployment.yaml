@@ -52,6 +52,12 @@ spec:
         ports:
         - name: http
           containerPort: 4444
+        livenessProbe: &probe
+          initialDelaySeconds: 10
+          httpGet:
+            port: http
+            path: /health
+        readinessProbe: *probe
         resources:
           requests:
             cpu: 50m
